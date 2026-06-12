@@ -160,9 +160,8 @@ function Home() {
 
   const propertiesData = useMemo(() => pageContent?.properties ?? [], [pageContent]);
 
-  // Derive top 2 featured opportunities dynamically
   const featuredOpportunities = useMemo(() => {
-    const list = propertiesData
+    return propertiesData
       .filter((p: any) => p.is_featured)
       .slice(0, 2)
       .map((p: any, idx: number) => ({
@@ -175,32 +174,6 @@ function Home() {
         img: p.image_url || (idx === 0 ? towerImg : interiorImg),
         isDb: true,
       }));
-
-    if (list.length < 2) {
-      return [
-        {
-          slug: "sonora-garden",
-          name: "Sonora Garden Residences",
-          city: "Las Piñas",
-          location: "Las Piñas · DMCI",
-          developer: "DMCI Homes",
-          status: "Pre-selling",
-          img: towerImg,
-          isDb: false,
-        },
-        {
-          slug: "crestmont",
-          name: "The Crestmont",
-          city: "Quezon City",
-          location: "Quezon City",
-          developer: "DMCI Homes",
-          status: "Move-in ready",
-          img: interiorImg,
-          isDb: false,
-        },
-      ];
-    }
-    return list;
   }, [propertiesData]);
 
   // Build the slides array from settings (up to 4)
@@ -367,6 +340,22 @@ function Home() {
           }}
         />
 
+        {/* Text protection gradients to shield hero subtext (left gradient on desktop, bottom gradient on mobile) */}
+        <div
+          aria-hidden
+          className="absolute inset-0 pointer-events-none z-[5] hidden md:block"
+          style={{
+            background: "linear-gradient(to right, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.2) 60%, transparent 100%)",
+          }}
+        />
+        <div
+          aria-hidden
+          className="absolute inset-0 pointer-events-none z-[5] block md:hidden"
+          style={{
+            background: "linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.25) 60%, transparent 100%)",
+          }}
+        />
+
         {/* Slide Dot Indicators — only shown when 2+ slides */}
         {totalSlides > 1 && (
           <div
@@ -396,8 +385,8 @@ function Home() {
                   width: i === activeSlide ? "32px" : "10px",
                   height: "10px",
                   borderRadius: "999px",
-                  background: i === activeSlide ? "#fff" : "rgba(255,255,255,0.45)",
-                  border: i === activeSlide ? "none" : "1.5px solid rgba(255,255,255,0.7)",
+                  background: i === activeSlide ? "#1A56DB" : "rgba(255,255,255,0.65)",
+                  border: i === activeSlide ? "none" : "1.5px solid rgba(255,255,255,0.9)",
                   boxShadow: "0 1px 4px rgba(0,0,0,0.4)",
                   cursor: "pointer",
                   padding: 0,
@@ -522,7 +511,7 @@ function Home() {
               return (
                 <div
                   key={a}
-                  className="text-[10px] uppercase tracking-[0.22em] md:text-[10.5px] md:tracking-[0.24em]"
+                  className="text-[12.5px] tracking-wide md:text-[13px]"
                 >
                   <span className="font-semibold">{cleanedA}</span>{" "}
                   <span className="text-white/65">{cleanedB}</span>
@@ -655,67 +644,41 @@ function Home() {
           </div>
 
           <div className="mt-16 grid md:mt-24 gap-12 md:grid-cols-12 md:gap-16">
-            {/* Opportunity 1 */}
-            <Reveal as="article" className="md:col-span-7">
-              <Link
-                to="/projects/$slug"
-                params={{ slug: featuredOpportunities[0].slug }}
-                className="block group"
-              >
-                <div className="img-luxe img-luxe-hover overflow-hidden rounded-[1.5rem]">
-                  <img
-                    src={featuredOpportunities[0].img}
-                    alt={featuredOpportunities[0].name}
-                    className="img-luxe aspect-[4/5] w-full object-cover"
-                    width={1600}
-                    height={2000}
-                    loading="lazy"
-                  />
-                </div>
-                <div className="mt-8 flex items-end justify-between">
-                  <div>
-                    <p className="eyebrow">{featuredOpportunities[0].location}</p>
-                    <h3 className="display-3 mt-3 group-hover:text-primary transition-colors">
-                      {featuredOpportunities[0].name}
-                    </h3>
-                  </div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                    {featuredOpportunities[0].status}
-                  </p>
-                </div>
-              </Link>
-            </Reveal>
-
-            {/* Opportunity 2 */}
-            <Reveal as="article" delay={160} className="md:col-span-5 md:pt-32">
-              <Link
-                to="/projects/$slug"
-                params={{ slug: featuredOpportunities[1].slug }}
-                className="block group"
-              >
-                <div className="img-luxe img-luxe-hover overflow-hidden rounded-[1.5rem]">
-                  <img
-                    src={featuredOpportunities[1].img}
-                    alt={featuredOpportunities[1].name}
-                    className="img-luxe aspect-[4/5] w-full object-cover"
-                    width={1920}
-                    height={1280}
-                    loading="lazy"
-                  />
-                </div>
-                <div className="mt-8 flex items-end justify-between">
-                  <div>
-                    <p className="eyebrow">{featuredOpportunities[1].location}</p>
-                    <h3 className="display-3 mt-3 group-hover:text-primary transition-colors">
-                      {featuredOpportunities[1].name}
-                    </h3>
-                  </div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                    {featuredOpportunities[1].status}
-                  </p>
-                </div>
-              </Link>
-            </Reveal>
+            {featuredOpportunities.map((opp, idx) => {
+              const isEven = idx % 2 === 0;
+              const colSpan = isEven ? "md:col-span-7" : "md:col-span-5 md:pt-32";
+              return (
+                <Reveal key={opp.slug} as="article" delay={idx * 160} className={colSpan}>
+                  <Link
+                    to="/projects/$slug"
+                    params={{ slug: opp.slug }}
+                    className="block group"
+                  >
+                    <div className="img-luxe img-luxe-hover overflow-hidden rounded-[1.5rem]">
+                      <img
+                        src={opp.img}
+                        alt={opp.name}
+                        className="img-luxe aspect-[4/5] w-full object-cover"
+                        width={isEven ? 1600 : 1920}
+                        height={isEven ? 2000 : 1280}
+                        loading="lazy"
+                      />
+                    </div>
+                    <div className="mt-8 flex items-end justify-between">
+                      <div>
+                        <p className="eyebrow">{opp.location}</p>
+                        <h3 className="display-3 mt-3 group-hover:text-primary transition-colors">
+                          {opp.name}
+                        </h3>
+                      </div>
+                      <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                        {opp.status}
+                      </p>
+                    </div>
+                  </Link>
+                </Reveal>
+              );
+            })}
           </div>
 
           <Reveal delay={200}>

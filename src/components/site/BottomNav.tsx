@@ -1,69 +1,45 @@
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Home, Building2, Search, BookOpen, MessageSquare } from "lucide-react";
+import { Compass, LayoutGrid, SlidersHorizontal, Newspaper, Phone } from "lucide-react";
 
 export function BottomNav() {
   const navigate = useNavigate();
   const location = useLocation();
   const pathname = location.pathname;
 
-  // Track scroll state to hide the nav bar during active scrolling
   const [isScrolling, setIsScrolling] = useState(false);
   const [hasScrolledPastHero, setHasScrolledPastHero] = useState(false);
   const scrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Guards to completely hide on specific views
   const isPortal = pathname.startsWith("/portal");
   const isProjectDetail = pathname.startsWith("/projects/");
 
   useEffect(() => {
     if (typeof window === "undefined" || isPortal || isProjectDetail) return;
 
-    let lastScrollY = window.scrollY;
-
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      
-      // Only show bottom navigation once scrolled past the main hero section (75% of viewport height)
       const heroThreshold = window.innerHeight * 0.75;
       setHasScrolledPastHero(currentScrollY > heroThreshold);
-
-      // Hide bar during active scroll
       setIsScrolling(true);
-
-      if (scrollTimerRef.current) {
-        clearTimeout(scrollTimerRef.current);
-      }
-
-      // Show bar 400ms after scrolling stops
-      scrollTimerRef.current = setTimeout(() => {
-        setIsScrolling(false);
-      }, 400);
-
-      lastScrollY = currentScrollY;
+      if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
+      scrollTimerRef.current = setTimeout(() => setIsScrolling(false), 400);
     };
 
-    // Calculate once on mount
     handleScroll();
-
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => {
       window.removeEventListener("scroll", handleScroll);
-      if (scrollTimerRef.current) {
-        clearTimeout(scrollTimerRef.current);
-      }
+      if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
     };
   }, [isPortal, isProjectDetail]);
 
-  if (isPortal || isProjectDetail) {
-    return null;
-  }
+  if (isPortal || isProjectDetail) return null;
 
-  // Symmetrical active tab calculation
-  const isHomeActive = pathname === "/";
+  const isHomeActive       = pathname === "/";
   const isPropertiesActive = pathname.startsWith("/properties");
-  const isGuidesActive = pathname.startsWith("/guides");
-  const isContactActive = pathname.startsWith("/contact");
+  const isGuidesActive     = pathname.startsWith("/guides");
+  const isContactActive    = pathname.startsWith("/contact");
 
   const handleSearchClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -74,61 +50,81 @@ export function BottomNav() {
         input.scrollIntoView({ behavior: "smooth", block: "center" });
       }
     } else {
-      navigate({ 
-        to: "/properties", 
-        search: { focus: true } as any 
-      });
+      navigate({ to: "/properties", search: { focus: true } as any });
     }
   };
+
+  // Shared classes
+  const tabBase =
+    "flex flex-1 flex-col items-center justify-center gap-0.5 py-1 rounded-2xl transition-all duration-300 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary";
+
+  const labelBase = "text-[9px] font-sans font-semibold tracking-[0.08em] uppercase leading-none";
 
   return (
     <nav
       aria-label="Mobile Navigation"
-      className="fixed inset-x-4 z-40 md:hidden transition-transform duration-500 max-w-md mx-auto"
+      className="fixed inset-x-3 z-40 md:hidden transition-transform duration-500 max-w-sm mx-auto"
       style={{
-        bottom: "calc(1rem + env(safe-area-inset-bottom))",
-        transform: (isScrolling || !hasScrolledPastHero) ? "translateY(calc(100% + 32px))" : "translateY(0)",
+        bottom: "calc(0.85rem + env(safe-area-inset-bottom))",
+        transform: (isScrolling || !hasScrolledPastHero)
+          ? "translateY(calc(100% + 32px))"
+          : "translateY(0)",
         transitionTimingFunction: "var(--ease-luxe)",
       }}
     >
-      <div 
-        className="flex items-center justify-between rounded-full border border-black/8 bg-white/80 px-2.5 py-1.5 shadow-[0_8px_32px_-6px_rgba(0,0,0,0.12)] backdrop-blur-md"
-        style={{
-          WebkitBackdropFilter: "blur(16px) saturate(160%)",
-        }}
+      <div
+        className="flex items-center justify-between rounded-[22px] border border-black/[0.07] bg-white/90 px-1 py-1 shadow-[0_12px_40px_-8px_rgba(0,0,0,0.16),0_2px_8px_-2px_rgba(0,0,0,0.06)]"
+        style={{ backdropFilter: "blur(20px) saturate(180%)", WebkitBackdropFilter: "blur(20px) saturate(180%)" }}
       >
         {/* Tab 1: Home */}
         <Link
           to="/"
           aria-current={isHomeActive ? "page" : undefined}
-          className={`flex h-11 flex-1 flex-col items-center justify-center rounded-xl transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
-            isHomeActive ? "text-primary font-bold" : "text-ink/60 hover:text-ink"
-          }`}
+          className={`${tabBase} ${isHomeActive ? "text-[#1A56DB]" : "text-ink/45 hover:text-ink/70"}`}
         >
-          <Home size={18} />
-          <span className="text-[9.5px] font-mono mt-0.5 tracking-wide">Home</span>
+          <span
+            className={`flex items-center justify-center rounded-xl transition-all duration-300 ${
+              isHomeActive ? "bg-[#1A56DB]/10 px-3 py-1.5" : "px-3 py-1.5"
+            }`}
+          >
+            <Compass size={19} strokeWidth={isHomeActive ? 2.25 : 1.75} />
+          </span>
+          <span className={`${labelBase} ${isHomeActive ? "text-[#1A56DB]" : "text-ink/40"}`}>
+            Home
+          </span>
         </Link>
 
         {/* Tab 2: Properties */}
         <Link
           to="/properties"
+          search={{} as any}
           aria-current={isPropertiesActive ? "page" : undefined}
-          className={`flex h-11 flex-1 flex-col items-center justify-center rounded-xl transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
-            isPropertiesActive ? "text-primary font-bold" : "text-ink/60 hover:text-ink"
-          }`}
+          className={`${tabBase} ${isPropertiesActive ? "text-[#1A56DB]" : "text-ink/45 hover:text-ink/70"}`}
         >
-          <Building2 size={18} />
-          <span className="text-[9.5px] font-mono mt-0.5 tracking-wide">Residences</span>
+          <span
+            className={`flex items-center justify-center rounded-xl transition-all duration-300 ${
+              isPropertiesActive ? "bg-[#1A56DB]/10 px-3 py-1.5" : "px-3 py-1.5"
+            }`}
+          >
+            <LayoutGrid size={19} strokeWidth={isPropertiesActive ? 2.25 : 1.75} />
+          </span>
+          <span className={`${labelBase} ${isPropertiesActive ? "text-[#1A56DB]" : "text-ink/40"}`}>
+            Browse
+          </span>
         </Link>
 
-        {/* Tab 3: Centered Search Magnifying Glass (Circular & Raised) */}
-        <div className="flex-1 flex justify-center items-center relative h-11">
+        {/* Tab 3: Center Search FAB */}
+        <div className="flex flex-1 justify-center items-center relative h-12">
           <button
             onClick={handleSearchClick}
             aria-label="Search Properties"
-            className="absolute -top-5 w-13 h-13 rounded-full bg-ink text-white hover:bg-primary active:scale-95 transition-all flex items-center justify-center shadow-[0_4px_16px_rgba(0,0,0,0.2)] border-[3.5px] border-white/95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 cursor-pointer"
+            className="absolute -top-5 w-14 h-14 rounded-full bg-[#1A56DB] text-white active:scale-95 transition-all duration-300 flex items-center justify-center cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A56DB] focus-visible:ring-offset-2"
+            style={{
+              boxShadow: "0 6px 24px rgba(26, 86, 219, 0.45), 0 2px 8px rgba(0,0,0,0.12)",
+              border: "3px solid white",
+            }}
           >
-            <Search size={20} strokeWidth={2.5} />
+            <SlidersHorizontal size={20} strokeWidth={2.25} />
           </button>
         </div>
 
@@ -136,24 +132,36 @@ export function BottomNav() {
         <Link
           to="/guides"
           aria-current={isGuidesActive ? "page" : undefined}
-          className={`flex h-11 flex-1 flex-col items-center justify-center rounded-xl transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
-            isGuidesActive ? "text-primary font-bold" : "text-ink/60 hover:text-ink"
-          }`}
+          className={`${tabBase} ${isGuidesActive ? "text-[#1A56DB]" : "text-ink/45 hover:text-ink/70"}`}
         >
-          <BookOpen size={18} />
-          <span className="text-[9.5px] font-mono mt-0.5 tracking-wide">Guides</span>
+          <span
+            className={`flex items-center justify-center rounded-xl transition-all duration-300 ${
+              isGuidesActive ? "bg-[#1A56DB]/10 px-3 py-1.5" : "px-3 py-1.5"
+            }`}
+          >
+            <Newspaper size={19} strokeWidth={isGuidesActive ? 2.25 : 1.75} />
+          </span>
+          <span className={`${labelBase} ${isGuidesActive ? "text-[#1A56DB]" : "text-ink/40"}`}>
+            Guides
+          </span>
         </Link>
 
         {/* Tab 5: Contact */}
         <Link
           to="/contact"
           aria-current={isContactActive ? "page" : undefined}
-          className={`flex h-11 flex-1 flex-col items-center justify-center rounded-xl transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
-            isContactActive ? "text-primary font-bold" : "text-ink/60 hover:text-ink"
-          }`}
+          className={`${tabBase} ${isContactActive ? "text-[#1A56DB]" : "text-ink/45 hover:text-ink/70"}`}
         >
-          <MessageSquare size={18} />
-          <span className="text-[9.5px] font-mono mt-0.5 tracking-wide">Inquire</span>
+          <span
+            className={`flex items-center justify-center rounded-xl transition-all duration-300 ${
+              isContactActive ? "bg-[#1A56DB]/10 px-3 py-1.5" : "px-3 py-1.5"
+            }`}
+          >
+            <Phone size={19} strokeWidth={isContactActive ? 2.25 : 1.75} />
+          </span>
+          <span className={`${labelBase} ${isContactActive ? "text-[#1A56DB]" : "text-ink/40"}`}>
+            Inquire
+          </span>
         </Link>
       </div>
     </nav>

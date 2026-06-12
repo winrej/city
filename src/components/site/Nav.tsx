@@ -106,16 +106,16 @@ export function Nav() {
             layoutMode === "pill"
               ? "rounded-full px-4 md:px-7"
               : "w-full rounded-none px-6 md:px-12"
-          } ${scrolled ? "h-14 md:h-[62px] shadow-soft" : "h-16 md:h-[76px]"}`}
+          } ${scrolled ? "h-14 md:h-[62px]" : "h-16 md:h-[76px]"} ${scrolled && !open ? "shadow-soft" : ""}`}
           style={{
             transitionTimingFunction: "var(--ease-luxe)",
-            background: `rgba(255, 255, 255, ${activeBgOpacity})`,
-            backdropFilter: `saturate(160%) blur(${activeBlur}px)`,
-            WebkitBackdropFilter: `saturate(160%) blur(${activeBlur}px)`,
-            border: `1px solid rgba(0, 0, 0, ${scrolled ? 0.07 : 0.04})`,
-            boxShadow: scrolled
+            background: open ? "transparent" : `rgba(255, 255, 255, ${activeBgOpacity})`,
+            backdropFilter: open ? "none" : `saturate(160%) blur(${activeBlur}px)`,
+            WebkitBackdropFilter: open ? "none" : `saturate(160%) blur(${activeBlur}px)`,
+            border: open ? "1px solid transparent" : `1px solid rgba(0, 0, 0, ${scrolled ? 0.07 : 0.04})`,
+            boxShadow: open ? "none" : (scrolled
               ? "0 2px 24px rgba(0, 0, 0, 0.07)"
-              : "0 1px 12px rgba(0, 0, 0, 0.04)",
+              : "0 1px 12px rgba(0, 0, 0, 0.04)"),
           }}
           aria-label="Primary"
         >
@@ -145,8 +145,11 @@ export function Nav() {
                 alt="DMCI Homes"
                 className="h-4 lg:h-6 object-contain opacity-75"
               />
-              <span className="text-[7.5px] lg:text-[8.5px] font-mono tracking-widest uppercase text-muted-foreground leading-tight">
+              <span className="hidden md:block text-[7.5px] lg:text-[8.5px] font-mono tracking-widest uppercase text-muted-foreground leading-tight">
                 Accredited<br />Partner
+              </span>
+              <span className="block md:hidden text-[9px] font-mono tracking-widest uppercase text-muted-foreground font-semibold leading-none">
+                DMCI
               </span>
             </div>
           </div>
@@ -193,7 +196,7 @@ export function Nav() {
               Book Consultation
             </Link>
             {/* Filter pill — properties page, mobile, scrolled */}
-            {isPropertiesPage && isMobile && scrolled && (
+            {isPropertiesPage && isMobile && scrolled && !open && (
               <button
                 id="nav-filter-pill"
                 type="button"
@@ -238,7 +241,7 @@ export function Nav() {
 
       {/* Full-screen luxury mobile drawer */}
       <div
-        className={`fixed inset-0 z-40 md:hidden ${open ? "pointer-events-auto" : "pointer-events-none"}`}
+        className={`fixed inset-0 z-[45] md:hidden ${open ? "pointer-events-auto" : "pointer-events-none"}`}
         aria-hidden={!open}
       >
         <div
@@ -249,64 +252,54 @@ export function Nav() {
           className={`relative flex h-full flex-col px-6 pb-10 transition-all duration-[350ms] ${open ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0"}`}
           style={{
             transitionTimingFunction: "var(--ease-luxe)",
-            paddingTop: "calc(6rem + env(safe-area-inset-top, 0px))",
-            paddingBottom: "calc(2.5rem + env(safe-area-inset-bottom))",
+            paddingTop: "calc(6.5rem + env(safe-area-inset-top, 0px))",
+            paddingBottom: "calc(2rem + env(safe-area-inset-bottom))",
           }}
         >
-          <p className="eyebrow">
-            <span className="gold-rule" />
-            Menu
-          </p>
-          <ul className="mt-10 flex flex-col">
+          <ul className="flex flex-col">
             {links
               .filter((l) => l.label !== "Properties" && l.label !== "Guides")
-              .map((l, i) => (
-                <li
-                  key={l.to}
-                className="border-b border-hairline transition-all duration-[350ms]"
-                style={{
-                  transitionDelay: open ? `${60 + i * 30}ms` : "0ms",
-                  transitionTimingFunction: "var(--ease-luxe)",
-                  opacity: open ? 1 : 0,
-                  transform: open ? "translateY(0)" : "translateY(8px)",
-                }}
-              >
-                <Link
-                  to={l.to}
-                  onClick={() => setOpen(false)}
-                  className="flex items-center justify-between py-6 text-[32px] font-bold tracking-[-0.028em] text-ink"
-                  activeProps={{ className: "text-primary" }}
-                >
-                  {l.label}
-                  <span aria-hidden className="text-muted-foreground">
-                    →
-                  </span>
-                </Link>
-              </li>
-            ))}
+              .map((l, i) => {
+                const details = l.label === "Why Invest" 
+                  ? { num: "01", desc: "Investment thesis, yield calculations, and market data" }
+                  : { num: "02", desc: "Our team, accreditation, and developer partnerships" };
+                return (
+                  <li
+                    key={l.to}
+                    className="border-b border-black/5 transition-all duration-[350ms]"
+                    style={{
+                      transitionDelay: open ? `${60 + i * 30}ms` : "0ms",
+                      transitionTimingFunction: "var(--ease-luxe)",
+                      opacity: open ? 1 : 0,
+                      transform: open ? "translateY(0)" : "translateY(8px)",
+                    }}
+                  >
+                    <Link
+                      to={l.to}
+                      onClick={() => setOpen(false)}
+                      className="group flex flex-col py-4 text-ink"
+                    >
+                      <div className="flex items-baseline justify-between">
+                        <div className="flex items-baseline gap-2.5">
+                          <span className="font-mono text-[9px] text-gold tracking-widest font-semibold">{details.num}</span>
+                          <span className="text-[20px] font-bold tracking-tight text-ink group-hover:text-primary transition-colors duration-300">
+                            {l.label}
+                          </span>
+                        </div>
+                        <span className="text-muted-foreground/60 group-hover:translate-x-1 group-hover:text-primary transition-all duration-300">
+                          →
+                        </span>
+                      </div>
+                      <p className="mt-1 pl-6 text-[12px] text-muted-foreground font-normal leading-normal">
+                        {details.desc}
+                      </p>
+                    </Link>
+                  </li>
+                );
+              })}
           </ul>
 
-          <div className="mt-auto pt-12">
-            {/* DMCI Accredited Partner badge in mobile drawer */}
-            <div
-              className="flex items-center justify-center gap-3 mb-8 py-4 px-6 rounded-2xl border border-black/8"
-              style={{ background: "rgba(0,0,0,0.025)" }}
-            >
-              <img
-                src="/dmci-homes-seeklogo.png"
-                alt="DMCI Homes"
-                className="h-8 object-contain opacity-80"
-              />
-              <div className="flex flex-col">
-                <span className="text-[10px] font-mono tracking-[0.18em] uppercase text-muted-foreground">
-                  Accredited Partner
-                </span>
-                <span className="text-[12px] font-semibold text-ink/70 mt-0.5">
-                  DMCI Homes
-                </span>
-              </div>
-            </div>
-
+          <div className="mt-auto pt-8">
             {/* Social Media Links in Mobile Menu */}
             {(() => {
               const socialSettings =
@@ -317,7 +310,7 @@ export function Nav() {
                   name: "Facebook",
                   icon: (
                     <svg
-                      className="h-5 w-5"
+                      className="h-4.5 w-4.5"
                       fill="currentColor"
                       viewBox="0 0 24 24"
                       aria-hidden="true"
@@ -335,7 +328,7 @@ export function Nav() {
                   name: "Instagram",
                   icon: (
                     <svg
-                      className="h-5 w-5"
+                      className="h-4.5 w-4.5"
                       fill="currentColor"
                       viewBox="0 0 24 24"
                       aria-hidden="true"
@@ -353,7 +346,7 @@ export function Nav() {
                   name: "TikTok",
                   icon: (
                     <svg
-                      className="h-5 w-5"
+                      className="h-4.5 w-4.5"
                       fill="currentColor"
                       viewBox="0 0 24 24"
                       aria-hidden="true"
@@ -367,7 +360,7 @@ export function Nav() {
                   name: "LinkedIn",
                   icon: (
                     <svg
-                      className="h-5 w-5"
+                      className="h-4.5 w-4.5"
                       fill="currentColor"
                       viewBox="0 0 24 24"
                       aria-hidden="true"
@@ -385,7 +378,7 @@ export function Nav() {
                   name: "YouTube",
                   icon: (
                     <svg
-                      className="h-5 w-5"
+                      className="h-4.5 w-4.5"
                       fill="currentColor"
                       viewBox="0 0 24 24"
                       aria-hidden="true"
@@ -398,62 +391,58 @@ export function Nav() {
                     </svg>
                   ),
                 },
-                {
-                  key: "reddit",
-                  name: "Reddit",
-                  icon: (
-                    <svg
-                      className="h-5 w-5"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                      aria-hidden="true"
-                    >
-                      <path d="M24 11.5c0-1.65-1.35-3-3-3-.96 0-1.86.48-2.42 1.24-1.64-1-3.85-1.64-6.23-1.72l1.28-4 3.66.78c.07.94.88 1.7 1.87 1.7 1.02 0 1.85-.83 1.85-1.85s-.83-1.85-1.85-1.85c-.88 0-1.62.62-1.8 1.44l-4-0.86c-.22-.05-.44.07-.51.29l-1.54 4.8c-2.43.04-4.68.68-6.35 1.7C4.18 9.78 3.28 9.3 2.3 9.3c-1.65 0-3 1.35-3 3 0 1.1.6 2.05 1.48 2.58-.06.3-.08.62-.08.92 0 3.75 4.36 6.8 9.75 6.8s9.75-3.05 9.75-6.8c0-.3-.02-.62-.08-.92.88-.53 1.48-1.48 1.48-2.58zM7.5 13c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5-.67 1.5-1.5 1.5-1.5-.67-1.5-1.5zm9.46 4c-1.22 1.22-3.53 1.3-4.46 1.3-.94 0-3.24-.08-4.46-1.3-.2-.2-.2-.5 0-.7.2-.2.5-.2.7 0 .9.9 2.8.98 3.76.98.96 0 2.87-.08 3.76-.98.2-.2.5-.2.7 0 .2.2.2.5 0 .7zm-1.96-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" />
-                    </svg>
-                  ),
-                },
               ];
 
               return (
-                <div className="flex gap-4 mb-6 justify-center">
-                  {socialPlatforms.map((platform) => {
-                    const rawUrl = socialSettings[platform.key];
-                    const fallbackUrls: Record<string, string> = {
-                      facebook: "https://facebook.com/cityqlo",
-                      instagram: "https://instagram.com/cityqlo",
-                      tiktok: "https://tiktok.com/@cityqlo",
-                      linkedin: "https://linkedin.com/company/cityqlo",
-                      youtube: "https://youtube.com/@cityqlo",
-                      reddit: "https://reddit.com/r/cityqlo",
-                    };
-                    const url = rawUrl || fallbackUrls[platform.key] || "#";
-                    return (
-                      <a
-                        key={platform.key}
-                        href={url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        title={platform.name}
-                        className="p-3 rounded-full bg-ink/5 text-ink/60 hover:text-ink hover:bg-ink/10 transition-all duration-300"
-                      >
-                        {platform.icon}
-                      </a>
-                    );
-                  })}
+                <div className="flex flex-col items-center mb-6">
+                  <span className="text-[9.5px] font-mono tracking-[0.2em] uppercase text-muted-foreground/80 mb-3">Connect with us</span>
+                  <div className="flex gap-2.5 justify-center">
+                    {socialPlatforms.map((platform) => {
+                      const rawUrl = socialSettings[platform.key];
+                      const fallbackUrls: Record<string, string> = {
+                        facebook: "https://facebook.com/cityqlo",
+                        instagram: "https://instagram.com/cityqlo",
+                        tiktok: "https://tiktok.com/@cityqlo",
+                        linkedin: "https://linkedin.com/company/cityqlo",
+                        youtube: "https://youtube.com/@cityqlo",
+                        reddit: "https://reddit.com/r/cityqlo",
+                      };
+                      const url = rawUrl || fallbackUrls[platform.key] || "#";
+                      return (
+                        <a
+                          key={platform.key}
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          title={platform.name}
+                          className="p-2.5 rounded-full bg-ink/3 text-ink/50 hover:text-ink hover:bg-ink/6 transition-all duration-300"
+                        >
+                          {platform.icon}
+                        </a>
+                      );
+                    })}
+                  </div>
                 </div>
               );
             })()}
 
+            {/* DMCI Accredited Partner minimalist text row */}
+            <div className="flex items-center justify-center gap-1.5 text-ink/40 font-mono text-[9px] uppercase tracking-[0.2em] mb-6">
+              <span>Accredited Partner</span>
+              <span className="h-1 w-1 rounded-full bg-gold" />
+              <span className="font-semibold text-ink/65">DMCI Homes</span>
+            </div>
+
             <Link
               to="/contact"
               onClick={() => setOpen(false)}
-              className="flex min-h-[60px] w-full items-center justify-center gap-3 rounded-full bg-ink px-6 text-[13px] font-semibold tracking-[0.02em] text-white transition-all duration-[350ms] hover:-translate-y-[2px] hover:shadow-lift"
+              className="flex min-h-[56px] w-full items-center justify-center gap-3 rounded-full bg-ink px-6 text-[13px] font-semibold tracking-[0.02em] text-white transition-all duration-[350ms] hover:-translate-y-[2px] hover:shadow-lift"
               style={{ transitionTimingFunction: "var(--ease-luxe)" }}
             >
               Book Consultation
               <span aria-hidden>→</span>
             </Link>
-            <p className="mt-6 text-center text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
+            <p className="mt-5 text-center text-[10.5px] uppercase tracking-[0.22em] text-muted-foreground">
               Metro Manila · hello@cityqlo.com
             </p>
           </div>
