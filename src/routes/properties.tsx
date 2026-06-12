@@ -54,6 +54,11 @@ function renderHeadlineWithBreaks(headline: string) {
 }
 
 export const Route = createFileRoute("/properties")({
+  validateSearch: (search: Record<string, unknown>) => {
+    return {
+      focus: search.focus === "true" || search.focus === true || undefined,
+    };
+  },
   head: () => ({
     meta: [
       { title: "Residences — Cinematic Gallery · CityQlo" },
@@ -249,6 +254,11 @@ function PropertyCard({
   );
 }
 
+// ─── CUSTOMIZABLE HERO OVERLAY ──────────────────────────────────────────────
+// Modify the value below (0 to 100) to adjust the darkness of the properties hero section.
+// (e.g. 45 for 45% opacity).
+const HERO_OVERLAY_OPACITY_PERCENT = 45;
+
 function Properties() {
   // ── Live page content from Supabase (consolidated query) ──
   const { data: pageContent, isLoading: propsLoading } = useQuery({
@@ -363,6 +373,26 @@ function Properties() {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const residencesRef = useRef<HTMLDivElement | null>(null);
+  const { focus } = Route.useSearch();
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    if (focus && searchInputRef.current) {
+      // Smooth scroll to the search input section
+      searchInputRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+      
+      // Focus the search input with a minor delay to allow smooth scrolling to settle
+      const timer = setTimeout(() => {
+        searchInputRef.current?.focus();
+      }, 500);
+
+      // Clean up the URL search parameter so it doesn't re-focus on subsequent reloads
+      const newUrl = window.location.pathname;
+      window.history.replaceState(null, "", newUrl);
+
+      return () => clearTimeout(timer);
+    }
+  }, [focus]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -528,12 +558,17 @@ function Properties() {
                 }`}
                 style={{ backgroundImage: `url(${slide.img})` }}
               />
+              {/* Customizable Overlay Dark Filter */}
+              <div
+                className="absolute inset-0 bg-black transition-opacity duration-700"
+                style={{ opacity: HERO_OVERLAY_OPACITY_PERCENT / 100 }}
+              />
               {/* Subtle Dark Gradient Overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-background via-black/35 to-black/60" />
 
-              <div className="relative z-20 flex h-full items-end pb-28">
+              <div className="relative z-20 flex h-full items-end pt-24 pb-28 md:pt-28 md:pb-24 hero-properties-container">
                 <div className="container-prose w-full">
-                  <div className="max-w-4xl text-white">
+                  <div className="max-w-4xl text-white hero-content-inner">
                     <Reveal>
                       <p className="font-mono tracking-[0.3em] text-[#3B82F6] text-[11px] uppercase font-bold">
                         {slide.tag}
@@ -641,6 +676,8 @@ function Properties() {
               <div className="relative flex items-center min-w-[200px] flex-1 md:flex-initial">
                 <Search className="absolute left-4.5 h-4 w-4 text-muted-foreground" />
                 <input
+                  id="properties-search-input"
+                  ref={searchInputRef}
                   type="text"
                   placeholder="Search residences..."
                   value={searchQuery}

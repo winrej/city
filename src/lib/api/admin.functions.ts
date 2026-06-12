@@ -467,6 +467,30 @@ export const createLead = createServerFn({ method: "POST" })
 
 // ─── Site Settings ────────────────────────────────────────────────────────────
 
+// Public read — no auth required. Fetches only the `seo` row for use in head().
+export const getPublicSeoSettings = createServerFn({ method: "GET" }).handler(async () => {
+  try {
+    const sb = await getServerClient();
+    const { data, error } = await sb
+      .from("site_settings")
+      .select("value")
+      .eq("key", "seo")
+      .single();
+    if (error) return null;
+    return (data?.value ?? null) as {
+      meta_title?: string;
+      meta_description?: string;
+      og_image_url?: string;
+      og_title?: string;
+      og_description?: string;
+      twitter_title?: string;
+      twitter_description?: string;
+    } | null;
+  } catch {
+    return null;
+  }
+});
+
 export const getSiteSettings = createServerFn({ method: "GET" }).handler(async () => {
   const sb = await getUserClient();
   const { data, error } = await sb.from("site_settings").select("*");

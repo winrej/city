@@ -1,5 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState, useEffect, useRef, useCallback } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
   MapPin,
@@ -37,7 +38,7 @@ import {
   Share2,
 } from "lucide-react";
 import { Reveal } from "@/components/site/Reveal";
-import { getProjectBySlug } from "@/lib/api/admin.functions";
+import { getProjectBySlug, getSiteSettings } from "@/lib/api/admin.functions";
 
 import towerImg from "@/assets/tower-exterior.jpg";
 import interiorImg from "@/assets/interior-living.jpg";
@@ -589,10 +590,13 @@ export const Route = createFileRoute("/projects/$slug")({
     const title = `${p.meta.name} — ${p.meta.city} · CityQlo`;
     const url = `/projects/${p.meta.id}`;
     
-    // Get the first hero image (with absolute path fallback)
+    // Get the first hero image — must be an absolute, publicly accessible URL
+    // Local Vite-hashed /assets/... paths are not accessible to social crawlers
     let heroImg = p.sections.hero?.hero_images?.[0] || "";
-    if (heroImg && !heroImg.startsWith("http")) {
-      heroImg = `https://cityqlo.com${heroImg}`;
+    const isAbsoluteUrl = heroImg.startsWith("http://") || heroImg.startsWith("https://");
+    const isBundledAsset = heroImg.startsWith("/assets/");
+    if (!heroImg || isBundledAsset || !isAbsoluteUrl) {
+      heroImg = "https://cityqlo.com/Logo.png";
     }
 
     return {
@@ -603,15 +607,18 @@ export const Route = createFileRoute("/projects/$slug")({
           name: "keywords",
           content: `${p.meta.name}, ${p.meta.city} real estate, ${p.meta.developer} projects, ${p.meta.location} condo, property for sale ${p.meta.city}`,
         },
+        { property: "og:type", content: "website" },
+        { property: "og:site_name", content: "CityQlo" },
         { property: "og:title", content: title },
         { property: "og:description", content: description },
-        { property: "og:url", content: url },
+        { property: "og:url", content: `https://cityqlo.com/projects/${p.meta.id}` },
         { property: "og:image", content: heroImg },
+        { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: title },
         { name: "twitter:description", content: description },
         { name: "twitter:image", content: heroImg },
       ],
-      links: [{ rel: "canonical", href: url }],
+      links: [{ rel: "canonical", href: `https://cityqlo.com/projects/${p.meta.id}` }],
     };
   },
   notFoundComponent: () => (
@@ -717,6 +724,24 @@ function formatPrice(price: number) {
 function ProjectDetailPage() {
   const { project: p } = Route.useLoaderData();
   const { meta, units, sections } = p;
+
+  const { data: siteSettings } = useQuery({
+    queryKey: ["portal-settings"],
+    queryFn: () => getSiteSettings(),
+  });
+
+  const contactSettings = siteSettings?.find((r: any) => r.key === "contact")?.value ?? {};
+
+  const rawPhone = contactSettings.phone || "+639000000000";
+  const cleanPhone = rawPhone.replace(/\s+/g, "");
+
+  const rawWhatsapp = contactSettings.whatsapp || "+639000000000";
+  const cleanWhatsapp = rawWhatsapp.replace(/[^0-9]/g, "");
+  const whatsappUrl = `https://wa.me/${cleanWhatsapp}`;
+
+  const rawViber = contactSettings.viber || contactSettings.phone || "+639000000000";
+  const isViberLink = rawViber.startsWith("http://") || rawViber.startsWith("https://") || rawViber.startsWith("viber://");
+  const viberUrl = isViberLink ? rawViber : `viber://chat?number=%2B${rawViber.replace(/[^0-9]/g, "")}`;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -985,7 +1010,7 @@ function ProjectDetailPage() {
       >
         <div className="flex items-stretch h-14">
           <a
-            href="tel:+639000000000"
+            href={`tel:${cleanPhone}`}
             id="mobile-bar-call"
             className="flex-1 flex flex-col items-center justify-center gap-0.5 text-ink/70 hover:text-primary transition-colors active:bg-surface"
           >
@@ -993,7 +1018,7 @@ function ProjectDetailPage() {
             <span className="text-[9px] font-bold uppercase tracking-wider">Call</span>
           </a>
           <a
-            href="https://wa.me/639000000000"
+            href={viberUrl}
             id="mobile-bar-viber"
             target="_blank"
             rel="noopener noreferrer"

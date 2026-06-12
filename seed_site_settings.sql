@@ -21,6 +21,7 @@ insert into public.site_settings (key, value) values
 ('contact', '{
   "phone": "",
   "whatsapp": "",
+  "viber": "",
   "messenger": "",
   "email": "contact@cityqlo.com",
   "address": "Metro Manila, Philippines"
@@ -71,7 +72,11 @@ insert into public.site_settings (key, value) values
 ('seo', '{
   "meta_title": "CityQlo \u2014 Find the Right Property, Not Just Another Condo",
   "meta_description": "Premium property advisory for Filipino professionals, investors, and OFWs. Make smarter property decisions with CityQlo.",
-  "og_image_url": ""
+  "og_image_url": "https://cityqlo.com/Logo.png",
+  "og_title": "",
+  "og_description": "",
+  "twitter_title": "",
+  "twitter_description": ""
 }'::jsonb),
 
 -- Social

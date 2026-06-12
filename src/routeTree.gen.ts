@@ -13,11 +13,11 @@ import { Route as WhyInvestRouteImport } from './routes/why-invest'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as PropertiesRouteImport } from './routes/properties'
 import { Route as PortalRouteImport } from './routes/portal'
-import { Route as GuidesRouteImport } from './routes/guides'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PortalIndexRouteImport } from './routes/portal/index'
+import { Route as GuidesIndexRouteImport } from './routes/guides.index'
 import { Route as ProjectsSlugRouteImport } from './routes/projects/$slug'
 import { Route as PortalSettingsRouteImport } from './routes/portal/settings'
 import { Route as PortalPropertiesRouteImport } from './routes/portal/properties'
@@ -26,7 +26,7 @@ import { Route as PortalLoginRouteImport } from './routes/portal/login'
 import { Route as PortalLeadsRouteImport } from './routes/portal/leads'
 import { Route as PortalContentRouteImport } from './routes/portal/content'
 import { Route as PortalBlogsRouteImport } from './routes/portal/blogs'
-import { Route as GuidesSlugRouteImport } from './routes/guides/$slug'
+import { Route as GuidesSlugRouteImport } from './routes/guides.$slug'
 import { Route as PortalBlogsIndexRouteImport } from './routes/portal/blogs/index'
 import { Route as PortalBlogsIdRouteImport } from './routes/portal/blogs.$id'
 
@@ -50,11 +50,6 @@ const PortalRoute = PortalRouteImport.update({
   path: '/portal',
   getParentRoute: () => rootRouteImport,
 } as any)
-const GuidesRoute = GuidesRouteImport.update({
-  id: '/guides',
-  path: '/guides',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
@@ -74,6 +69,11 @@ const PortalIndexRoute = PortalIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => PortalRoute,
+} as any)
+const GuidesIndexRoute = GuidesIndexRouteImport.update({
+  id: '/guides/',
+  path: '/guides/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ProjectsSlugRoute = ProjectsSlugRouteImport.update({
   id: '/projects/$slug',
@@ -116,9 +116,9 @@ const PortalBlogsRoute = PortalBlogsRouteImport.update({
   getParentRoute: () => PortalRoute,
 } as any)
 const GuidesSlugRoute = GuidesSlugRouteImport.update({
-  id: '/$slug',
-  path: '/$slug',
-  getParentRoute: () => GuidesRoute,
+  id: '/guides/$slug',
+  path: '/guides/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const PortalBlogsIndexRoute = PortalBlogsIndexRouteImport.update({
   id: '/',
@@ -135,7 +135,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
-  '/guides': typeof GuidesRouteWithChildren
   '/portal': typeof PortalRouteWithChildren
   '/properties': typeof PropertiesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -149,6 +148,7 @@ export interface FileRoutesByFullPath {
   '/portal/properties': typeof PortalPropertiesRoute
   '/portal/settings': typeof PortalSettingsRoute
   '/projects/$slug': typeof ProjectsSlugRoute
+  '/guides/': typeof GuidesIndexRoute
   '/portal/': typeof PortalIndexRoute
   '/portal/blogs/$id': typeof PortalBlogsIdRoute
   '/portal/blogs/': typeof PortalBlogsIndexRoute
@@ -157,7 +157,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
-  '/guides': typeof GuidesRouteWithChildren
   '/properties': typeof PropertiesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/why-invest': typeof WhyInvestRoute
@@ -169,6 +168,7 @@ export interface FileRoutesByTo {
   '/portal/properties': typeof PortalPropertiesRoute
   '/portal/settings': typeof PortalSettingsRoute
   '/projects/$slug': typeof ProjectsSlugRoute
+  '/guides': typeof GuidesIndexRoute
   '/portal': typeof PortalIndexRoute
   '/portal/blogs/$id': typeof PortalBlogsIdRoute
   '/portal/blogs': typeof PortalBlogsIndexRoute
@@ -178,7 +178,6 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
-  '/guides': typeof GuidesRouteWithChildren
   '/portal': typeof PortalRouteWithChildren
   '/properties': typeof PropertiesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -192,6 +191,7 @@ export interface FileRoutesById {
   '/portal/properties': typeof PortalPropertiesRoute
   '/portal/settings': typeof PortalSettingsRoute
   '/projects/$slug': typeof ProjectsSlugRoute
+  '/guides/': typeof GuidesIndexRoute
   '/portal/': typeof PortalIndexRoute
   '/portal/blogs/$id': typeof PortalBlogsIdRoute
   '/portal/blogs/': typeof PortalBlogsIndexRoute
@@ -202,7 +202,6 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/contact'
-    | '/guides'
     | '/portal'
     | '/properties'
     | '/sitemap.xml'
@@ -216,6 +215,7 @@ export interface FileRouteTypes {
     | '/portal/properties'
     | '/portal/settings'
     | '/projects/$slug'
+    | '/guides/'
     | '/portal/'
     | '/portal/blogs/$id'
     | '/portal/blogs/'
@@ -224,7 +224,6 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/contact'
-    | '/guides'
     | '/properties'
     | '/sitemap.xml'
     | '/why-invest'
@@ -236,6 +235,7 @@ export interface FileRouteTypes {
     | '/portal/properties'
     | '/portal/settings'
     | '/projects/$slug'
+    | '/guides'
     | '/portal'
     | '/portal/blogs/$id'
     | '/portal/blogs'
@@ -244,7 +244,6 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/contact'
-    | '/guides'
     | '/portal'
     | '/properties'
     | '/sitemap.xml'
@@ -258,6 +257,7 @@ export interface FileRouteTypes {
     | '/portal/properties'
     | '/portal/settings'
     | '/projects/$slug'
+    | '/guides/'
     | '/portal/'
     | '/portal/blogs/$id'
     | '/portal/blogs/'
@@ -267,12 +267,13 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   ContactRoute: typeof ContactRoute
-  GuidesRoute: typeof GuidesRouteWithChildren
   PortalRoute: typeof PortalRouteWithChildren
   PropertiesRoute: typeof PropertiesRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   WhyInvestRoute: typeof WhyInvestRoute
+  GuidesSlugRoute: typeof GuidesSlugRoute
   ProjectsSlugRoute: typeof ProjectsSlugRoute
+  GuidesIndexRoute: typeof GuidesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -305,13 +306,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/guides': {
-      id: '/guides'
-      path: '/guides'
-      fullPath: '/guides'
-      preLoaderRoute: typeof GuidesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/contact': {
       id: '/contact'
       path: '/contact'
@@ -339,6 +333,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/portal/'
       preLoaderRoute: typeof PortalIndexRouteImport
       parentRoute: typeof PortalRoute
+    }
+    '/guides/': {
+      id: '/guides/'
+      path: '/guides'
+      fullPath: '/guides/'
+      preLoaderRoute: typeof GuidesIndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/projects/$slug': {
       id: '/projects/$slug'
@@ -398,10 +399,10 @@ declare module '@tanstack/react-router' {
     }
     '/guides/$slug': {
       id: '/guides/$slug'
-      path: '/$slug'
+      path: '/guides/$slug'
       fullPath: '/guides/$slug'
       preLoaderRoute: typeof GuidesSlugRouteImport
-      parentRoute: typeof GuidesRoute
+      parentRoute: typeof rootRouteImport
     }
     '/portal/blogs/': {
       id: '/portal/blogs/'
@@ -419,17 +420,6 @@ declare module '@tanstack/react-router' {
     }
   }
 }
-
-interface GuidesRouteChildren {
-  GuidesSlugRoute: typeof GuidesSlugRoute
-}
-
-const GuidesRouteChildren: GuidesRouteChildren = {
-  GuidesSlugRoute: GuidesSlugRoute,
-}
-
-const GuidesRouteWithChildren =
-  GuidesRoute._addFileChildren(GuidesRouteChildren)
 
 interface PortalBlogsRouteChildren {
   PortalBlogsIdRoute: typeof PortalBlogsIdRoute
@@ -474,12 +464,13 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   ContactRoute: ContactRoute,
-  GuidesRoute: GuidesRouteWithChildren,
   PortalRoute: PortalRouteWithChildren,
   PropertiesRoute: PropertiesRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   WhyInvestRoute: WhyInvestRoute,
+  GuidesSlugRoute: GuidesSlugRoute,
   ProjectsSlugRoute: ProjectsSlugRoute,
+  GuidesIndexRoute: GuidesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

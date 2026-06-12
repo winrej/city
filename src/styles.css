@@ -470,6 +470,41 @@
   }
 }
 
+/* Short viewport height overrides to prevent overlapping navigation header */
+@media (max-height: 720px) {
+  .display-1 {
+    font-size: clamp(1.85rem, 5.5vw, 2.75rem) !important;
+    line-height: 1.05 !important;
+  }
+  .display-2 {
+    font-size: clamp(1.65rem, 5vw, 2.5rem) !important;
+    line-height: 1.08 !important;
+  }
+  .lede {
+    font-size: clamp(0.95rem, 1.3vw, 1.125rem) !important;
+  }
+  /* Spacing adjustments inside hero content */
+  .hero-content-inner h1 {
+    margin-top: 0.75rem !important;
+  }
+  .hero-content-inner .lede {
+    margin-top: 0.75rem !important;
+  }
+  .hero-content-inner .flex-wrap,
+  .hero-content-inner .gap-3,
+  .hero-content-inner .gap-4 {
+    margin-top: 1rem !important;
+  }
+  .hero-home-container {
+    padding-top: 5rem !important;
+    padding-bottom: 7rem !important;
+  }
+  .hero-properties-container {
+    padding-top: 5.5rem !important;
+    padding-bottom: 5.5rem !important;
+  }
+}
+
 /* ── Blog Article Prose Typography ─────────────────────────────────────────── */
 .prose-cityqlo {
   color: var(--foreground);

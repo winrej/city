@@ -77,8 +77,10 @@ export function Nav() {
       <header
         className="fixed inset-x-0 top-0 z-50 transition-all duration-300"
         style={{
-          padding:
-            layoutMode === "pill" ? (scrolled ? "0.5rem 1rem 0" : "0.85rem 1.25rem 0") : "0px",
+          paddingTop: `calc(${layoutMode === "pill" ? (scrolled ? "0.5rem" : "0.85rem") : "0px"} + env(safe-area-inset-top, 0px))`,
+          paddingLeft: layoutMode === "pill" ? (scrolled ? "1rem" : "1.25rem") : "0px",
+          paddingRight: layoutMode === "pill" ? (scrolled ? "1rem" : "1.25rem") : "0px",
+          paddingBottom: "0px",
         }}
       >
         <nav
@@ -113,9 +115,9 @@ export function Nav() {
                 style={{ transitionTimingFunction: "var(--ease-luxe)" }}
               />
             </Link>
-            {/* DMCI badge — desktop only, hide while scrolling */}
+            {/* DMCI badge — all screen sizes, hide while scrolling */}
             <div
-              className={`hidden lg:flex items-center gap-2 border-l border-black/10 pl-4 h-7 transition-all duration-[400ms] ${
+              className={`flex items-center gap-1.5 border-l border-black/10 pl-3 lg:pl-4 h-7 transition-all duration-[400ms] ${
                 collapsed ? "opacity-0 pointer-events-none -translate-x-2" : "opacity-100 translate-x-0"
               }`}
               style={{ transitionTimingFunction: "var(--ease-luxe)" }}
@@ -123,9 +125,9 @@ export function Nav() {
               <img
                 src="/dmci-homes-seeklogo.png"
                 alt="DMCI Homes"
-                className="h-6 object-contain opacity-75"
+                className="h-4 lg:h-6 object-contain opacity-75"
               />
-              <span className="text-[8.5px] font-mono tracking-widest uppercase text-muted-foreground leading-tight">
+              <span className="text-[7.5px] lg:text-[8.5px] font-mono tracking-widest uppercase text-muted-foreground leading-tight">
                 Accredited<br />Partner
               </span>
             </div>
@@ -205,9 +207,10 @@ export function Nav() {
           style={{ transitionTimingFunction: "var(--ease-luxe)" }}
         />
         <div
-          className={`relative flex h-full flex-col px-6 pb-10 pt-24 transition-all duration-[350ms] ${open ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0"}`}
+          className={`relative flex h-full flex-col px-6 pb-10 transition-all duration-[350ms] ${open ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0"}`}
           style={{
             transitionTimingFunction: "var(--ease-luxe)",
+            paddingTop: "calc(6rem + env(safe-area-inset-top, 0px))",
             paddingBottom: "calc(2.5rem + env(safe-area-inset-bottom))",
           }}
         >

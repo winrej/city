@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useLocation } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { getSiteSettings } from "../../lib/api/admin.functions";
 
@@ -94,12 +94,35 @@ const fallbackUrls: Record<string, string> = {
 };
 
 export function Footer() {
+  const location = useLocation();
+  const pathname = location.pathname;
+  const isContactPage = pathname === "/contact";
+
   const { data: siteSettings } = useQuery({
     queryKey: ["portal-settings"],
     queryFn: () => getSiteSettings(),
   });
 
   const socialSettings = siteSettings?.find((r: any) => r.key === "social")?.value ?? {};
+
+  if (isContactPage) {
+    return (
+      <footer
+        style={{ background: "#34393D" }}
+        className="mt-16 md:mt-24 rounded-t-[32px] md:rounded-t-[40px] overflow-hidden"
+      >
+        <div className="px-6 py-10 md:px-16 mx-auto max-w-7xl">
+          <div
+            className="flex flex-col gap-3 text-[11px] tracking-[0.06em] md:flex-row md:justify-between items-center"
+            style={{ color: "rgba(255,255,255,0.35)" }}
+          >
+            <p>© {new Date().getFullYear()} CityQlo. All rights reserved.</p>
+            <p>Property advisory · Philippines</p>
+          </div>
+        </div>
+      </footer>
+    );
+  }
 
   return (
     <footer

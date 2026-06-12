@@ -116,6 +116,15 @@ interface HomepageSettings {
   stat_3_desc?: string;
 }
 
+// ─── CUSTOMIZABLE HERO OVERLAY ──────────────────────────────────────────────
+// Modify the value below (0 to 100) to adjust the default darkness of the home hero section.
+// (e.g. 40 for 40% opacity). If a value is saved in the CMS settings, that will take precedence.
+const HERO_OVERLAY_OPACITY_PERCENT = 40; 
+
+const cleanBadgeText = (text: string) => {
+  return text.replace(/acccredited/gi, "Accredited");
+};
+
 function Home() {
   // loaderData is available synchronously — no loading flash
   const { initialSettings, initialPageContent } = Route.useLoaderData();
@@ -344,7 +353,7 @@ function Home() {
         {/* Overlay Dark Filter */}
         <div
           className="absolute inset-0 bg-black transition-opacity duration-700"
-          style={{ opacity: homepageSettings.hero_overlay_opacity ?? 0.4 }}
+          style={{ opacity: homepageSettings.hero_overlay_opacity ?? (HERO_OVERLAY_OPACITY_PERCENT / 100) }}
         />
         <div
           aria-hidden
@@ -398,10 +407,10 @@ function Home() {
 
         <div
           ref={heroContentRef}
-          className="relative z-10 flex h-full items-center pb-44 pt-32 will-change-transform md:pb-40 md:pt-36"
+          className="relative z-10 flex h-full items-center pt-28 pb-32 will-change-transform md:pt-32 md:pb-28 hero-home-container"
         >
           <div className="container-prose">
-            <div className="max-w-4xl text-white">
+            <div className="max-w-4xl text-white hero-content-inner">
               {homepageSettings.hero_eyebrow !== "" && (
                 <p className="eyebrow rise text-white/55">
                   <span className="gold-rule" />
@@ -504,15 +513,19 @@ function Home() {
                 homepageSettings.hero_badge_4_bold || "No-pressure",
                 homepageSettings.hero_badge_4_regular || "consultations",
               ],
-            ].map(([a, b]) => (
-              <div
-                key={a}
-                className="text-[10px] uppercase tracking-[0.22em] md:text-[10.5px] md:tracking-[0.24em]"
-              >
-                <span className="font-semibold">{a}</span>{" "}
-                <span className="text-white/65">{b}</span>
-              </div>
-            ))}
+            ].map(([a, b]) => {
+              const cleanedA = cleanBadgeText(a);
+              const cleanedB = cleanBadgeText(b);
+              return (
+                <div
+                  key={a}
+                  className="text-[10px] uppercase tracking-[0.22em] md:text-[10.5px] md:tracking-[0.24em]"
+                >
+                  <span className="font-semibold">{cleanedA}</span>{" "}
+                  <span className="text-white/65">{cleanedB}</span>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>

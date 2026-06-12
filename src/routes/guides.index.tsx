@@ -5,7 +5,7 @@ import { Reveal } from "@/components/site/Reveal";
 import { getPublicBlogs } from "@/lib/api/admin.functions";
 
 
-export const Route = createFileRoute("/guides")({
+export const Route = createFileRoute("/guides/")({
   head: () => ({
     meta: [
       { title: "Guides — Property Insights | CityQlo" },
@@ -21,6 +21,16 @@ export const Route = createFileRoute("/guides")({
           "Editorial guides and insights on buying, investing, and navigating the Metro Manila property market.",
       },
       { property: "og:url", content: "https://cityqlo.com/guides" },
+      { property: "og:type", content: "website" },
+      { property: "og:image", content: "https://cityqlo.com/Logo.png" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Guides — Property Insights | CityQlo" },
+      {
+        name: "twitter:description",
+        content:
+          "Editorial guides and insights on buying, investing, and navigating the Metro Manila property market.",
+      },
+      { name: "twitter:image", content: "https://cityqlo.com/Logo.png" },
     ],
     links: [{ rel: "canonical", href: "https://cityqlo.com/guides" }],
   }),
@@ -40,12 +50,12 @@ type BlogPost = {
 };
 
 function formatDate(iso?: string | null) {
-  if (!iso) return "Coming soon";
+  if (!iso) return "Published";
   return new Intl.DateTimeFormat("en-PH", { year: "numeric", month: "long", day: "numeric" }).format(new Date(iso));
 }
 
 function BlogCard({ post, index }: { post: BlogPost; index: number }) {
-  const isPublished = !!post.published_at;
+  const isPublished = !!post.slug;
 
   return (
     <Reveal delay={index * 60}>

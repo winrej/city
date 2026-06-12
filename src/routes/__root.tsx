@@ -15,7 +15,9 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Nav } from "../components/site/Nav";
 import { Footer } from "../components/site/Footer";
+import { BottomNav } from "../components/site/BottomNav";
 import { Toaster } from "../components/ui/sonner";
+import { getPublicSeoSettings } from "../lib/api/admin.functions";
 
 function NotFoundComponent() {
   return (
@@ -78,60 +80,78 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 // Default language configuration for future localization
 const APP_LOCALE = "en";
 
+const DEFAULT_SEO = {
+  meta_title: "CityQlo — Smarter Property Decisions in Metro Manila",
+  meta_description:
+    "CityQlo helps Filipino professionals, investors, and OFWs make smarter property decisions in Metro Manila.",
+  og_image_url: "https://cityqlo.com/Logo.png",
+  og_title: "CityQlo — Smarter Property Decisions in Metro Manila",
+  og_description:
+    "CityQlo helps Filipino professionals, investors, and OFWs make smarter property decisions in Metro Manila.",
+  twitter_title: "CityQlo — Smarter Property Decisions in Metro Manila",
+  twitter_description:
+    "CityQlo helps Filipino professionals, investors, and OFWs make smarter property decisions in Metro Manila.",
+};
+
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  head: () => ({
-    meta: [
-      { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "CityQlo — Smarter Property Decisions in Metro Manila" },
-      {
-        name: "description",
-        content:
-          "CityQlo helps Filipino professionals, investors, and OFWs make smarter property decisions in Metro Manila.",
-      },
-      {
-        name: "keywords",
-        content:
-          "Metro Manila real estate, property advisory Philippines, DMCI Homes, condo investment Manila, OFW property investment, CityQlo",
-      },
-      { name: "author", content: "CityQlo" },
-      { property: "og:title", content: "CityQlo — Smarter Property Decisions in Metro Manila" },
-      {
-        property: "og:description",
-        content:
-          "CityQlo helps Filipino professionals, investors, and OFWs make smarter property decisions in Metro Manila.",
-      },
-      { property: "og:type", content: "website" },
-      { property: "og:site_name", content: "CityQlo" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "theme-color", content: "oklch(0.43 0.20 258)" },
-      { name: "twitter:title", content: "CityQlo — Smarter Property Decisions in Metro Manila" },
-      {
-        name: "twitter:description",
-        content:
-          "CityQlo helps Filipino professionals, investors, and OFWs make smarter property decisions in Metro Manila.",
-      },
-      {
-        property: "og:image",
-        content:
-          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/cc5bb21b-e9f7-47c5-8886-07eed52e91f6/id-preview-8d313d68--6383a3c8-02fc-485a-ae50-11a763776907.lovable.app-1780903893799.png",
-      },
-      {
-        name: "twitter:image",
-        content:
-          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/cc5bb21b-e9f7-47c5-8886-07eed52e91f6/id-preview-8d313d68--6383a3c8-02fc-485a-ae50-11a763776907.lovable.app-1780903893799.png",
-      },
-    ],
-    links: [
-      { rel: "stylesheet", href: appCss },
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Montserrat:wght@400;500;600;700;800;900&display=swap",
-      },
-    ],
-  }),
+  // Load SEO settings from DB at request time so head() can use live values
+  loader: async () => {
+    try {
+      const seo = await getPublicSeoSettings();
+      return { seo };
+    } catch {
+      return { seo: null };
+    }
+  },
+  head: ({ loaderData }) => {
+    const seo = loaderData?.seo;
+
+    // Merge DB values over defaults — empty strings fall back to defaults
+    const title = seo?.meta_title?.trim() || DEFAULT_SEO.meta_title;
+    const description = seo?.meta_description?.trim() || DEFAULT_SEO.meta_description;
+    const ogImage = seo?.og_image_url?.trim() || DEFAULT_SEO.og_image_url;
+    const ogTitle = seo?.og_title?.trim() || seo?.meta_title?.trim() || DEFAULT_SEO.og_title;
+    const ogDesc = seo?.og_description?.trim() || seo?.meta_description?.trim() || DEFAULT_SEO.og_description;
+    const twitterTitle = seo?.twitter_title?.trim() || ogTitle;
+    const twitterDesc = seo?.twitter_description?.trim() || ogDesc;
+
+    return {
+      meta: [
+        { charSet: "utf-8" },
+        { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
+        { title },
+        { name: "description", content: description },
+        {
+          name: "keywords",
+          content:
+            "Metro Manila real estate, property advisory Philippines, DMCI Homes, condo investment Manila, OFW property investment, CityQlo",
+        },
+        { name: "author", content: "CityQlo" },
+        { property: "og:title", content: ogTitle },
+        { property: "og:description", content: ogDesc },
+        { property: "og:type", content: "website" },
+        { property: "og:url", content: "https://cityqlo.com" },
+        { property: "og:site_name", content: "CityQlo" },
+        { property: "og:image", content: ogImage },
+        { property: "og:image:width", content: "1200" },
+        { property: "og:image:height", content: "630" },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "theme-color", content: "oklch(0.43 0.20 258)" },
+        { name: "twitter:title", content: twitterTitle },
+        { name: "twitter:description", content: twitterDesc },
+        { name: "twitter:image", content: ogImage },
+      ],
+      links: [
+        { rel: "stylesheet", href: appCss },
+        { rel: "preconnect", href: "https://fonts.googleapis.com" },
+        { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+        {
+          rel: "stylesheet",
+          href: "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Montserrat:wght@400;500;600;700;800;900&display=swap",
+        },
+      ],
+    };
+  },
   shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
@@ -189,6 +209,7 @@ function RootComponent() {
         <Outlet />
       </main>
       {!isPortal && <Footer />}
+      {!isPortal && <BottomNav />}
       <Toaster
         position="bottom-right"
         theme="dark"
