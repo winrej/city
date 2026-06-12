@@ -21,6 +21,8 @@ import { Reveal } from "@/components/site/Reveal";
 import { ConsultationCTA } from "@/components/site/ConsultationCTA";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getPublicPropertiesPageContent } from "@/lib/api/admin.functions";
+import { useScrollDirection } from "@/hooks/useScrollDirection";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 // Import local image assets (both JPGs and the new PNGs)
 import locMakati from "@/assets/loc-makati.png";
@@ -372,6 +374,34 @@ function Properties() {
   const [activeShareProperty, setActiveShareProperty] = useState<Property | null>(null);
   const [currentSlide, setCurrentSlide] = useState(0);
 
+  // Scroll and mobile states
+  const { scrollDirection, isScrolledPast } = useScrollDirection(80);
+  const isMobile = useIsMobile();
+  const [isFiltersSheetOpen, setIsFiltersSheetOpen] = useState(false);
+  const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
+  const [sortBy, setSortBy] = useState<"default" | "price-asc" | "price-desc" | "featured">("default");
+
+  // Derive active filter labels
+  const activeFilterLabels = useMemo(() => {
+    const labels = [];
+    if (selectedLocation) labels.push(selectedLocation);
+    if (selectedPriceRange) {
+      if (selectedPriceRange === "under-6m") labels.push("Under ₱6.0M");
+      else if (selectedPriceRange === "6m-8m") labels.push("₱6.0M – ₱8.0M");
+      else if (selectedPriceRange === "above-8m") labels.push("Above ₱8.0M");
+    }
+    if (selectedStatus !== "All") labels.push(selectedStatus);
+    if (selectedCategory) labels.push(selectedCategory);
+    if (searchQuery) labels.push(`"${searchQuery}"`);
+    return labels;
+  }, [selectedLocation, selectedPriceRange, selectedStatus, selectedCategory, searchQuery]);
+
+  const filterSummaryText = activeFilterLabels.length > 0
+    ? activeFilterLabels.join(" · ")
+    : "Filters";
+
+  const activeFiltersCount = activeFilterLabels.length;
+
   const residencesRef = useRef<HTMLDivElement | null>(null);
   const { focus } = Route.useSearch();
   const searchInputRef = useRef<HTMLInputElement | null>(null);
@@ -400,6 +430,31 @@ function Properties() {
     }, 6000);
     return () => clearInterval(timer);
   }, [featuredDevelopments.length]);
+
+  // Lock body scroll when filter bottom sheet is open
+  useEffect(() => {
+    if (isFiltersSheetOpen) {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = prev;
+      };
+    }
+  }, [isFiltersSheetOpen]);
+
+  // Broadcast active filter count to Nav pill badge via custom event
+  useEffect(() => {
+    window.dispatchEvent(
+      new CustomEvent("filters-active-count", { detail: activeFiltersCount })
+    );
+  }, [activeFiltersCount]);
+
+  // Listen for Nav pill tap to open the bottom sheet
+  useEffect(() => {
+    const handler = () => setIsFiltersSheetOpen(true);
+    window.addEventListener("open-filters-sheet", handler);
+    return () => window.removeEventListener("open-filters-sheet", handler);
+  }, []);
 
   // Keyboard navigation for featured carousel
   useEffect(() => {
@@ -649,104 +704,258 @@ function Properties() {
         </div>
       </section>
 
-      {/* STICKY FILTER RAIL */}
-      <div className="sticky top-14 md:top-[62px] z-30 w-full border-y border-border/50 bg-background/85 backdrop-blur-xl transition-all duration-300">
+      {/* STICKY FILTER RAIL — desktop always expanded; mobile hides entirely after 80px scroll (pill lives in Nav) */}
+      <div
+        className={`sticky top-14 md:top-[62px] z-30 w-full border-y border-border/50 bg-background/85 backdrop-blur-xl transition-all duration-300 ${
+          isMobile && isScrolledPast && scrollDirection === "down"
+            ? "h-0 overflow-hidden border-transparent"
+            : ""
+        }`}
+      >
+        {/* ── Full filter rail (desktop always, mobile when not yet scrolled) ── */}
         <div className="container-prose py-3">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            {/* Category tabs */}
-            <div className="flex items-center gap-1 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
-              {(["All", "RFO", "Pre-selling"] as const).map((status) => (
-                <button
-                  key={status}
-                  onClick={() => setSelectedStatus(status)}
-                  className={`px-5 py-2 text-[12.5px] font-semibold rounded-full tracking-wide transition-all ${
-                    selectedStatus === status
-                      ? "bg-ink text-white"
-                      : "text-muted-foreground hover:bg-surface hover:text-ink"
-                  }`}
-                >
-                  {status}
-                </button>
-              ))}
-            </div>
-
-            {/* Quick dropdown selectors and Search input */}
-            <div className="flex flex-wrap items-center gap-2 md:gap-3">
-              {/* Search bar */}
-              <div className="relative flex items-center min-w-[200px] flex-1 md:flex-initial">
-                <Search className="absolute left-4.5 h-4 w-4 text-muted-foreground" />
-                <input
-                  id="properties-search-input"
-                  ref={searchInputRef}
-                  type="text"
-                  placeholder="Search residences..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="h-10 w-full rounded-full border border-border/70 bg-surface/50 pl-11 pr-4 text-[13px] placeholder-muted-foreground/75 focus:border-ink focus:bg-background focus:outline-none transition-all duration-300"
-                />
-                {searchQuery && (
+              {/* Status tabs */}
+              <div className="flex items-center gap-1 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
+                {(["All", "RFO", "Pre-selling"] as const).map((status) => (
                   <button
-                    onClick={() => setSearchQuery("")}
-                    className="absolute right-3.5 text-muted-foreground hover:text-ink"
+                    key={status}
+                    onClick={() => setSelectedStatus(status)}
+                    className={`px-5 py-2 text-[12.5px] font-semibold rounded-full tracking-wide transition-all ${
+                      selectedStatus === status
+                        ? "bg-ink text-white"
+                        : "text-muted-foreground hover:bg-surface hover:text-ink"
+                    }`}
                   >
-                    <X className="h-3.5 w-3.5" />
+                    {status}
+                  </button>
+                ))}
+              </div>
+
+              {/* Quick dropdown selectors and Search input */}
+              <div className="flex flex-wrap items-center gap-2 md:gap-3">
+                {/* Search bar */}
+                <div className="relative flex items-center min-w-[200px] flex-1 md:flex-initial">
+                  <Search className="absolute left-4.5 h-4 w-4 text-muted-foreground" />
+                  <input
+                    id="properties-search-input"
+                    ref={searchInputRef}
+                    type="text"
+                    placeholder="Search residences..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="h-10 w-full rounded-full border border-border/70 bg-surface/50 pl-11 pr-4 text-[13px] placeholder-muted-foreground/75 focus:border-ink focus:bg-background focus:outline-none transition-all duration-300"
+                  />
+                  {searchQuery && (
+                    <button
+                      onClick={() => setSearchQuery("")}
+                      className="absolute right-3.5 text-muted-foreground hover:text-ink"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </div>
+
+                {/* Location Select */}
+                <div className="relative flex items-center">
+                  <select
+                    value={selectedLocation || ""}
+                    onChange={(e) => setSelectedLocation(e.target.value || null)}
+                    className="h-10 rounded-full border border-border/70 bg-surface/50 px-5 pr-9 text-[12.5px] font-semibold text-ink focus:border-ink focus:outline-none appearance-none cursor-pointer"
+                  >
+                    <option value="">All Districts</option>
+                    {filteredLocationsData.map((loc) => (
+                      <option key={loc.name} value={loc.name}>
+                        {loc.name}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute right-3.5 pointer-events-none text-muted-foreground font-semibold text-[10px]">
+                    ▼
+                  </div>
+                </div>
+
+                {/* Price Select */}
+                <div className="relative flex items-center">
+                  <select
+                    value={selectedPriceRange || ""}
+                    onChange={(e) => setSelectedPriceRange(e.target.value || null)}
+                    className="h-10 rounded-full border border-border/70 bg-surface/50 px-5 pr-9 text-[12.5px] font-semibold text-ink focus:border-ink focus:outline-none appearance-none cursor-pointer"
+                  >
+                    <option value="">All Prices</option>
+                    <option value="under-6m">Under ₱6.0M</option>
+                    <option value="6m-8m">₱6.0M – ₱8.0M</option>
+                    <option value="above-8m">Above ₱8.0M</option>
+                  </select>
+                  <div className="absolute right-3.5 pointer-events-none text-muted-foreground font-semibold text-[10px]">
+                    ▼
+                  </div>
+                </div>
+
+                {/* Clear filters trigger */}
+                {(searchQuery ||
+                  selectedLocation ||
+                  selectedCategory ||
+                  selectedPriceRange ||
+                  selectedStatus !== "All") && (
+                  <button
+                    onClick={clearAllFilters}
+                    className="h-10 px-4 rounded-full border border-dashed border-border text-[12.5px] font-medium text-muted-foreground hover:border-ink hover:text-ink transition-colors"
+                  >
+                    Clear Filters
                   </button>
                 )}
               </div>
-
-              {/* Location Select */}
-              <div className="relative flex items-center">
-                <select
-                  value={selectedLocation || ""}
-                  onChange={(e) => setSelectedLocation(e.target.value || null)}
-                  className="h-10 rounded-full border border-border/70 bg-surface/50 px-5 pr-9 text-[12.5px] font-semibold text-ink focus:border-ink focus:outline-none appearance-none cursor-pointer"
-                >
-                  <option value="">All Districts</option>
-                  {filteredLocationsData.map((loc) => (
-                    <option key={loc.name} value={loc.name}>
-                      {loc.name}
-                    </option>
-                  ))}
-                </select>
-                <div className="absolute right-3.5 pointer-events-none text-muted-foreground font-semibold text-[10px]">
-                  ▼
-                </div>
-              </div>
-
-              {/* Price Select */}
-              <div className="relative flex items-center">
-                <select
-                  value={selectedPriceRange || ""}
-                  onChange={(e) => setSelectedPriceRange(e.target.value || null)}
-                  className="h-10 rounded-full border border-border/70 bg-surface/50 px-5 pr-9 text-[12.5px] font-semibold text-ink focus:border-ink focus:outline-none appearance-none cursor-pointer"
-                >
-                  <option value="">All Prices</option>
-                  <option value="under-6m">Under ₱6.0M</option>
-                  <option value="6m-8m">₱6.0M – ₱8.0M</option>
-                  <option value="above-8m">Above ₱8.0M</option>
-                </select>
-                <div className="absolute right-3.5 pointer-events-none text-muted-foreground font-semibold text-[10px]">
-                  ▼
-                </div>
-              </div>
-
-              {/* Clear filters trigger */}
-              {(searchQuery ||
-                selectedLocation ||
-                selectedCategory ||
-                selectedPriceRange ||
-                selectedStatus !== "All") && (
-                <button
-                  onClick={clearAllFilters}
-                  className="h-10 px-4 rounded-full border border-dashed border-border text-[12.5px] font-medium text-muted-foreground hover:border-ink hover:text-ink transition-colors"
-                >
-                  Clear Filters
-                </button>
-              )}
             </div>
           </div>
         </div>
-      </div>
+
+      {/* ── FILTER BOTTOM SHEET ── */}
+      {isFiltersSheetOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-end"
+          style={{ background: "rgba(10,12,20,0.60)", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)" }}
+          onClick={() => setIsFiltersSheetOpen(false)}
+        >
+          <div
+            className="w-full relative overflow-hidden animate-sheet-up"
+            style={{
+              borderRadius: "24px 24px 0 0",
+              background: "oklch(0.985 0.002 247)",
+              border: "1px solid oklch(0 0 0 / 0.08)",
+              boxShadow: "0 -8px 60px -10px rgba(0,0,0,0.25), 0 0 0 0.5px oklch(0 0 0 / 0.06)",
+              paddingBottom: "calc(1.5rem + env(safe-area-inset-bottom))",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Handle bar */}
+            <div className="flex justify-center pt-3 pb-1">
+              <div className="h-1 w-10 rounded-full bg-ink/15" />
+            </div>
+
+            {/* Sheet header */}
+            <div className="flex items-center justify-between px-6 py-3 border-b border-border/40">
+              <div>
+                <p className="text-[10px] font-mono tracking-[0.22em] uppercase text-muted-foreground">Refine results</p>
+                <p className="text-[17px] font-bold text-ink mt-0.5">Filters</p>
+              </div>
+              <button
+                onClick={() => setIsFiltersSheetOpen(false)}
+                className="w-9 h-9 rounded-full flex items-center justify-center bg-surface/80 border border-border/50 text-ink/60 hover:text-ink transition-colors"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="px-6 pt-5 space-y-6">
+              {/* Search */}
+              <div>
+                <p className="text-[10.5px] font-mono tracking-[0.18em] uppercase text-muted-foreground mb-3">Search</p>
+                <div className="relative flex items-center">
+                  <Search className="absolute left-4 h-4 w-4 text-muted-foreground" />
+                  <input
+                    type="text"
+                    placeholder="Search residences..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="h-11 w-full rounded-2xl border border-border/70 bg-white pl-11 pr-4 text-[14px] placeholder-muted-foreground/60 focus:border-ink focus:outline-none transition-all duration-300"
+                  />
+                  {searchQuery && (
+                    <button onClick={() => setSearchQuery("")} className="absolute right-4 text-muted-foreground">
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Status */}
+              <div>
+                <p className="text-[10.5px] font-mono tracking-[0.18em] uppercase text-muted-foreground mb-3">Availability</p>
+                <div className="flex gap-2">
+                  {(["All", "RFO", "Pre-selling"] as const).map((status) => (
+                    <button
+                      key={status}
+                      onClick={() => setSelectedStatus(status)}
+                      className={`flex-1 py-2.5 text-[13px] font-semibold rounded-2xl border transition-all ${
+                        selectedStatus === status
+                          ? "bg-ink text-white border-ink"
+                          : "bg-white text-ink/70 border-border/60 hover:border-ink/40"
+                      }`}
+                    >
+                      {status}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* District */}
+              <div>
+                <p className="text-[10.5px] font-mono tracking-[0.18em] uppercase text-muted-foreground mb-3">District</p>
+                <div className="relative">
+                  <select
+                    value={selectedLocation || ""}
+                    onChange={(e) => setSelectedLocation(e.target.value || null)}
+                    className="h-11 w-full rounded-2xl border border-border/60 bg-white px-4 pr-10 text-[14px] font-medium text-ink focus:border-ink focus:outline-none appearance-none cursor-pointer"
+                  >
+                    <option value="">All Districts</option>
+                    {filteredLocationsData.map((loc) => (
+                      <option key={loc.name} value={loc.name}>
+                        {loc.name} ({loc.count})
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground text-[10px] font-bold">▼</div>
+                </div>
+              </div>
+
+              {/* Price Range */}
+              <div>
+                <p className="text-[10.5px] font-mono tracking-[0.18em] uppercase text-muted-foreground mb-3">Price Range</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { value: "", label: "All Prices" },
+                    { value: "under-6m", label: "Under ₱6.0M" },
+                    { value: "6m-8m", label: "₱6.0M – ₱8.0M" },
+                    { value: "above-8m", label: "Above ₱8.0M" },
+                  ].map((opt) => (
+                    <button
+                      key={opt.value}
+                      onClick={() => setSelectedPriceRange(opt.value || null)}
+                      className={`py-2.5 px-3 text-[12.5px] font-semibold rounded-2xl border transition-all ${
+                        (selectedPriceRange ?? "") === opt.value
+                          ? "bg-primary text-white border-primary"
+                          : "bg-white text-ink/70 border-border/60 hover:border-primary/40"
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex gap-3 pt-1">
+                {activeFiltersCount > 0 && (
+                  <button
+                    onClick={() => { clearAllFilters(); }}
+                    className="flex-1 h-12 rounded-2xl border border-dashed border-border text-[13.5px] font-semibold text-muted-foreground hover:border-ink hover:text-ink transition-colors"
+                  >
+                    Clear all
+                  </button>
+                )}
+                <button
+                  onClick={() => setIsFiltersSheetOpen(false)}
+                  className="flex-1 h-12 rounded-2xl bg-ink text-white text-[13.5px] font-semibold tracking-wide transition-all hover:bg-ink/90 active:scale-[0.98]"
+                >
+                  {activeFiltersCount > 0
+                    ? `Show ${filteredProperties.length} result${filteredProperties.length !== 1 ? "s" : ""}`
+                    : "Done"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* BROWSE BY LIFESTYLE TIERS (COLLECTION CARDS) */}
       <section className="px-4 section-pad-sm bg-surface/40">

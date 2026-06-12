@@ -56,7 +56,8 @@ type TabType =
   | "collections"
   | "featured_district"
   | "marketing_pages"
-  | "carousel";
+  | "carousel"
+  | "featured_opps";
 
 const MARKETING_PAGE_FALLBACKS: Record<string, Record<string, any>> = {
   page_guides: GUIDES_PAGE_FALLBACK,
@@ -1152,6 +1153,13 @@ function HomepageEditorPage() {
             <FileText size={15} />
             Guides / About
           </button>
+          <button
+            onClick={() => setActiveTab("featured_opps")}
+            className={`portal-settings-nav-item ${activeTab === "featured_opps" ? "active" : ""}`}
+          >
+            <Star size={15} />
+            Featured Opportunities
+          </button>
         </aside>
 
         {/* Tab Contents */}
@@ -1160,7 +1168,7 @@ function HomepageEditorPage() {
           style={{
             display: "grid",
             gridTemplateColumns:
-              activeTab === "hero" || activeTab === "nav" || activeTab === "background"
+              activeTab === "hero" || activeTab === "nav" || activeTab === "background" || activeTab === "featured_opps"
                 ? "1fr 1fr"
                 : "1fr",
             gap: "1.5rem",
@@ -1168,6 +1176,133 @@ function HomepageEditorPage() {
             width: "100%",
           }}
         >
+          {/* ─── FEATURED OPPORTUNITIES TAB ─── */}
+          {activeTab === "featured_opps" && (
+            <>
+              <div className="portal-card portal-settings-fields">
+                <div className="portal-card-header">
+                  <div className="portal-card-title">
+                    <Star size={16} />
+                    Featured Opportunities Section Details
+                  </div>
+                </div>
+
+                <div className="portal-field">
+                  <label className="portal-field-label">Eyebrow Tagline</label>
+                  <input
+                    type="text"
+                    placeholder="Selected"
+                    value={getVal("featured_eyebrow", "Selected")}
+                    onChange={(e) => handleFieldChange("featured_eyebrow", e.target.value)}
+                    className="portal-input"
+                  />
+                </div>
+
+                <div className="portal-field">
+                  <label className="portal-field-label">Headline / Title</label>
+                  <input
+                    type="text"
+                    placeholder="Featured opportunities."
+                    value={getVal("featured_title", "Featured opportunities.")}
+                    onChange={(e) => handleFieldChange("featured_title", e.target.value)}
+                    className="portal-input"
+                  />
+                </div>
+
+                <div className="portal-field">
+                  <label className="portal-field-label">Description Paragraph</label>
+                  <textarea
+                    rows={4}
+                    placeholder="A curated, ever-evolving shortlist — chosen for resilience, lifestyle, and long-term value."
+                    value={getVal(
+                      "featured_description",
+                      "A curated, ever-evolving shortlist — chosen for resilience, lifestyle, and long-term value.",
+                    )}
+                    onChange={(e) => handleFieldChange("featured_description", e.target.value)}
+                    className="portal-textarea"
+                  />
+                </div>
+              </div>
+
+              <div className="portal-card">
+                <div className="portal-card-header">
+                  <div className="portal-card-title">Currently Featured Properties</div>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "1rem", marginTop: "1rem" }}>
+                  {(() => {
+                    const featured = (adminProperties ?? []).filter((p: any) => p.is_featured && !p.is_deleted);
+                    if (featured.length === 0) {
+                      return (
+                        <div className="portal-empty-state" style={{ padding: "1.5rem" }}>
+                          <p style={{ margin: 0, fontSize: "0.85rem" }}>No properties are currently marked as featured.</p>
+                          <p style={{ fontSize: "0.75rem", color: "var(--zinc-500)", margin: "0.25rem 0 0" }}>
+                            Go to the <strong>Properties</strong> page to select properties to show here.
+                          </p>
+                        </div>
+                      );
+                    }
+                    return (
+                      <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                        <p style={{ fontSize: "0.75rem", color: "var(--zinc-400)", margin: 0 }}>
+                          The following {featured.length} properties are currently featured and will appear under this section on the homepage:
+                        </p>
+                        {featured.map((p: any) => (
+                          <div
+                            key={p.id}
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "0.75rem",
+                              background: "rgba(255,255,255,0.02)",
+                              border: "1px solid rgba(255,255,255,0.06)",
+                              borderRadius: "8px",
+                              padding: "0.75rem",
+                            }}
+                          >
+                            {p.image_url ? (
+                              <img
+                                src={p.image_url}
+                                alt={p.name}
+                                style={{ width: "50px", height: "38px", objectFit: "cover", borderRadius: "4px" }}
+                              />
+                            ) : (
+                              <div
+                                style={{
+                                  width: "50px",
+                                  height: "38px",
+                                  background: "rgba(255,255,255,0.05)",
+                                  borderRadius: "4px",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  fontSize: "10px",
+                                  color: "var(--zinc-500)"
+                                }}
+                              >
+                                No Image
+                              </div>
+                            )}
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{ fontWeight: 600, fontSize: "0.85rem", color: "#fff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                {p.name}
+                              </div>
+                              <div style={{ fontSize: "0.75rem", color: "var(--zinc-400)" }}>
+                                {p.city} · {p.developer}
+                              </div>
+                            </div>
+                            <span style={{ fontSize: "0.7rem", color: "var(--zinc-500)", fontFamily: "monospace" }}>
+                              Rank: {p.featured_rank ?? 0}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })()}
+                </div>
+              </div>
+            </>
+          )}
+
           {/* ─── LIFESTYLE COLLECTIONS TAB ─── */}
           {activeTab === "marketing_pages" && (
             <div className="portal-card portal-settings-fields">

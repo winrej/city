@@ -248,6 +248,21 @@
   animation: cq-rise 1200ms var(--ease-luxe) both;
 }
 
+/* Filter bottom sheet — slides up from below viewport */
+@keyframes cq-sheet-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+@utility animate-sheet-up {
+  animation: cq-sheet-up 340ms var(--ease-luxe) both;
+}
+
 @utility rise-delay-1 {
   animation-delay: 220ms;
 }
@@ -461,6 +476,9 @@
     filter: none;
   }
   .image-in {
+    animation: none;
+  }
+  .animate-sheet-up {
     animation: none;
   }
   a:active,

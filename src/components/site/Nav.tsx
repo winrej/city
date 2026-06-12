@@ -1,7 +1,9 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getSiteSettings } from "../../lib/api/admin.functions";
+import { useIsMobile } from "../../hooks/use-mobile";
+import { Sliders } from "lucide-react";
 
 const links = [
   { to: "/properties", label: "Properties" },
@@ -15,8 +17,13 @@ export function Nav() {
   const [scrolled, setScrolled] = useState(false);
   // true while the user is actively scrolling — collapses the nav
   const [isScrolling, setIsScrolling] = useState(false);
+  // Filter pill state (properties page only)
+  const [filterCount, setFilterCount] = useState(0);
 
   const scrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isMobile = useIsMobile();
+  const isPropertiesPage = pathname === "/properties";
 
   const { data: siteSettings } = useQuery({
     queryKey: ["portal-settings"],
@@ -59,6 +66,17 @@ export function Nav() {
       };
     }
   }, [open]);
+
+  // Sync filter count badge from properties page via custom event
+  useEffect(() => {
+    const handler = (e: Event) => {
+      setFilterCount((e as CustomEvent<number>).detail ?? 0);
+    };
+    window.addEventListener("filters-active-count", handler);
+    // Reset when leaving the properties page
+    if (!isPropertiesPage) setFilterCount(0);
+    return () => window.removeEventListener("filters-active-count", handler);
+  }, [isPropertiesPage]);
 
   // Collapse the nav (hide links + CTA) only while actively scrolling down
   // Always keep it visible at the very top of the page
@@ -174,6 +192,27 @@ export function Nav() {
             >
               Book Consultation
             </Link>
+            {/* Filter pill — properties page, mobile, scrolled */}
+            {isPropertiesPage && isMobile && scrolled && (
+              <button
+                id="nav-filter-pill"
+                type="button"
+                aria-label="Open filters"
+                onClick={() => window.dispatchEvent(new CustomEvent("open-filters-sheet"))}
+                className={`inline-flex items-center gap-1.5 rounded-full border border-black/12 bg-white/80 backdrop-blur px-3.5 py-2 text-[12px] font-semibold text-ink transition-all duration-300 active:scale-95 md:hidden ${
+                  collapsed ? "opacity-0 pointer-events-none" : "opacity-100"
+                }`}
+                style={{ transitionTimingFunction: "var(--ease-luxe)" }}
+              >
+                <Sliders className="h-3 w-3 text-ink/60" />
+                Filters
+                {filterCount > 0 && (
+                  <span className="flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white leading-none">
+                    {filterCount}
+                  </span>
+                )}
+              </button>
+            )}
             <button
               type="button"
               aria-label={open ? "Close menu" : "Open menu"}
@@ -219,9 +258,11 @@ export function Nav() {
             Menu
           </p>
           <ul className="mt-10 flex flex-col">
-            {links.map((l, i) => (
-              <li
-                key={l.to}
+            {links
+              .filter((l) => l.label !== "Properties" && l.label !== "Guides")
+              .map((l, i) => (
+                <li
+                  key={l.to}
                 className="border-b border-hairline transition-all duration-[350ms]"
                 style={{
                   transitionDelay: open ? `${60 + i * 30}ms` : "0ms",

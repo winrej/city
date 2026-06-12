@@ -114,6 +114,9 @@ interface HomepageSettings {
   stat_2_desc?: string;
   stat_3_val?: string;
   stat_3_desc?: string;
+  featured_eyebrow?: string;
+  featured_title?: string;
+  featured_description?: string;
 }
 
 // ─── CUSTOMIZABLE HERO OVERLAY ──────────────────────────────────────────────
@@ -633,16 +636,20 @@ function Home() {
         <div className="container-prose">
           <div className="grid items-end gap-6 md:grid-cols-12">
             <Reveal className="md:col-span-7">
-              <p className="eyebrow">
-                <span className="gold-rule" />
-                Selected
-              </p>
-              <h2 className="display-2 mt-6">Featured opportunities.</h2>
+              {homepageSettings.featured_eyebrow !== "" && (
+                <p className="eyebrow">
+                  <span className="gold-rule" />
+                  {homepageSettings.featured_eyebrow || "Selected"}
+                </p>
+              )}
+              <h2 className="display-2 mt-6">
+                {homepageSettings.featured_title || "Featured opportunities."}
+              </h2>
             </Reveal>
             <Reveal delay={160} className="md:col-span-4 md:col-start-9">
               <p className="text-[15px] leading-relaxed text-muted-foreground">
-                A curated, ever-evolving shortlist — chosen for resilience, lifestyle, and long-term
-                value.
+                {homepageSettings.featured_description ||
+                  "A curated, ever-evolving shortlist — chosen for resilience, lifestyle, and long-term value."}
               </p>
             </Reveal>
           </div>
