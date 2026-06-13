@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getSiteSettings } from "../../lib/api/admin.functions";
 import { useIsMobile } from "../../hooks/use-mobile";
-import { Sliders } from "lucide-react";
 
 const links = [
   { to: "/properties", label: "Properties" },
@@ -148,9 +147,6 @@ export function Nav() {
               <span className="hidden md:block text-[7.5px] lg:text-[8.5px] font-mono tracking-widest uppercase text-muted-foreground leading-tight">
                 Accredited<br />Partner
               </span>
-              <span className="block md:hidden text-[9px] font-mono tracking-widest uppercase text-muted-foreground font-semibold leading-none">
-                DMCI
-              </span>
             </div>
           </div>
 
@@ -195,27 +191,7 @@ export function Nav() {
             >
               Book Consultation
             </Link>
-            {/* Filter pill — properties page, mobile, scrolled */}
-            {isPropertiesPage && isMobile && scrolled && !open && (
-              <button
-                id="nav-filter-pill"
-                type="button"
-                aria-label="Open filters"
-                onClick={() => window.dispatchEvent(new CustomEvent("open-filters-sheet"))}
-                className={`inline-flex items-center gap-1.5 rounded-full border border-black/12 bg-white/80 backdrop-blur px-3.5 py-2 text-[12px] font-semibold text-ink transition-all duration-300 active:scale-95 md:hidden ${
-                  collapsed ? "opacity-0 pointer-events-none" : "opacity-100"
-                }`}
-                style={{ transitionTimingFunction: "var(--ease-luxe)" }}
-              >
-                <Sliders className="h-3 w-3 text-ink/60" />
-                Filters
-                {filterCount > 0 && (
-                  <span className="flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white leading-none">
-                    {filterCount}
-                  </span>
-                )}
-              </button>
-            )}
+
             <button
               type="button"
               aria-label={open ? "Close menu" : "Open menu"}
@@ -334,9 +310,7 @@ export function Nav() {
                       aria-hidden="true"
                     >
                       <path
-                        fillRule="evenodd"
-                        d="M12.315 2c2.43 0 2.784.01 3.71.054 9.39.429 9.02 9.35 9.38 9.38.044.926.054 1.281.054 3.71 0 2.43-.01 2.784-.054 3.71-.428 9.39-9.356 9.02-9.38 9.38-.926.044-1.28 0-3.71 0-2.43 0-2.784-.01-3.71-.054-9.39-.429-9.02-9.35-9.38-9.38C2.078 15.282 2.067 14.92 2.067 12.5c0-2.43.01-2.784.054-3.71.428-9.39 9.356-9.02 9.38-9.38.926-.044 1.28 0 3.71 0zm0 1.913c-2.392 0-2.677.01-3.621.053-6.83.312-6.522 6.516-6.83 6.83-.043.944-.053 1.229-.053 3.62 0 2.392.01 2.677.053 3.621.312 6.83 6.516 6.522 6.83 6.83.944.043 1.229.053 3.62.053 2.392 0 2.677-.01 3.621-.053 6.83-.312 6.522-6.516 6.83-6.83.043-.944.053-1.229.053-3.62 0-2.392-.01-2.677-.053-3.621-.312-6.83-6.516-6.522-6.83-6.83-.944-.043-1.229-.053-3.62-.053zm0 3.201a5.385 5.385 0 110 10.77 5.385 5.385 0 010-10.77zm0 1.913a3.472 3.472 0 100 6.944 3.472 3.472 0 000-6.944zm5.502-1.125a1.26 1.26 0 11-2.52 0 1.26 1.26 0 012.52 0z"
-                        clipRule="evenodd"
+                        d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"
                       />
                     </svg>
                   ),
@@ -415,7 +389,7 @@ export function Nav() {
                           target="_blank"
                           rel="noopener noreferrer"
                           title={platform.name}
-                          className="p-2.5 rounded-full bg-ink/3 text-ink/50 hover:text-ink hover:bg-ink/6 transition-all duration-300"
+                          className="flex h-11 w-11 items-center justify-center rounded-full border border-gold/20 bg-background text-gold/80 hover:text-white hover:bg-gold hover:border-gold transition-all duration-300 shadow-sm hover:shadow-soft hover:-translate-y-[1.5px]"
                         >
                           {platform.icon}
                         </a>
@@ -436,7 +410,7 @@ export function Nav() {
             <Link
               to="/contact"
               onClick={() => setOpen(false)}
-              className="flex min-h-[56px] w-full items-center justify-center gap-3 rounded-full bg-ink px-6 text-[13px] font-semibold tracking-[0.02em] text-white transition-all duration-[350ms] hover:-translate-y-[2px] hover:shadow-lift"
+              className="flex min-h-[56px] w-full items-center justify-center gap-3 rounded-full bg-[#1A56DB] hover:bg-[#1544C0] px-6 text-[13px] font-semibold tracking-[0.02em] text-white transition-all duration-[350ms] hover:-translate-y-[2px] hover:shadow-lift"
               style={{ transitionTimingFunction: "var(--ease-luxe)" }}
             >
               Book Consultation

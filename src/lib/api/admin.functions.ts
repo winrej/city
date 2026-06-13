@@ -977,6 +977,7 @@ export const createProject = createServerFn({ method: "POST" })
       full_address: z.string().min(1),
       min_price: z.number(),
       max_price: z.number(),
+      location_district: z.string().optional(),
     }),
   )
   .handler(async ({ data }) => {
@@ -988,6 +989,7 @@ export const createProject = createServerFn({ method: "POST" })
       .from("projects")
       .insert({
         ...data,
+        location_district: data.location_district || data.city,
         status: "draft",
       })
       .select("id")
@@ -1089,6 +1091,7 @@ export const PropertyCreateSchema = z.object({
   promo_badge: z.string().nullable().optional(),
   is_spotlight: z.boolean().default(false),
   featured_rank: z.number().int().default(0),
+  autoCreateProject: z.boolean().optional(),
 });
 
 export const PropertyUpdateSchema = z.object({
@@ -1155,24 +1158,83 @@ export const getAdminProperties = createServerFn({ method: "GET" }).handler(asyn
 export const createProperty = createServerFn({ method: "POST" })
   .validator((d: unknown) => PropertyCreateSchema.parse(d))
   .handler(async ({ data }) => {
-    await requireAdminSession();
+    const { session } = await requireAdminSession();
 
     const sb = await getServerClient();
     const baseSlug = slugify(data.name);
     const slug = await uniquePropertySlug(sb, baseSlug);
 
+    const { autoCreateProject, ...propertyFields } = data;
+
     const { data: inserted, error } = await sb
       .from("properties")
       .insert({
-        ...data,
+        ...propertyFields,
         slug,
-        highlights: JSON.stringify(data.highlights ?? []),
+        highlights: JSON.stringify(propertyFields.highlights ?? []),
         updated_at: new Date().toISOString(),
       })
       .select()
       .single();
 
     if (error) throw new Error(error.message);
+
+    // Auto-create matching Project stub & draft workspace
+    if (autoCreateProject) {
+      const { data: proj, error: projError } = await sb
+        .from("projects")
+        .insert({
+          title: data.name,
+          slug: slug,
+          category: data.category,
+          developer: data.developer,
+          location_district: data.location,
+          city: data.city.includes(",") ? data.city.split(",").pop()?.trim() || data.city : data.city,
+          full_address: data.city,
+          min_price: Math.round(data.price_min * 1000000),
+          max_price: Math.round(data.price_min * 1000000 * 1.5),
+          status: "draft",
+        })
+        .select("id")
+        .single();
+
+      if (projError) {
+        console.error("Failed to auto-create matching project stub:", projError.message);
+      } else if (proj) {
+        const initialSnapshot = {
+          api_version: "1.2",
+          schema_version: "2026-06",
+          generated_at: new Date().toISOString(),
+          project_meta: {
+            id: proj.id,
+            title: data.name,
+            slug: slug,
+            developer: data.developer,
+            location_district: data.location,
+            city: data.city.includes(",") ? data.city.split(",").pop()?.trim() || data.city : data.city,
+            full_address: data.city,
+            status: "draft",
+            category: data.category,
+            min_price: Math.round(data.price_min * 1000000),
+            max_price: Math.round(data.price_min * 1000000 * 1.5),
+          },
+          layout_flow: [],
+          units: [],
+          landmarks: [],
+        };
+
+        const { error: draftError } = await sb.from("project_draft_workspaces").insert({
+          project_id: proj.id,
+          draft_snapshot: initialSnapshot,
+          updated_by: session.user.id,
+        });
+
+        if (draftError) {
+          console.error("Failed to auto-create matching project workspace:", draftError.message);
+        }
+      }
+    }
+
     return inserted;
   });
 

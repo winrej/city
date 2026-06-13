@@ -80,6 +80,7 @@ type FormState = {
   promo_badge: string;
   is_spotlight: boolean;
   featured_rank: number;
+  autoCreateProject: boolean;
 };
 
 const EMPTY_FORM: FormState = {
@@ -103,6 +104,7 @@ const EMPTY_FORM: FormState = {
   promo_badge: "",
   is_spotlight: false,
   featured_rank: 0,
+  autoCreateProject: true,
 };
 
 function PropertyFormModal({
@@ -551,6 +553,26 @@ function PropertyFormModal({
                   ★ Spotlight Property
                 </span>
               </label>
+              {mode === "create" && (
+                <label
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                    cursor: "pointer",
+                    fontSize: "13px",
+                    color: "oklch(0.74 0.137 79)",
+                    fontWeight: "bold",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={form.autoCreateProject}
+                    onChange={(e) => set("autoCreateProject", e.target.checked)}
+                  />
+                  Auto-create matching Project page
+                </label>
+              )}
             </div>
           </div>
 

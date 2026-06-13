@@ -218,26 +218,40 @@ function Guides() {
                 />
               </div>
 
-              {/* Tag filters */}
-              <div className="flex flex-wrap gap-2">
-                <button
-                  onClick={() => setActiveTag(null)}
-                  className={`rounded-full border px-4 py-1.5 text-[11px] font-semibold tracking-[0.06em] uppercase transition-all duration-300 ${!activeTag ? "border-ink bg-ink text-white" : "border-border bg-white text-muted-foreground hover:border-ink hover:text-ink"}`}
-                  style={{ transitionTimingFunction: "var(--ease-luxe)" }}
+              {/* Tag filters (Horizontal scroll on mobile, wrap on desktop) */}
+              <>
+                <style>{`
+                  .scrollbar-none::-webkit-scrollbar {
+                    display: none;
+                  }
+                `}</style>
+                <div
+                  className="flex flex-row gap-2 pb-3 pt-1 -mx-4 px-4 overflow-x-auto sm:mx-0 sm:px-0 sm:flex-wrap sm:overflow-visible scrollbar-none"
+                  style={{
+                    msOverflowStyle: "none",
+                    scrollbarWidth: "none",
+                    WebkitOverflowScrolling: "touch",
+                  }}
                 >
-                  All
-                </button>
-                {allTags.map((tag) => (
                   <button
-                    key={tag}
-                    onClick={() => setActiveTag(activeTag === tag ? null : tag)}
-                    className={`rounded-full border px-4 py-1.5 text-[11px] font-semibold tracking-[0.06em] uppercase transition-all duration-300 ${activeTag === tag ? "border-primary bg-primary text-white" : "border-border bg-white text-muted-foreground hover:border-primary hover:text-primary"}`}
+                    onClick={() => setActiveTag(null)}
+                    className={`shrink-0 rounded-full border px-4 py-1.5 text-[11px] font-semibold tracking-[0.06em] uppercase transition-all duration-300 ${!activeTag ? "border-ink bg-ink text-white" : "border-border bg-white text-muted-foreground hover:border-ink hover:text-ink"}`}
                     style={{ transitionTimingFunction: "var(--ease-luxe)" }}
                   >
-                    {tag}
+                    All
                   </button>
-                ))}
-              </div>
+                  {allTags.map((tag) => (
+                    <button
+                      key={tag}
+                      onClick={() => setActiveTag(activeTag === tag ? null : tag)}
+                      className={`shrink-0 rounded-full border px-4 py-1.5 text-[11px] font-semibold tracking-[0.06em] uppercase transition-all duration-300 ${activeTag === tag ? "border-primary bg-primary text-white" : "border-border bg-white text-muted-foreground hover:border-primary hover:text-primary"}`}
+                      style={{ transitionTimingFunction: "var(--ease-luxe)" }}
+                    >
+                      {tag}
+                    </button>
+                  ))}
+                </div>
+              </>
             </div>
           </Reveal>
         </div>

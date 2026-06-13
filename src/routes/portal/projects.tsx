@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   FolderOpen,
   Plus,
@@ -28,6 +28,7 @@ import {
   saveProjectDraft,
   publishProject,
   getProjectBySlug,
+  getAdminProperties,
 } from "../../lib/api/admin.functions";
 import { toast } from "sonner";
 
@@ -53,6 +54,7 @@ function ProjectsPage() {
     full_address: "",
     min_price: 4500000,
     max_price: 13500000,
+    location_district: "",
   });
 
   // Fetch admin projects list
@@ -64,6 +66,24 @@ function ProjectsPage() {
     queryKey: ["admin-projects"],
     queryFn: () => getAdminProjects(),
   });
+
+  // Fetch properties list to link with projects
+  const { data: properties } = useQuery({
+    queryKey: ["admin-properties"],
+    queryFn: () => getAdminProperties(),
+  });
+
+  const existingProjectSlugs = useMemo(() => {
+    if (!projects) return new Set<string>();
+    return new Set(projects.map((p) => p.slug));
+  }, [projects]);
+
+  const unlinkedProperties = useMemo(() => {
+    if (!properties) return [];
+    return (properties as any[]).filter(
+      (p) => !p.is_deleted && !existingProjectSlugs.has(p.slug)
+    );
+  }, [properties, existingProjectSlugs]);
 
   const createMutation = useMutation({
     mutationFn: (vars: Parameters<typeof createProject>[0]) => createProject(vars),
@@ -79,6 +99,7 @@ function ProjectsPage() {
         full_address: "",
         min_price: 4500000,
         max_price: 13500000,
+        location_district: "",
       });
       toast.success("Project created successfully");
       // Open editor for new project
@@ -254,10 +275,53 @@ function ProjectsPage() {
                 ✕
               </button>
             </div>
-            <div
+             <div
               className="portal-detail-body"
               style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
             >
+              {unlinkedProperties.length > 0 && (
+                <div className="portal-field" style={{ background: "rgba(255, 255, 255, 0.03)", padding: "0.75rem", borderRadius: "8px", border: "1px solid rgba(255, 255, 255, 0.06)" }}>
+                  <label className="portal-field-label" style={{ color: "oklch(0.74 0.137 79)", fontWeight: "bold" }}>
+                    Link & Import from Existing Property (Optional)
+                  </label>
+                  <div className="portal-select-wrap">
+                    <select
+                      onChange={(e) => {
+                        const selectedId = e.target.value;
+                        if (!selectedId) return;
+                        const p = (properties as any[])?.find((x) => x.id === selectedId);
+                        if (p) {
+                          setNewProj({
+                            title: p.name,
+                            slug: p.slug,
+                            category: p.category,
+                            developer: p.developer,
+                            city: p.location,
+                            full_address: p.city,
+                            min_price: Math.round(p.price_min * 1000000),
+                            max_price: Math.round(p.price_min * 1000000 * 1.5),
+                            location_district: p.location,
+                          });
+                        }
+                      }}
+                      className="portal-select"
+                      defaultValue=""
+                    >
+                      <option value="">-- Or select property to auto-fill --</option>
+                      {unlinkedProperties.map((p: any) => (
+                        <option key={p.id} value={p.id}>
+                          {p.name} ({p.location})
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown size={14} className="portal-select-icon" />
+                  </div>
+                  <span style={{ fontSize: "11px", color: "var(--zinc-500)", marginTop: "0.25rem", display: "block" }}>
+                    Selecting a property auto-populates the form and ensures the slugs match perfectly.
+                  </span>
+                </div>
+              )}
+
               <div className="portal-field">
                 <label className="portal-field-label">Project Title</label>
                 <input

@@ -104,10 +104,13 @@ interface HomepageSettings {
   founder_lede?: string;
   founder_cta_text?: string;
   founder_cta_link?: string;
+  founder_quote?: string;
+  founder_signature_text?: string;
   team_member_image_url?: string;
   team_member_role?: string;
   team_member_name?: string;
   team_member_bio?: string;
+  team_member_quote?: string;
   stat_1_val?: string;
   stat_1_desc?: string;
   stat_2_val?: string;
@@ -359,13 +362,13 @@ function Home() {
         {/* Slide Dot Indicators — only shown when 2+ slides */}
         {totalSlides > 1 && (
           <div
+            className="hidden md:flex"
             style={{
               position: "absolute",
               bottom: "6rem",
               left: "50%",
               transform: "translateX(-50%)",
               zIndex: 20,
-              display: "flex",
               gap: "8px",
               alignItems: "center",
             }}
@@ -735,15 +738,335 @@ function Home() {
         </div>
       </section>
 
-      {/* SECTION 6 — About Preview (editorial) */}
-      <section className="px-4 section-pad">
-        <div className="container-prose">
+      {/* SECTION 6 — Founder Section (Cinematic Dark) */}
+      <section
+        aria-label="About the Founder"
+        style={{
+          background: "oklch(0.21 0.012 252)",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        {/* Radial glow accent — brand blue, left side */}
+        <div
+          aria-hidden
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "radial-gradient(ellipse 55% 65% at 20% 55%, oklch(0.43 0.20 258 / 0.13) 0%, transparent 70%)",
+            pointerEvents: "none",
+          }}
+        />
+        {/* Subtle noise grain texture overlay */}
+        <div
+          aria-hidden
+          style={{
+            position: "absolute",
+            inset: 0,
+            backgroundImage:
+              "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E\")",
+            backgroundRepeat: "repeat",
+            backgroundSize: "180px 180px",
+            pointerEvents: "none",
+            opacity: 0.5,
+          }}
+        />
+
+        <div className="container-prose px-4 section-pad">
           {homepageSettings.enable_team_member ? (
-            <div className="grid gap-20 md:grid-cols-2 md:gap-32">
-              {/* Founder Profile */}
-              <div className="grid items-center gap-10">
+            /* ── DUAL MODE: Founder + Team Member ── */
+            <div className="grid gap-20 md:grid-cols-2 md:gap-16">
+              {/* ── Founder Card ── */}
+              <div style={{ display: "grid", gap: "2.5rem" }}>
                 <Reveal>
-                  <div className="img-luxe img-luxe-hover overflow-hidden rounded-[1.5rem]">
+                  <div style={{ position: "relative" }}>
+                    {/* Gold vertical accent bar */}
+                    <div
+                      aria-hidden
+                      style={{
+                        position: "absolute",
+                        top: "2.5rem",
+                        left: "-1.25rem",
+                        width: "3px",
+                        height: "55%",
+                        background:
+                          "linear-gradient(to bottom, oklch(0.74 0.137 79), oklch(0.74 0.137 79 / 0))",
+                        borderRadius: "2px",
+                      }}
+                    />
+                    <div
+                      className="img-luxe img-luxe-hover overflow-hidden"
+                      style={{ borderRadius: "1.5rem", position: "relative" }}
+                    >
+                      <img
+                        src={homepageSettings.founder_image_url || founderImg}
+                        alt="CityQlo founder portrait"
+                        className="img-luxe aspect-[4/5] w-full object-cover"
+                        width={1400}
+                        height={1750}
+                        loading="lazy"
+                      />
+                      {/* Bottom gradient vignette matching dark bg */}
+                      <div
+                        aria-hidden
+                        style={{
+                          position: "absolute",
+                          inset: "55% 0 0",
+                          background:
+                            "linear-gradient(to top, oklch(0.21 0.012 252 / 0.6), transparent)",
+                          pointerEvents: "none",
+                        }}
+                      />
+                    </div>
+                  </div>
+                </Reveal>
+                <Reveal delay={120}>
+                  <p className="eyebrow" style={{ color: "oklch(0.74 0.137 79 / 0.9)" }}>
+                    <span className="gold-rule" />
+                    {homepageSettings.founder_eyebrow || "Founder"}
+                  </p>
+                  <h2 className="display-3 mt-4" style={{ color: "#fff" }}>
+                    {homepageSettings.founder_headline || "A quieter way to invest."}
+                  </h2>
+
+                  {/* Editorial blockquote — only shown when quote is set */}
+                  {homepageSettings.founder_quote && (
+                    <blockquote
+                      style={{
+                        position: "relative",
+                        margin: "2rem 0",
+                        padding: "1.25rem 1.25rem 1.25rem 2.25rem",
+                        borderLeft: "3px solid oklch(0.74 0.137 79)",
+                        background: "oklch(0.74 0.137 79 / 0.08)",
+                        borderRadius: "0 1rem 1rem 0",
+                      }}
+                    >
+                      <span
+                        aria-hidden
+                        style={{
+                          position: "absolute",
+                          top: "-0.75rem",
+                          left: "0.6rem",
+                          fontSize: "3.5rem",
+                          lineHeight: 1,
+                          fontFamily: "Georgia, serif",
+                          color: "oklch(0.74 0.137 79 / 0.45)",
+                          userSelect: "none",
+                        }}
+                      >
+                        &ldquo;
+                      </span>
+                      <p
+                        style={{
+                          fontStyle: "italic",
+                          fontSize: "clamp(0.95rem, 1.3vw, 1.05rem)",
+                          lineHeight: 1.65,
+                          color: "oklch(0.9 0.008 252)",
+                          margin: 0,
+                        }}
+                      >
+                        {homepageSettings.founder_quote}
+                      </p>
+                    </blockquote>
+                  )}
+
+                  <p
+                    className="lede"
+                    style={{
+                      color: "oklch(0.72 0.008 252)",
+                      marginTop: homepageSettings.founder_quote ? "0" : "1.5rem",
+                    }}
+                  >
+                    {homepageSettings.founder_lede ||
+                      "CityQlo began with a simple frustration: Filipino buyers deserved an advisor — not another salesperson. We exist to give that conversation back to families and OFWs planning for the long run."}
+                  </p>
+
+                  {/* Cursive handwritten signature */}
+                  {homepageSettings.founder_signature_text && (
+                    <p
+                      style={{
+                        fontFamily: "'Dancing Script', 'Brush Script MT', cursive",
+                        fontSize: "clamp(1.75rem, 2.5vw, 2.5rem)",
+                        color: "oklch(0.74 0.137 79)",
+                        lineHeight: 1.2,
+                        marginTop: "1.75rem",
+                        letterSpacing: "0.01em",
+                      }}
+                    >
+                      {homepageSettings.founder_signature_text}
+                    </p>
+                  )}
+
+                  <div style={{ marginTop: "2rem" }}>
+                    <Link
+                      to={homepageSettings.founder_cta_link || "/about"}
+                      className="inline-flex items-center gap-2 rounded-full border px-6 py-3 text-[13px] font-semibold transition-all duration-700 hover:-translate-y-[2px]"
+                      style={{
+                        borderColor: "oklch(1 0 0 / 0.25)",
+                        color: "#fff",
+                        transitionTimingFunction: "var(--ease-luxe)",
+                      }}
+                      onMouseEnter={(e) => {
+                        (e.currentTarget as HTMLAnchorElement).style.borderColor = "oklch(1 0 0 / 0.7)";
+                        (e.currentTarget as HTMLAnchorElement).style.background = "oklch(1 0 0 / 0.07)";
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.currentTarget as HTMLAnchorElement).style.borderColor = "oklch(1 0 0 / 0.25)";
+                        (e.currentTarget as HTMLAnchorElement).style.background = "transparent";
+                      }}
+                    >
+                      {homepageSettings.founder_cta_text || "Read our story"}
+                      <span aria-hidden>→</span>
+                    </Link>
+                  </div>
+                </Reveal>
+              </div>
+
+              {/* ── Team Member Card ── */}
+              <div style={{ display: "grid", gap: "2.5rem", paddingTop: "4rem" }}>
+                <Reveal>
+                  <div style={{ position: "relative" }}>
+                    <div
+                      aria-hidden
+                      style={{
+                        position: "absolute",
+                        top: "2.5rem",
+                        left: "-1.25rem",
+                        width: "3px",
+                        height: "55%",
+                        background:
+                          "linear-gradient(to bottom, oklch(0.74 0.137 79), oklch(0.74 0.137 79 / 0))",
+                        borderRadius: "2px",
+                      }}
+                    />
+                    <div
+                      className="img-luxe img-luxe-hover overflow-hidden"
+                      style={{ borderRadius: "1.5rem", position: "relative" }}
+                    >
+                      <img
+                        src={homepageSettings.team_member_image_url || founderImg}
+                        alt={homepageSettings.team_member_name || "Team member portrait"}
+                        className="img-luxe aspect-[4/5] w-full object-cover"
+                        width={1400}
+                        height={1750}
+                        loading="lazy"
+                      />
+                      <div
+                        aria-hidden
+                        style={{
+                          position: "absolute",
+                          inset: "55% 0 0",
+                          background:
+                            "linear-gradient(to top, oklch(0.21 0.012 252 / 0.6), transparent)",
+                          pointerEvents: "none",
+                        }}
+                      />
+                    </div>
+                  </div>
+                </Reveal>
+                <Reveal delay={120}>
+                  <p className="eyebrow" style={{ color: "oklch(0.74 0.137 79 / 0.9)" }}>
+                    <span className="gold-rule" />
+                    {homepageSettings.team_member_role || "Advisor"}
+                  </p>
+                  <h2 className="display-3 mt-4" style={{ color: "#fff" }}>
+                    {homepageSettings.team_member_name || "Team Member"}
+                  </h2>
+
+                  {homepageSettings.team_member_quote && (
+                    <blockquote
+                      style={{
+                        position: "relative",
+                        margin: "2rem 0",
+                        padding: "1.25rem 1.25rem 1.25rem 2.25rem",
+                        borderLeft: "3px solid oklch(0.74 0.137 79)",
+                        background: "oklch(0.74 0.137 79 / 0.08)",
+                        borderRadius: "0 1rem 1rem 0",
+                      }}
+                    >
+                      <span
+                        aria-hidden
+                        style={{
+                          position: "absolute",
+                          top: "-0.75rem",
+                          left: "0.6rem",
+                          fontSize: "3.5rem",
+                          lineHeight: 1,
+                          fontFamily: "Georgia, serif",
+                          color: "oklch(0.74 0.137 79 / 0.45)",
+                          userSelect: "none",
+                        }}
+                      >
+                        &ldquo;
+                      </span>
+                      <p
+                        style={{
+                          fontStyle: "italic",
+                          fontSize: "clamp(0.95rem, 1.3vw, 1.05rem)",
+                          lineHeight: 1.65,
+                          color: "oklch(0.9 0.008 252)",
+                          margin: 0,
+                        }}
+                      >
+                        {homepageSettings.team_member_quote}
+                      </p>
+                    </blockquote>
+                  )}
+
+                  <p
+                    className="lede"
+                    style={{
+                      color: "oklch(0.72 0.008 252)",
+                      marginTop: homepageSettings.team_member_quote ? "0" : "1.5rem",
+                    }}
+                  >
+                    {homepageSettings.team_member_bio ||
+                      "Dedicated to helping Filipino professionals and investors make smart long-term property decisions."}
+                  </p>
+                </Reveal>
+              </div>
+            </div>
+          ) : (
+            /* ── SINGLE FOUNDER MODE — large editorial layout ── */
+            <div className="grid items-center gap-16 md:grid-cols-12 md:gap-20">
+              {/* Portrait column */}
+              <Reveal className="md:col-span-5">
+                <div style={{ position: "relative" }}>
+                  {/* Gold vertical accent line on the left edge */}
+                  <div
+                    aria-hidden
+                    style={{
+                      position: "absolute",
+                      top: "3rem",
+                      left: "-1.5rem",
+                      width: "3px",
+                      height: "60%",
+                      background:
+                        "linear-gradient(to bottom, oklch(0.74 0.137 79), oklch(0.74 0.137 79 / 0))",
+                      borderRadius: "2px",
+                    }}
+                  />
+                  {/* Subtle corner glow behind portrait */}
+                  <div
+                    aria-hidden
+                    style={{
+                      position: "absolute",
+                      inset: "-2rem -2rem -2rem -2rem",
+                      background:
+                        "radial-gradient(ellipse 80% 80% at 50% 50%, oklch(0.43 0.20 258 / 0.18) 0%, transparent 70%)",
+                      pointerEvents: "none",
+                      borderRadius: "2rem",
+                    }}
+                  />
+                  <div
+                    className="img-luxe img-luxe-hover overflow-hidden"
+                    style={{
+                      borderRadius: "1.5rem",
+                      position: "relative",
+                      boxShadow: "0 32px 80px -20px oklch(0 0 0 / 0.6)",
+                    }}
+                  >
                     <img
                       src={homepageSettings.founder_image_url || founderImg}
                       alt="CityQlo founder portrait"
@@ -752,93 +1075,143 @@ function Home() {
                       height={1750}
                       loading="lazy"
                     />
-                  </div>
-                </Reveal>
-                <Reveal delay={120}>
-                  <p className="eyebrow">
-                    <span className="gold-rule" />
-                    {homepageSettings.founder_eyebrow || "Founder"}
-                  </p>
-                  <h2 className="display-3 mt-4">
-                    {homepageSettings.founder_headline || "A quieter way to invest."}
-                  </h2>
-                  <p className="lede mt-6 text-[15px] leading-relaxed">
-                    {homepageSettings.founder_lede ||
-                      "CityQlo began with a simple frustration: Filipino buyers deserved an advisor — not another salesperson. We exist to give that conversation back to families and OFWs planning for the long run."}
-                  </p>
-                  <div className="mt-8">
-                    <Link
-                      to={homepageSettings.founder_cta_link || "/about"}
-                      className="link-quiet hover:border-ink"
-                    >
-                      {homepageSettings.founder_cta_text || "Read our story"}{" "}
-                      <span aria-hidden>→</span>
-                    </Link>
-                  </div>
-                </Reveal>
-              </div>
-
-              {/* Team Member Profile */}
-              <div className="grid items-center gap-10 md:pt-16">
-                <Reveal>
-                  <div className="img-luxe img-luxe-hover overflow-hidden rounded-[1.5rem]">
-                    <img
-                      src={homepageSettings.team_member_image_url || founderImg}
-                      alt={homepageSettings.team_member_name || "Team member portrait"}
-                      className="img-luxe aspect-[4/5] w-full object-cover"
-                      width={1400}
-                      height={1750}
-                      loading="lazy"
+                    {/* Bottom gradient vignette that bleeds into the dark bg */}
+                    <div
+                      aria-hidden
+                      style={{
+                        position: "absolute",
+                        inset: "50% 0 0",
+                        background:
+                          "linear-gradient(to top, oklch(0.21 0.012 252 / 0.55), transparent)",
+                        pointerEvents: "none",
+                      }}
                     />
                   </div>
-                </Reveal>
-                <Reveal delay={120}>
-                  <p className="eyebrow">
-                    <span className="gold-rule" />
-                    {homepageSettings.team_member_role || "Advisor"}
-                  </p>
-                  <h2 className="display-3 mt-4">
-                    {homepageSettings.team_member_name || "Team Member"}
-                  </h2>
-                  <p className="lede mt-6 text-[15px] leading-relaxed">
-                    {homepageSettings.team_member_bio ||
-                      "Dedicated to helping Filipino professionals and investors make smart long-term property decisions."}
-                  </p>
-                </Reveal>
-              </div>
-            </div>
-          ) : (
-            <div className="grid items-center gap-16 md:grid-cols-12 md:gap-24">
-              <Reveal className="md:col-span-6">
-                <div className="img-luxe img-luxe-hover overflow-hidden rounded-[1.5rem]">
-                  <img
-                    src={homepageSettings.founder_image_url || founderImg}
-                    alt="CityQlo founder portrait"
-                    className="img-luxe aspect-[4/5] w-full object-cover"
-                    width={1400}
-                    height={1750}
-                    loading="lazy"
-                  />
                 </div>
               </Reveal>
-              <Reveal delay={160} className="md:col-span-5 md:col-start-8">
-                <p className="eyebrow">
+
+              {/* Content column */}
+              <Reveal delay={160} className="md:col-span-6 md:col-start-7">
+                {/* Eyebrow in gold */}
+                <p className="eyebrow" style={{ color: "oklch(0.74 0.137 79 / 0.9)" }}>
                   <span className="gold-rule" />
                   {homepageSettings.founder_eyebrow || "Founder"}
                 </p>
-                <h2 className="display-2 mt-6">
+
+                {/* Main headline */}
+                <h2
+                  className="display-2 mt-6"
+                  style={{ color: "#fff", lineHeight: 1.05 }}
+                >
                   {homepageSettings.founder_headline || "A quieter way to invest."}
                 </h2>
-                <p className="lede mt-10">
+
+                {/* Editorial pull-quote — appears when founder_quote is set */}
+                {homepageSettings.founder_quote && (
+                  <blockquote
+                    style={{
+                      position: "relative",
+                      margin: "2.5rem 0",
+                      padding: "1.5rem 1.5rem 1.5rem 2.75rem",
+                      borderLeft: "3px solid oklch(0.74 0.137 79)",
+                      background: "oklch(0.74 0.137 79 / 0.07)",
+                      borderRadius: "0 1.25rem 1.25rem 0",
+                    }}
+                  >
+                    {/* Decorative oversized opening quotation mark */}
+                    <span
+                      aria-hidden
+                      style={{
+                        position: "absolute",
+                        top: "-1rem",
+                        left: "0.75rem",
+                        fontSize: "5rem",
+                        lineHeight: 1,
+                        fontFamily: "Georgia, 'Times New Roman', serif",
+                        color: "oklch(0.74 0.137 79 / 0.4)",
+                        userSelect: "none",
+                        pointerEvents: "none",
+                      }}
+                    >
+                      &ldquo;
+                    </span>
+                    <p
+                      style={{
+                        fontStyle: "italic",
+                        fontSize: "clamp(1rem, 1.5vw, 1.15rem)",
+                        lineHeight: 1.7,
+                        color: "oklch(0.92 0.008 252)",
+                        margin: 0,
+                        fontWeight: 400,
+                      }}
+                    >
+                      {homepageSettings.founder_quote}
+                    </p>
+                  </blockquote>
+                )}
+
+                {/* Body lede */}
+                <p
+                  className="lede"
+                  style={{
+                    color: "oklch(0.70 0.01 252)",
+                    marginTop: homepageSettings.founder_quote ? "0" : "2.5rem",
+                  }}
+                >
                   {homepageSettings.founder_lede ||
                     "CityQlo began with a simple frustration: Filipino buyers deserved an advisor — not another salesperson. We exist to give that conversation back to families and OFWs planning for the long run."}
                 </p>
-                <div className="mt-12">
+
+                {/* Handwritten signature in Dancing Script */}
+                {homepageSettings.founder_signature_text && (
+                  <div style={{ marginTop: "2.25rem", paddingTop: "1.5rem", borderTop: "1px solid oklch(1 0 0 / 0.08)" }}>
+                    <p
+                      style={{
+                        fontFamily: "'Dancing Script', 'Brush Script MT', cursive",
+                        fontSize: "clamp(2rem, 3vw, 3rem)",
+                        color: "oklch(0.74 0.137 79)",
+                        lineHeight: 1.2,
+                        letterSpacing: "0.01em",
+                        margin: 0,
+                      }}
+                    >
+                      {homepageSettings.founder_signature_text}
+                    </p>
+                    <p
+                      style={{
+                        fontSize: "0.6875rem",
+                        letterSpacing: "0.2em",
+                        textTransform: "uppercase",
+                        color: "oklch(0.55 0.01 252)",
+                        marginTop: "0.4rem",
+                        fontFamily: "'JetBrains Mono', monospace",
+                      }}
+                    >
+                      {homepageSettings.founder_eyebrow || "Founder"}, CityQlo
+                    </p>
+                  </div>
+                )}
+
+                {/* CTA */}
+                <div style={{ marginTop: "2.5rem" }}>
                   <Link
                     to={homepageSettings.founder_cta_link || "/about"}
-                    className="link-quiet hover:border-ink"
+                    className="inline-flex items-center gap-2 rounded-full border px-7 py-3.5 text-[13px] font-semibold tracking-[0.02em] transition-all duration-700 hover:-translate-y-[2px]"
+                    style={{
+                      borderColor: "oklch(1 0 0 / 0.22)",
+                      color: "#fff",
+                      transitionTimingFunction: "var(--ease-luxe)",
+                    }}
+                    onMouseEnter={(e) => {
+                      (e.currentTarget as HTMLAnchorElement).style.borderColor = "oklch(1 0 0 / 0.65)";
+                      (e.currentTarget as HTMLAnchorElement).style.background = "oklch(1 0 0 / 0.07)";
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.currentTarget as HTMLAnchorElement).style.borderColor = "oklch(1 0 0 / 0.22)";
+                      (e.currentTarget as HTMLAnchorElement).style.background = "transparent";
+                    }}
                   >
-                    {homepageSettings.founder_cta_text || "Read our story"}{" "}
+                    {homepageSettings.founder_cta_text || "Read our story"}
                     <span aria-hidden>→</span>
                   </Link>
                 </div>

@@ -2532,6 +2532,86 @@ function HomepageEditorPage() {
                 </div>
               </div>
 
+              {/* ─── New: Cinematic Enhancements ─── */}
+              <div
+                style={{
+                  background: "rgba(255,255,255,0.02)",
+                  border: "1px solid rgba(255,255,255,0.06)",
+                  borderRadius: "12px",
+                  padding: "1.25rem",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "1rem",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.25rem" }}>
+                  <span
+                    style={{
+                      width: "8px",
+                      height: "8px",
+                      borderRadius: "50%",
+                      background: "oklch(0.74 0.137 79)",
+                      flexShrink: 0,
+                    }}
+                  />
+                  <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "oklch(0.74 0.137 79)", textTransform: "uppercase", letterSpacing: "0.15em" }}>
+                    Cinematic Enhancements
+                  </span>
+                </div>
+
+                <div className="portal-field">
+                  <label className="portal-field-label">Editorial Pull Quote</label>
+                  <textarea
+                    rows={3}
+                    placeholder="e.g. &ldquo;I believe every Filipino family deserves a trusted advisor, not just another salesperson.&rdquo;"
+                    value={getVal("founder_quote", "")}
+                    onChange={(e) => handleFieldChange("founder_quote", e.target.value)}
+                    className="portal-textarea"
+                  />
+                  <span style={{ fontSize: "0.7rem", color: "var(--zinc-500)", marginTop: "0.35rem", display: "block" }}>
+                    Appears as a highlighted italic blockquote on the homepage. Leave blank to hide.
+                  </span>
+                </div>
+
+                <div className="portal-field">
+                  <label className="portal-field-label">Handwritten Signature Text</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Kristofer Yumul"
+                    value={getVal("founder_signature_text", "")}
+                    onChange={(e) => handleFieldChange("founder_signature_text", e.target.value)}
+                    className="portal-input"
+                  />
+                  <span style={{ fontSize: "0.7rem", color: "var(--zinc-500)", marginTop: "0.35rem", display: "block" }}>
+                    Displayed in a cursive script font in gold below the bio. Leave blank to hide.
+                  </span>
+                  {getVal("founder_signature_text", "") && (
+                    <div
+                      style={{
+                        marginTop: "0.75rem",
+                        padding: "0.75rem 1rem",
+                        background: "rgba(255,255,255,0.03)",
+                        borderRadius: "8px",
+                        border: "1px solid rgba(255,255,255,0.06)",
+                      }}
+                    >
+                      <span style={{ fontSize: "0.65rem", color: "var(--zinc-500)", display: "block", marginBottom: "0.35rem", textTransform: "uppercase", letterSpacing: "0.1em" }}>Preview</span>
+                      <p
+                        style={{
+                          fontFamily: "'Dancing Script', 'Brush Script MT', cursive",
+                          fontSize: "2rem",
+                          color: "oklch(0.74 0.137 79)",
+                          lineHeight: 1.2,
+                          margin: 0,
+                        }}
+                      >
+                        {getVal("founder_signature_text", "")}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
               <div className="portal-card-header mt-6 pt-4 border-t border-[var(--portal-border)]">
                 <div className="portal-card-title">
                   <User size={16} />
@@ -2587,6 +2667,20 @@ function HomepageEditorPage() {
                       onChange={(e) => handleFieldChange("team_member_bio", e.target.value)}
                       className="portal-textarea"
                     />
+                  </div>
+
+                  <div className="portal-field">
+                    <label className="portal-field-label">Editorial Pull Quote (optional)</label>
+                    <textarea
+                      rows={2}
+                      placeholder="e.g. &ldquo;Every question matters. Every family is different.&rdquo;"
+                      value={getVal("team_member_quote", "")}
+                      onChange={(e) => handleFieldChange("team_member_quote", e.target.value)}
+                      className="portal-textarea"
+                    />
+                    <span style={{ fontSize: "0.7rem", color: "var(--zinc-500)", marginTop: "0.35rem", display: "block" }}>
+                      Appears as a highlighted italic blockquote under the team member. Leave blank to hide.
+                    </span>
                   </div>
 
                   <div className="portal-field">

@@ -111,36 +111,7 @@ interface Property {
   featured_rank: number;
 }
 
-// Featured developments fallbacks for migration safety net
-const FEATURED_DEVELOPMENTS_FALLBACK = [
-  {
-    name: "The Oriana",
-    developer: "DMCI Homes",
-    city: "Aurora Blvd, Quezon City",
-    desc: "A resort-inspired, transit-oriented dual-tower sanctuary along Aurora Boulevard. Configured for natural breeze, sunlight, and long-term appreciation.",
-    img: propOriana,
-    tag: "Featured Development",
-    link: "/contact",
-  },
-  {
-    name: "The Valeron Tower",
-    developer: "DMCI Homes & Marubeni JV",
-    city: "C-5, Pasig City",
-    desc: "A prestigious 55-storey high-rise development along the C-5 corridor. Blending Japanese quality checks with resort-style living.",
-    img: towerImg,
-    tag: "Spotlight Residence",
-    link: "/contact",
-  },
-  {
-    name: "Fortis Residences",
-    developer: "DMCI Homes",
-    city: "Chino Roces Ave, Makati City",
-    desc: "A luxury-class residential tower in the emerging Chino Roces creative district. Featuring high-end fixtures, bespoke concierge, and smart-home features.",
-    img: poolImg,
-    tag: "Premium Luxury",
-    link: "/contact",
-  },
-];
+
 
 function PropertyCard({
   property,
@@ -276,7 +247,7 @@ function Properties() {
 
   // Derive featured developments dynamically
   const featuredDevelopments = useMemo(() => {
-    const list = (propertiesData as Property[])
+    return (propertiesData as Property[])
       .filter((p) => p.is_featured)
       .map((p, idx) => ({
         name: p.name,
@@ -287,7 +258,6 @@ function Properties() {
         tag: p.promo_badge || "Featured Development",
         link: `/projects/${p.slug}`,
       }));
-    return list.length > 0 ? list : FEATURED_DEVELOPMENTS_FALLBACK;
   }, [propertiesData]);
 
   // Spotlight property deterministic selection
@@ -308,24 +278,7 @@ function Properties() {
     // 3. Fallback to latest property
     if (props.length > 0) return props[0];
 
-    // local fallback
-    return {
-      name: "The Valeron",
-      developer: "DMCI Homes & Marubeni JV",
-      city: "C-5, Pasig City",
-      location: "Pasig City",
-      description:
-        "A joint-venture masterpiece by DMCI Homes & Marubeni Corporation. Strategically anchored along C5 corridor in Pasig City. Integrating robust Japanese manufacturing checks with iconic resort hospitality.",
-      highlights: [
-        "Minutes from Ortigas East & Bridgetowne CBD",
-        "Dual-developer quality assurance (PH & Japan)",
-        "Extra-private floor plates (under 18 units/level)",
-        "High ceiling configurations and tall light glass",
-      ],
-      slug: "valeron-tower",
-      promo_badge: "Spotlight Residence",
-      image_url: null,
-    };
+    return null;
   }, [propertiesData]);
 
   // Lifestyle collections config settings mapping
@@ -594,115 +547,117 @@ function Properties() {
   return (
     <>
       {/* HERO CAROUSEL SECTION */}
-      <section className="relative h-[92vh] min-h-[600px] w-full overflow-hidden bg-ink">
-        {featuredDevelopments.map((slide, idx) => {
-          const isActive = idx === currentSlide;
-          return (
-            <div
-              key={slide.name}
-              className={`absolute inset-0 transition-all duration-[1000ms] ease-in-out ${
-                isActive
-                  ? "opacity-100 z-10 pointer-events-auto"
-                  : "opacity-0 z-0 pointer-events-none"
-              }`}
-            >
-              {/* Full-bleed Architectural Image */}
+      {featuredDevelopments.length > 0 && (
+        <section className="relative h-[92vh] min-h-[600px] w-full overflow-hidden bg-ink">
+          {featuredDevelopments.map((slide, idx) => {
+            const isActive = idx === currentSlide;
+            return (
               <div
-                className={`absolute inset-0 bg-cover bg-center transition-transform duration-[6000ms] ease-out ${
-                  isActive ? "scale-105" : "scale-100"
+                key={slide.name}
+                className={`absolute inset-0 transition-all duration-[1000ms] ease-in-out ${
+                  isActive
+                    ? "opacity-100 z-10 pointer-events-auto"
+                    : "opacity-0 z-0 pointer-events-none"
                 }`}
-                style={{ backgroundImage: `url(${slide.img})` }}
-              />
-              {/* Customizable Overlay Dark Filter */}
-              <div
-                className="absolute inset-0 bg-black transition-opacity duration-700"
-                style={{ opacity: HERO_OVERLAY_OPACITY_PERCENT / 100 }}
-              />
-              {/* Subtle Dark Gradient Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-background via-black/35 to-black/60" />
+              >
+                {/* Full-bleed Architectural Image */}
+                <div
+                  className={`absolute inset-0 bg-cover bg-center transition-transform duration-[6000ms] ease-out ${
+                    isActive ? "scale-105" : "scale-100"
+                  }`}
+                  style={{ backgroundImage: `url(${slide.img})` }}
+                />
+                {/* Customizable Overlay Dark Filter */}
+                <div
+                  className="absolute inset-0 bg-black transition-opacity duration-700"
+                  style={{ opacity: HERO_OVERLAY_OPACITY_PERCENT / 100 }}
+                />
+                {/* Subtle Dark Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-background via-black/35 to-black/60" />
 
-              <div className="relative z-20 flex h-full items-end pt-24 pb-28 md:pt-28 md:pb-24 hero-properties-container">
-                <div className="container-prose w-full">
-                  <div className="max-w-4xl text-white hero-content-inner">
-                    <Reveal>
-                      <p className="font-mono tracking-[0.3em] text-[#3B82F6] text-[11px] uppercase font-bold">
-                        {slide.tag}
-                      </p>
-                    </Reveal>
-                    <Reveal delay={120}>
-                      <h1 className="display-1 mt-6 text-white tracking-tighter leading-[0.9] font-extrabold">
-                        {slide.name},<br />
-                        <span className="text-[0.75em] opacity-90 font-medium">
-                          {slide.city.split(",")[1]?.trim() || slide.city}
-                        </span>
-                      </h1>
-                    </Reveal>
-                    <Reveal delay={240}>
-                      <p className="lede mt-8 max-w-xl text-white/80 text-[16px] md:text-[18px]">
-                        {slide.desc}
-                      </p>
-                    </Reveal>
-                    <Reveal delay={360}>
-                      <div className="mt-10 flex flex-wrap gap-4">
-                        <Link
-                          to={slide.link}
-                          className="inline-flex min-h-[50px] items-center justify-center gap-2 rounded-full bg-white px-8 text-[13px] font-semibold text-ink transition-all duration-300 hover:-translate-y-[2px] hover:shadow-lift"
-                        >
-                          Schedule Viewing
-                        </Link>
-                        <button
-                          onClick={scrollToResidences}
-                          className="inline-flex min-h-[50px] items-center justify-center gap-2 rounded-full border border-white/45 px-8 text-[13px] font-semibold text-white transition-all duration-300 hover:bg-white/10 hover:border-white"
-                        >
-                          Explore Collection
-                        </button>
-                      </div>
-                    </Reveal>
+                <div className="relative z-20 flex h-full items-end pt-24 pb-28 md:pt-28 md:pb-24 hero-properties-container">
+                  <div className="container-prose w-full">
+                    <div className="max-w-4xl text-white hero-content-inner">
+                      <Reveal>
+                        <p className="font-mono tracking-[0.3em] text-[#3B82F6] text-[11px] uppercase font-bold">
+                          {slide.tag}
+                        </p>
+                      </Reveal>
+                      <Reveal delay={120}>
+                        <h1 className="display-1 mt-6 text-white tracking-tighter leading-[0.9] font-extrabold">
+                          {slide.name},<br />
+                          <span className="text-[0.75em] opacity-90 font-medium">
+                            {slide.city.split(",")[1]?.trim() || slide.city}
+                          </span>
+                        </h1>
+                      </Reveal>
+                      <Reveal delay={240}>
+                        <p className="lede mt-8 max-w-xl text-white/80 text-[16px] md:text-[18px]">
+                          {slide.desc}
+                        </p>
+                      </Reveal>
+                      <Reveal delay={360}>
+                        <div className="mt-10 flex flex-wrap gap-4">
+                          <Link
+                             to={slide.link}
+                            className="inline-flex min-h-[50px] items-center justify-center gap-2 rounded-full bg-white px-8 text-[13px] font-semibold text-ink transition-all duration-300 hover:-translate-y-[2px] hover:shadow-lift"
+                          >
+                            Schedule Viewing
+                          </Link>
+                          <button
+                            onClick={scrollToResidences}
+                            className="inline-flex min-h-[50px] items-center justify-center gap-2 rounded-full border border-white/45 px-8 text-[13px] font-semibold text-white transition-all duration-300 hover:bg-white/10 hover:border-white"
+                          >
+                            Explore Collection
+                          </button>
+                        </div>
+                      </Reveal>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
 
-        {/* Carousel Navigation Arrows */}
-        <div className="absolute top-1/2 -translate-y-1/2 left-6 z-20 hidden md:block">
-          <button
-            onClick={() =>
-              setCurrentSlide(
-                (prev) => (prev - 1 + featuredDevelopments.length) % featuredDevelopments.length,
-              )
-            }
-            className="p-3 rounded-full border border-white/20 bg-black/25 text-white/70 hover:text-white hover:bg-black/50 hover:border-white/50 backdrop-blur-sm transition-all cursor-pointer"
-            aria-label="Previous slide"
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </button>
-        </div>
-        <div className="absolute top-1/2 -translate-y-1/2 right-6 z-20 hidden md:block">
-          <button
-            onClick={() => setCurrentSlide((prev) => (prev + 1) % featuredDevelopments.length)}
-            className="p-3 rounded-full border border-white/20 bg-black/25 text-white/70 hover:text-white hover:bg-black/50 hover:border-white/50 backdrop-blur-sm transition-all cursor-pointer"
-            aria-label="Next slide"
-          >
-            <ChevronRight className="h-5 w-5" />
-          </button>
-        </div>
-
-        {/* Carousel Indicators / Dots */}
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 flex gap-3">
-          {featuredDevelopments.map((_, idx) => (
+          {/* Carousel Navigation Arrows */}
+          <div className="absolute top-1/2 -translate-y-1/2 left-6 z-20 hidden md:block">
             <button
-              key={idx}
-              onClick={() => setCurrentSlide(idx)}
-              className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
-                idx === currentSlide ? "w-8 bg-[#3B82F6]" : "w-2.5 bg-white/40 hover:bg-white/70"
-              }`}
-              aria-label={`Go to slide ${idx + 1}`}
-            />
-          ))}
-        </div>
-      </section>
+              onClick={() =>
+                setCurrentSlide(
+                  (prev) => (prev - 1 + featuredDevelopments.length) % featuredDevelopments.length,
+                )
+              }
+              className="p-3 rounded-full border border-white/20 bg-black/25 text-white/70 hover:text-white hover:bg-black/50 hover:border-white/50 backdrop-blur-sm transition-all cursor-pointer"
+              aria-label="Previous slide"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+          </div>
+          <div className="absolute top-1/2 -translate-y-1/2 right-6 z-20 hidden md:block">
+            <button
+              onClick={() => setCurrentSlide((prev) => (prev + 1) % featuredDevelopments.length)}
+              className="p-3 rounded-full border border-white/20 bg-black/25 text-white/70 hover:text-white hover:bg-black/50 hover:border-white/50 backdrop-blur-sm transition-all cursor-pointer"
+              aria-label="Next slide"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          </div>
+
+          {/* Carousel Indicators / Dots */}
+          <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 flex gap-3">
+            {featuredDevelopments.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setCurrentSlide(idx)}
+                className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                  idx === currentSlide ? "w-8 bg-[#3B82F6]" : "w-2.5 bg-white/40 hover:bg-white/70"
+                }`}
+                aria-label={`Go to slide ${idx + 1}`}
+              />
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* STICKY FILTER RAIL — desktop always expanded; mobile hides entirely after 80px scroll (pill lives in Nav) */}
       <div
