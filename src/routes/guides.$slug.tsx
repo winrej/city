@@ -79,8 +79,8 @@ function markdownToHtml(md: string): string {
     .replace(/^### (.+)$/gm, (_, t) => `<h3 id="${slugify(t)}">${t}</h3>`)
     .replace(/^## (.+)$/gm, (_, t) => `<h2 id="${slugify(t)}">${t}</h2>`)
     .replace(/^# (.+)$/gm, (_, t) => `<h1 id="${slugify(t)}">${t}</h1>`)
-    // Blockquote
-    .replace(/^&gt; (.+)$/gm, "<blockquote>$1</blockquote>")
+    // Blockquote (accept literal ">" — it is not escaped above)
+    .replace(/^(?:&gt;|>) (.+)$/gm, "<blockquote>$1</blockquote>")
     // Code blocks
     .replace(/```[\w]*\n?([\s\S]*?)```/gm, "<pre><code>$1</code></pre>")
     // Inline code
@@ -97,8 +97,35 @@ function markdownToHtml(md: string): string {
     .replace(/^[-*] (.+)$/gm, "<li>$1</li>")
     // Ordered list items
     .replace(/^\d+\. (.+)$/gm, "<li>$1</li>")
-    // Links
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+    // Links — internal (/ or #) open in the same tab; external open in a new tab
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_m: string, text: string, href: string) =>
+      /^(\/|#)/.test(href)
+        ? `<a href="${href}">${text}</a>`
+        : `<a href="${href}" target="_blank" rel="noopener noreferrer">${text}</a>`,
+    );
+
+  // GFM tables → <table> (must run before paragraph/line-break processing,
+  // while table rows still occupy their own newline-separated lines)
+  html = html.replace(
+    /^\|.+\|[ \t]*\n\|[ \t:|-]+\|[ \t]*\n(?:\|.+\|[ \t]*\n?)+/gm,
+    (block) => {
+      const lines = block.trim().split("\n");
+      const splitRow = (row: string) =>
+        row
+          .replace(/^\s*\|/, "")
+          .replace(/\|\s*$/, "")
+          .split("|")
+          .map((c) => c.trim());
+      const head = splitRow(lines[0]).map((c) => `<th>${c}</th>`).join("");
+      const body = lines
+        .slice(2)
+        .map((r) => "<tr>" + splitRow(r).map((c) => `<td>${c}</td>`).join("") + "</tr>")
+        .join("");
+      return `<table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
+    },
+  );
+
+  html = html
     // Line breaks / paragraphs
     .replace(/\n\n/g, "</p><p>")
     .replace(/\n/g, "<br />");
@@ -122,7 +149,12 @@ function markdownToHtml(md: string): string {
     .replace(/(<\/pre>)<\/p>/g, "$1")
     .replace(/<p>(<ul>)/g, "$1")
     .replace(/(<\/ul>)<\/p>/g, "$1")
-    .replace(/<p>(<hr\s*\/>)<\/p>/g, "$1");
+    .replace(/<p>(<hr\s*\/>)<\/p>/g, "$1")
+    // Tables: strip wrapping paragraphs and any stray line-breaks around them
+    .replace(/<p>(<table>)/g, "$1")
+    .replace(/(<\/table>)<\/p>/g, "$1")
+    .replace(/<br \/>(<table>)/g, "$1")
+    .replace(/(<\/table>)<br \/>/g, "$1");
 
   return html;
 }

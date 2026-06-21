@@ -1,6 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { ArrowRight, ChevronDown } from "lucide-react";
 import { getSiteSettings } from "../../lib/api/admin.functions";
 import { useIsMobile } from "../../hooks/use-mobile";
 
@@ -335,18 +336,16 @@ export function Nav() {
                   onClick={() => setOpen(false)}
                   className="group flex flex-col py-4 text-ink"
                 >
-                  <div className="flex items-baseline justify-between">
-                    <div className="flex items-baseline gap-2.5">
-                      <span className="font-mono text-[9px] text-gold tracking-widest font-semibold">{l.num}</span>
-                      <span className="text-[20px] font-bold tracking-tight text-ink group-hover:text-primary transition-colors duration-300">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="font-mono text-[10px] text-gold/80 tracking-[0.2em] font-bold">{l.num}</span>
+                      <span className="font-display font-extrabold text-[22px] tracking-tight text-ink group-hover:text-primary transition-colors duration-300">
                         {l.label}
                       </span>
                     </div>
-                    <span className="text-muted-foreground/60 group-hover:translate-x-1 group-hover:text-primary transition-all duration-300">
-                      →
-                    </span>
+                    <ArrowRight className="h-4.5 w-4.5 text-muted-foreground/50 transition-all duration-300 group-hover:translate-x-1 group-hover:text-primary" />
                   </div>
-                  <p className="mt-1 pl-6 text-[12px] text-muted-foreground font-normal leading-normal">
+                  <p className="mt-1.5 pl-7 text-[12.5px] text-muted-foreground font-medium leading-normal">
                     {l.desc}
                   </p>
                 </Link>
@@ -366,24 +365,22 @@ export function Nav() {
               <button
                 type="button"
                 onClick={() => setMoreExpanded((v) => !v)}
-                className="group flex w-full flex-col py-4 text-left"
+                className="group flex w-full flex-col py-4 text-left focus:outline-none"
               >
-                <div className="flex items-baseline justify-between">
-                  <div className="flex items-baseline gap-2.5">
-                    <span className="font-mono text-[9px] text-gold tracking-widest font-semibold">03</span>
-                    <span className="text-[20px] font-bold tracking-tight text-ink group-hover:text-primary transition-colors duration-300">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="font-mono text-[10px] text-gold/80 tracking-[0.2em] font-bold">03</span>
+                    <span className="font-display font-extrabold text-[22px] tracking-tight text-ink group-hover:text-primary transition-colors duration-300">
                       More
                     </span>
                   </div>
-                  <span
-                    className={`text-muted-foreground/60 transition-all duration-300 group-hover:text-primary ${
-                      moreExpanded ? "rotate-90" : ""
+                  <ChevronDown
+                    className={`h-4.5 w-4.5 text-muted-foreground/50 transition-transform duration-300 group-hover:text-primary ${
+                      moreExpanded ? "rotate-180" : ""
                     }`}
-                  >
-                    →
-                  </span>
+                  />
                 </div>
-                <p className="mt-1 pl-6 text-[12px] text-muted-foreground font-normal leading-normal">
+                <p className="mt-1.5 pl-7 text-[12.5px] text-muted-foreground font-medium leading-normal">
                   About, FAQ & Careers
                 </p>
               </button>
@@ -396,17 +393,19 @@ export function Nav() {
                   transitionTimingFunction: "var(--ease-luxe)",
                 }}
               >
-                <ul className="mb-3 flex flex-col gap-0.5 pl-6">
+                <ul className="mb-3 flex flex-col gap-1.5 pl-7">
                   {moreLinks.map((ml) => (
                     <li key={ml.to}>
                       <Link
                         to={ml.to}
                         onClick={() => { setOpen(false); setMoreExpanded(false); }}
-                        className="flex items-center justify-between rounded-xl px-3 py-3.5 transition-colors duration-200 hover:bg-black/[0.04] active:bg-black/[0.06]"
+                        className="group flex items-center justify-between rounded-xl px-3 py-2.5 transition-all duration-300 hover:bg-black/[0.04]"
                         activeProps={{ className: "text-primary" }}
                       >
-                        <span className="text-[15px] font-semibold text-ink/80">{ml.label}</span>
-                        <span className="text-[11px] text-muted-foreground/50">→</span>
+                        <span className="text-[14.5px] font-[600] text-ink/80 group-hover:text-primary transition-colors duration-300">
+                          {ml.label}
+                        </span>
+                        <ArrowRight className="h-3.5 w-3.5 text-muted-foreground/45 transition-all duration-300 group-hover:translate-x-0.5 group-hover:text-primary" />
                       </Link>
                     </li>
                   ))}

@@ -612,6 +612,31 @@
   height: auto;
   margin: 2em 0;
 }
+.prose-cityqlo table {
+  display: block;
+  width: 100%;
+  margin: 2em 0;
+  border-collapse: collapse;
+  overflow-x: auto;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+.prose-cityqlo thead th {
+  background: var(--muted);
+  font-weight: 700;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.prose-cityqlo th,
+.prose-cityqlo td {
+  border: 1px solid var(--border);
+  padding: 0.625em 0.875em;
+  text-align: left;
+  vertical-align: top;
+}
+.prose-cityqlo tbody tr:nth-child(even) {
+  background: var(--surface);
+}
 
 /* ── Blog Markdown Editor (admin portal) ───────────────────────────────────── */
 .blog-editor-textarea {
