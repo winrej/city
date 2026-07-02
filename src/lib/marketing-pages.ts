@@ -101,6 +101,37 @@ export const WHY_INVEST_PAGE_FALLBACK = {
     { title: "Inflation hedge", description: "Hard assets keep pace with - or outrun - rising cost of living." },
     { title: "Generational asset", description: "Pass it on, refinance it, or leverage it as part of a wider portfolio." },
   ],
+  rental_strategies_heading: "Three ways your unit can earn.",
+  rental_strategies_description:
+    "A DMCI property isn't just a home - it can also become a source of recurring income. Here's how different rental strategies compare.",
+  rental_strategies_disclaimer:
+    "Returns depend on location, occupancy, management, seasonality, and market conditions.",
+  rental_strategies: [
+    {
+      title: "Short-term (Airbnb)",
+      description:
+        "Nightly stays in tourist- and CBD-adjacent towers can outperform traditional leases - in exchange for active management, furnishing, and occupancy risk.",
+      effort: "High",
+      yield: "High",
+      guide_slug: "short-term-airbnb-rentals-manila",
+    },
+    {
+      title: "Staycation",
+      description:
+        "Resort-style DMCI amenities make units a natural fit for weekend and holiday guests - a middle ground between nightly churn and long leases.",
+      effort: "Medium",
+      yield: "Med-High",
+      guide_slug: "staycation-rentals-dmci",
+    },
+    {
+      title: "Long-term rental",
+      description:
+        "A 6-12 month lease trades peak yield for predictable, peso-resilient cash flow and minimal turnover - the classic passive hold.",
+      effort: "Low",
+      yield: "Steady",
+      guide_slug: "long-term-rentals-metro-manila",
+    },
+  ],
   faq_heading: "Honest answers.",
   faq_description: "If yours is not here, ask us directly.",
   faqs: [

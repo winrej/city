@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, BedDouble, Umbrella, KeyRound } from "lucide-react";
 import towerImg from "@/assets/tower-exterior.jpg";
 import interiorImg from "@/assets/interior-living.jpg";
 import { ConsultationCTA } from "@/components/site/ConsultationCTA";
@@ -88,6 +88,22 @@ function WhyInvest() {
     "What ownership earns you over time.",
   );
   const benefits = getArrayField(pageSettings.benefits, WHY_INVEST_PAGE_FALLBACK.benefits);
+  const rentalHeading = getTextField(
+    pageSettings.rental_strategies_heading,
+    WHY_INVEST_PAGE_FALLBACK.rental_strategies_heading,
+  );
+  const rentalDescription = getTextField(
+    pageSettings.rental_strategies_description,
+    WHY_INVEST_PAGE_FALLBACK.rental_strategies_description,
+  );
+  const rentalStrategies = getArrayField(
+    pageSettings.rental_strategies,
+    WHY_INVEST_PAGE_FALLBACK.rental_strategies,
+  );
+  const rentalDisclaimer = getTextField(
+    pageSettings.rental_strategies_disclaimer,
+    WHY_INVEST_PAGE_FALLBACK.rental_strategies_disclaimer,
+  );
   const faqHeading = getTextField(pageSettings.faq_heading, "Honest answers.");
   const faqDescription = getTextField(
     pageSettings.faq_description,
@@ -96,6 +112,13 @@ function WhyInvest() {
   const faqs = getArrayField(pageSettings.faqs, WHY_INVEST_PAGE_FALLBACK.faqs);
 
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+
+  // Consistent outlined icon set per rental strategy, indexed by position (kept in code — not CMS)
+  const rentalStrategyIcons = [
+    <BedDouble key="short-term" className="h-6 w-6 text-primary" strokeWidth={1.75} aria-hidden="true" />,
+    <Umbrella key="staycation" className="h-6 w-6 text-primary" strokeWidth={1.75} aria-hidden="true" />,
+    <KeyRound key="long-term" className="h-6 w-6 text-primary" strokeWidth={1.75} aria-hidden="true" />,
+  ];
 
   // Hardcoded premium structural labels matching the pillars index
   const pillarTechLabels = [
@@ -353,6 +376,92 @@ function WhyInvest() {
               </Reveal>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Rental Income Strategies */}
+      <section className="px-4 section-pad surface relative overflow-hidden">
+        {/* Float handwritten note */}
+        <span
+          className="absolute hidden xl:inline-block pointer-events-none opacity-[0.25] text-[34px] rotate-[-4deg] select-none text-gold"
+          style={{ fontFamily: '"Dancing Script", cursive', top: "10%", right: "4%" }}
+        >
+          Make it work for you
+        </span>
+
+        <div className="container-wide relative z-10">
+          <div className="max-w-3xl">
+            <Reveal>
+              <p className="eyebrow">
+                <span className="gold-rule" />
+                Income Strategies
+              </p>
+              <h2 className="display-2 mt-6">{rentalHeading}</h2>
+              <p className="mt-6 text-[16px] leading-relaxed text-muted-foreground">
+                {rentalDescription}
+              </p>
+            </Reveal>
+          </div>
+
+          <div className="mt-16 grid gap-8 md:grid-cols-3">
+            {rentalStrategies.map((s: any, i: number) => (
+              <Reveal key={s.title || i} delay={i * 100}>
+                <div
+                  className="group relative flex h-full flex-col rounded-[1.5rem] border border-border bg-background p-8 md:p-10 transition-all duration-700 hover:-translate-y-1 hover:shadow-lift hover:border-primary/30 overflow-hidden"
+                  style={{ transitionTimingFunction: "var(--ease-luxe)" }}
+                >
+                  {/* Hover-expanding gold line */}
+                  <div
+                    className="absolute bottom-0 left-0 h-[2px] bg-gold w-0 group-hover:w-full transition-all duration-700"
+                    style={{ transitionTimingFunction: "var(--ease-luxe)" }}
+                  />
+
+                  <div className="flex items-center justify-between">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-hairline bg-surface transition-colors duration-500 group-hover:border-primary/30">
+                      {rentalStrategyIcons[i]}
+                    </div>
+                    <span className="font-mono text-[11px] font-semibold tracking-[0.28em] text-muted-foreground/50">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                  </div>
+
+                  <h3 className="mt-7 text-[22px] font-bold tracking-[-0.025em] text-ink">
+                    {s.title}
+                  </h3>
+                  <p className="mt-4 flex-1 text-[15.5px] leading-relaxed text-muted-foreground">
+                    {s.description}
+                  </p>
+
+                  {/* Effort / Yield comparison labels */}
+                  <div className="mt-8 flex items-center gap-2 border-t border-hairline pt-5 font-mono text-[10px] uppercase tracking-widest text-muted-foreground/70">
+                    <span>Effort: <span className="text-ink/70">{s.effort}</span></span>
+                    <span className="text-gold/60">·</span>
+                    <span>Yield: <span className="text-ink/70">{s.yield}</span></span>
+                  </div>
+
+                  {/* Deep-dive guide link */}
+                  {s.guide_slug && (
+                    <Link
+                      to="/guides/$slug"
+                      params={{ slug: s.guide_slug }}
+                      className="mt-6 inline-flex items-center gap-1.5 text-[13px] font-semibold text-primary transition-all duration-300 hover:gap-2.5"
+                    >
+                      Read the guide
+                      <span aria-hidden>→</span>
+                    </Link>
+                  )}
+                </div>
+              </Reveal>
+            ))}
+          </div>
+
+          {/* Expectation-setting disclaimer */}
+          <Reveal delay={120}>
+            <p className="mt-10 flex items-start gap-2 text-[13px] italic leading-relaxed text-muted-foreground/70">
+              <span aria-hidden className="mt-[3px] h-1 w-1 shrink-0 rounded-full bg-gold/70" />
+              {rentalDisclaimer}
+            </p>
+          </Reveal>
         </div>
       </section>
 

@@ -20,8 +20,6 @@ const moreLinks = [
 export function Nav() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  // true while the user is actively scrolling — collapses the nav
-  const [isScrolling, setIsScrolling] = useState(false);
   // Filter pill state (properties page only)
   const [filterCount, setFilterCount] = useState(0);
   // Desktop "More" dropdown
@@ -31,7 +29,6 @@ export function Nav() {
   // Mobile "More" accordion
   const [moreExpanded, setMoreExpanded] = useState(false);
 
-  const scrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isMobile = useIsMobile();
   const isPropertiesPage = pathname === "/properties";
@@ -45,27 +42,12 @@ export function Nav() {
 
   useEffect(() => {
     const onScroll = () => {
-      const y = window.scrollY;
-      setScrolled(y > 24);
-
-      // Mark as actively scrolling
-      setIsScrolling(true);
-
-      // Clear any existing pause timer
-      if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
-
-      // After 400ms of no scroll events, consider the user paused
-      scrollTimerRef.current = setTimeout(() => {
-        setIsScrolling(false);
-      }, 400);
+      setScrolled(window.scrollY > 24);
     };
 
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
-    };
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   useEffect(() => {
@@ -89,9 +71,8 @@ export function Nav() {
     return () => window.removeEventListener("filters-active-count", handler);
   }, [isPropertiesPage]);
 
-  // Collapse the nav (hide links + CTA) only while actively scrolling down
-  // Always keep it visible at the very top of the page
-  const collapsed = isScrolling && scrolled;
+  // Nav stays fully expanded at all times — no hide-on-scroll collapse
+  const collapsed = false;
 
   // Read config settings
   const layoutMode = homepageSettings.nav_layout_mode ?? "pill";

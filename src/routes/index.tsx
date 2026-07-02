@@ -486,6 +486,26 @@ function Home() {
           </div>
         </div>
 
+        {/* Floating Consultant Card — bottom right, glassmorphism */}
+        <div className="rise rise-delay-4 absolute right-6 bottom-[calc(7.5rem+20%)] z-20 hidden w-[320px] max-w-[calc(100vw-3rem)] lg:block">
+          <div className="flex items-start gap-4 rounded-[28px] border border-white/20 bg-white/10 p-5 shadow-[0_8px_40px_-8px_rgba(0,0,0,0.5)] backdrop-blur-2xl">
+            <img
+              src="https://res.cloudinary.com/dcnohpztl/image/upload/q_auto/f_auto/v1780922893/photo_2026-06-06_09-41-17_drf5cu.jpg"
+              alt="Jerwin Daliva"
+              className="h-20 w-20 shrink-0 rounded-full border border-white/30 object-cover"
+            />
+            <div className="min-w-0">
+              <p className="text-[15px] font-semibold leading-tight text-white">Jerwin Daliva</p>
+              <p className="mt-1 text-[11.5px] font-medium uppercase tracking-[0.06em] text-[#93B4FF]">
+                Official DMCI Accredited Property Consultant
+              </p>
+              <p className="mt-3 text-[13px] leading-snug text-white/80">
+                Helping you make confident property decisions.
+              </p>
+            </div>
+          </div>
+        </div>
+
         <div
           className="rise rise-delay-4 absolute inset-x-0 bottom-0 z-10 border-t border-[#1A56DB]/30 bg-black/30 backdrop-blur-md"
           style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
