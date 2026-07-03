@@ -6,7 +6,6 @@ import {
   Search,
   Share2,
   X,
-  Check,
   Sparkles,
   ArrowRight,
   Info,
@@ -26,11 +25,6 @@ import { useScrollDirection } from "@/hooks/useScrollDirection";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 // Import local image assets (both JPGs and the new PNGs)
-import locMakati from "@/assets/loc-makati.png";
-import locBgc from "@/assets/loc-bgc.png";
-import locPasig from "@/assets/loc-pasig.png";
-import locQuezon from "@/assets/loc-quezon.png";
-import locMandaluyong from "@/assets/loc-mandaluyong.png";
 import propOriana from "@/assets/prop-oriana.png";
 import towerImg from "@/assets/tower-exterior.jpg";
 import interiorImg from "@/assets/interior-living.jpg";
@@ -274,7 +268,6 @@ function Properties() {
   });
 
   const propertiesData = useMemo(() => pageContent?.properties ?? [], [pageContent]);
-  const collectionsSettings = useMemo(() => pageContent?.collectionsSettings ?? {}, [pageContent]);
   const featuredDistrict = useMemo(() => pageContent?.featuredDistrict ?? {}, [pageContent]);
   const showFeaturedDistrict = featuredDistrict?.enabled !== false;
 
@@ -314,47 +307,9 @@ function Properties() {
     return null;
   }, [propertiesData]);
 
-  // Lifestyle collections config settings mapping
-  const collectionsData = useMemo(() => {
-    return [
-      {
-        id: "Metro Core" as const,
-        title: "Metro Core",
-        tagline: collectionsSettings?.["Metro Core"]?.tagline ?? "High-yield urban spacing.",
-        desc:
-          collectionsSettings?.["Metro Core"]?.description ??
-          "Makati, Taguig, Pasig, Mandaluyong, Quezon City, Caloocan, Manila, Pasay, Cebu, Davao",
-        img: collectionsSettings?.["Metro Core"]?.image_url || locBgc,
-      },
-      {
-        id: "Suburban Enclaves" as const,
-        title: "Suburban Enclaves",
-        tagline: collectionsSettings?.["Suburban Enclaves"]?.tagline ?? "Suburban breathing room.",
-        desc:
-          collectionsSettings?.["Suburban Enclaves"]?.description ??
-          "Parañaque, Muntinlupa, Las Piñas, Bacoor, Cabuyao",
-        img: collectionsSettings?.["Suburban Enclaves"]?.image_url || interiorImg,
-      },
-      {
-        id: "Resort & Leisure" as const,
-        title: "Resort & Leisure",
-        tagline:
-          collectionsSettings?.["Resort & Leisure"]?.tagline ??
-          "Premium coastal & mountain retreats.",
-        desc:
-          collectionsSettings?.["Resort & Leisure"]?.description ??
-          "Boracay (Malay), Batangas (Solmera), Baguio, Tuba (Benguet)",
-        img: collectionsSettings?.["Resort & Leisure"]?.image_url || poolImg,
-      },
-    ];
-  }, [collectionsSettings]);
-
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStatus, setSelectedStatus] = useState<"All" | "RFO" | "Pre-selling">("All");
   const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<
-    "Metro Core" | "Suburban Enclaves" | "Resort & Leisure" | null
-  >(null);
   const [selectedPriceRange, setSelectedPriceRange] = useState<string | null>(null);
 
   const [activeShareProperty, setActiveShareProperty] = useState<Property | null>(null);
@@ -377,10 +332,9 @@ function Properties() {
       else if (selectedPriceRange === "above-8m") labels.push("Above ₱8.0M");
     }
     if (selectedStatus !== "All") labels.push(selectedStatus);
-    if (selectedCategory) labels.push(selectedCategory);
     if (searchQuery) labels.push(`"${searchQuery}"`);
     return labels;
-  }, [selectedLocation, selectedPriceRange, selectedStatus, selectedCategory, searchQuery]);
+  }, [selectedLocation, selectedPriceRange, selectedStatus, searchQuery]);
 
   const filterSummaryText = activeFilterLabels.length > 0
     ? activeFilterLabels.join(" · ")
@@ -480,9 +434,6 @@ function Properties() {
       // Location matches
       const matchesLocation = !selectedLocation || property.location === selectedLocation;
 
-      // Category matches
-      const matchesCategory = !selectedCategory || property.category === selectedCategory;
-
       // Price matches using price_min (never price_display)
       let matchesPrice = true;
       if (selectedPriceRange === "under-6m") {
@@ -493,14 +444,13 @@ function Properties() {
         matchesPrice = property.price_min > 8.0;
       }
 
-      return matchesSearch && matchesStatus && matchesLocation && matchesCategory && matchesPrice;
+      return matchesSearch && matchesStatus && matchesLocation && matchesPrice;
     });
   }, [
     propertiesData,
     searchQuery,
     selectedStatus,
     selectedLocation,
-    selectedCategory,
     selectedPriceRange,
   ]);
 
@@ -512,35 +462,6 @@ function Properties() {
     });
     return Array.from(seen.entries()).map(([name, count]) => ({ name, count }));
   }, [propertiesData]);
-
-  // Dynamically filter locations based on selected category
-  const filteredLocationsData = useMemo(() => {
-    if (!selectedCategory) return locationsData;
-    const activeLocations = new Set(
-      (propertiesData as Property[])
-        .filter((p) => p.category === selectedCategory)
-        .map((p) => p.location),
-    );
-    return locationsData.filter((loc) => activeLocations.has(loc.name));
-  }, [selectedCategory, locationsData, propertiesData]);
-
-  const handleSelectCategory = (
-    category: "Metro Core" | "Suburban Enclaves" | "Resort & Leisure",
-  ) => {
-    if (selectedCategory === category) {
-      setSelectedCategory(null);
-    } else {
-      setSelectedCategory(category);
-      if (selectedLocation) {
-        const hasLocationInNewCategory = (propertiesData as Property[]).some(
-          (p) => p.category === category && p.location === selectedLocation,
-        );
-        if (!hasLocationInNewCategory) {
-          setSelectedLocation(null);
-        }
-      }
-    }
-  };
 
   const handleShare = (property: Property) => {
     const shareUrl = `${window.location.origin}/projects/${property.slug || property.id}`;
@@ -574,7 +495,6 @@ function Properties() {
     setSearchQuery("");
     setSelectedStatus("All");
     setSelectedLocation(null);
-    setSelectedCategory(null);
     setSelectedPriceRange(null);
   };
 
@@ -763,7 +683,7 @@ function Properties() {
                     className="h-10 rounded-full border border-border/70 bg-surface/50 px-5 pr-9 text-[12.5px] font-semibold text-ink focus:border-ink focus:outline-none appearance-none cursor-pointer"
                   >
                     <option value="">All Districts</option>
-                    {filteredLocationsData.map((loc) => (
+                    {locationsData.map((loc) => (
                       <option key={loc.name} value={loc.name}>
                         {loc.name}
                       </option>
@@ -794,7 +714,6 @@ function Properties() {
                 {/* Clear filters trigger */}
                 {(searchQuery ||
                   selectedLocation ||
-                  selectedCategory ||
                   selectedPriceRange ||
                   selectedStatus !== "All") && (
                   <button
@@ -897,7 +816,7 @@ function Properties() {
                     className="h-11 w-full rounded-2xl border border-border/60 bg-white px-4 pr-10 text-[14px] font-medium text-ink focus:border-ink focus:outline-none appearance-none cursor-pointer"
                   >
                     <option value="">All Districts</option>
-                    {filteredLocationsData.map((loc) => (
+                    {locationsData.map((loc) => (
                       <option key={loc.name} value={loc.name}>
                         {loc.name} ({loc.count})
                       </option>
@@ -955,71 +874,6 @@ function Properties() {
           </div>
         </div>
       )}
-
-      {/* BROWSE BY LIFESTYLE TIERS (COLLECTION CARDS) */}
-      <section className="px-4 section-pad-sm bg-surface/40">
-        <div className="container-prose">
-          <Reveal>
-            <p className="eyebrow">
-              <span className="gold-rule" />
-              Collections
-            </p>
-          </Reveal>
-          <Reveal delay={120}>
-            <h2 className="display-3 mt-4 max-w-xl">Browse by Lifestyle & Yield.</h2>
-          </Reveal>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
-            {collectionsData.map((collection, i) => {
-              const isActive = selectedCategory === collection.id;
-              return (
-                <Reveal key={collection.id} delay={i * 120}>
-                  <div
-                    onClick={() => handleSelectCategory(collection.id)}
-                    className={`group relative aspect-[4/3] md:aspect-[3/4] lg:aspect-[4/5] cursor-pointer overflow-hidden rounded-3xl border transition-all duration-500 bg-ink ${
-                      isActive
-                        ? "border-[#3B82F6] ring-2 ring-[#3B82F6]/30 scale-[0.98]"
-                        : "border-transparent hover:-translate-y-1 hover:shadow-soft"
-                    }`}
-                  >
-                    {/* Background image */}
-                    <img
-                      src={collection.img}
-                      alt={`${collection.title} collection`}
-                      className="absolute inset-0 h-full w-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105 opacity-60"
-                      loading="lazy"
-                    />
-                    {/* Portrait Gradient overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent" />
-
-                    {/* Location Card Info */}
-                    <div className="absolute bottom-6 left-6 right-6 text-white flex flex-col justify-end h-full">
-                      <p className="font-mono text-[10px] tracking-widest uppercase text-[#60A5FA] font-bold">
-                        Collection
-                      </p>
-                      <h3 className="text-[22px] font-bold tracking-tight text-white mt-1">
-                        {collection.title}
-                      </h3>
-                      <p className="text-[14px] text-white/95 italic font-medium mt-1 leading-snug">
-                        "{collection.tagline}"
-                      </p>
-                      <p className="text-[11px] text-white/55 mt-3 leading-relaxed font-light line-clamp-2">
-                        {collection.desc}
-                      </p>
-                    </div>
-
-                    {isActive && (
-                      <div className="absolute top-4 right-4 bg-[#3B82F6] text-white p-1 rounded-full shadow-md">
-                        <Check className="h-3.5 w-3.5 stroke-[3]" />
-                      </div>
-                    )}
-                  </div>
-                </Reveal>
-              );
-            })}
-          </div>
-        </div>
-      </section>
 
       {/* "THE PASIG COLLECTION" — DARK INVERSION BLOCK */}
       {showFeaturedDistrict && (
@@ -1126,10 +980,10 @@ function Properties() {
       )}
 
       {/* PROPERTY GRID (AVAILABLE RESIDENCES) */}
-      <section ref={residencesRef} className="px-4 py-8 scroll-mt-24">
+      <section ref={residencesRef} className="px-4 py-10 md:py-12 scroll-mt-24">
         <div className="container-prose">
           {/* Centered Intro */}
-          <div className="text-center max-w-2xl mx-auto mb-16">
+          <div className="text-center max-w-2xl mx-auto mb-10 md:mb-12">
             <Reveal>
               <p className="eyebrow">
                 <span className="gold-rule" />

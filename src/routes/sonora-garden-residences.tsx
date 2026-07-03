@@ -15,6 +15,7 @@ import {
 import { Reveal } from "@/components/site/Reveal";
 import { ConsultationCTA } from "@/components/site/ConsultationCTA";
 import { BreadcrumbJsonLd } from "@/components/site/BreadcrumbJsonLd";
+import { VirtualTourSection } from "@/components/site/VirtualTourSection";
 // TODO: replace with a real Sonora Garden Residences hero image when available.
 import heroImg from "@/assets/tower-exterior.jpg";
 
@@ -323,6 +324,23 @@ function StructuredData() {
     })),
   };
 
+  const videoSchema = {
+    "@context": "https://schema.org",
+    "@type": "VideoObject",
+    name: "Sonora Garden Residences — 360° Virtual Property Tour",
+    description:
+      "Immersive 360° virtual tour of Sonora Garden Residences by DMCI Homes in Las Piñas — walk the property, amenities, and 1BR–3BR units including a furnished 3-bedroom model unit.",
+    thumbnailUrl: [OG_IMAGE],
+    uploadDate: "2026-06-01",
+    contentUrl: CANONICAL,
+    embedUrl: "https://dmcihomes.viewin360.co/share/collection/7bGzp",
+    publisher: {
+      "@type": "Organization",
+      name: "CityQlo",
+      logo: { "@type": "ImageObject", url: "https://cityqlo.com/Logo.png" },
+    },
+  };
+
   const articleSchema = {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -350,6 +368,10 @@ function StructuredData() {
       />
       <script
         type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(videoSchema) }}
+      />
+      <script
+        type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
       />
     </>
@@ -368,6 +390,7 @@ const TOC = [
   { id: "price", label: "Price list & computation" },
   { id: "financing", label: "Financing options" },
   { id: "amenities", label: "Amenities" },
+  { id: "tour", label: "Virtual tour (360°)" },
   { id: "who", label: "Who it's for" },
   { id: "investment", label: "Investment potential" },
   { id: "developer", label: "Why DMCI Homes" },
@@ -796,6 +819,9 @@ function SonoraPillarPage() {
               security with CCTV — all maintained by DMCI Homes Property Management Corporation.
             </p>
           </Section>
+
+          {/* Virtual tour */}
+          <VirtualTourSection />
 
           {/* Who */}
           <Section id="who" eyebrow="Fit" title="Who is Sonora Garden Residences for?">

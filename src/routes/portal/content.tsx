@@ -21,7 +21,6 @@ import {
   Edit3,
   ArrowUp,
   ArrowDown,
-  Layers,
   FileText,
 } from "lucide-react";
 import {
@@ -53,7 +52,6 @@ type TabType =
   | "nav"
   | "background"
   | "testimonials"
-  | "collections"
   | "featured_district"
   | "marketing_pages"
   | "carousel"
@@ -633,11 +631,6 @@ function HomepageEditorPage() {
     return row?.value ?? {};
   }, [rawSettings]);
 
-  const collectionsRow = useMemo(() => {
-    const row = rawSettings?.find((r: any) => r.key === "collections_settings");
-    return row?.value ?? {};
-  }, [rawSettings]);
-
   const districtRow = useMemo(() => {
     const row = rawSettings?.find((r: any) => r.key === "featured_district");
     return row?.value ?? {};
@@ -699,9 +692,6 @@ function HomepageEditorPage() {
     }
   }, [settingsRows]);
 
-  const [collectionsDraft, setCollectionsDraft] = useState<Record<string, any>>({});
-  const [collectionsDirty, setCollectionsDirty] = useState(false);
-
   const [districtDraft, setDistrictDraft] = useState<Record<string, any>>({});
   const [districtDirty, setDistrictDirty] = useState(false);
 
@@ -709,12 +699,6 @@ function HomepageEditorPage() {
     Record<string, { pageJson: string; seo: Record<string, any> }>
   >({});
   const [marketingDirty, setMarketingDirty] = useState(false);
-
-  useEffect(() => {
-    if (collectionsRow && Object.keys(collectionsRow).length > 0) {
-      setCollectionsDraft(collectionsRow);
-    }
-  }, [collectionsRow]);
 
   useEffect(() => {
     if (districtRow && Object.keys(districtRow).length > 0) {
@@ -733,17 +717,6 @@ function HomepageEditorPage() {
     }
     setMarketingDraft(nextDraft);
   }, [marketingRows]);
-
-  const handleCollectionsChange = (category: string, field: string, value: any) => {
-    setCollectionsDraft((prev) => ({
-      ...prev,
-      [category]: {
-        ...(prev[category] ?? {}),
-        [field]: value,
-      },
-    }));
-    setCollectionsDirty(true);
-  };
 
   const handleDistrictChange = (field: string, value: any) => {
     setDistrictDraft((prev) => ({
@@ -811,23 +784,6 @@ function HomepageEditorPage() {
       setSaveError(msg);
       toast.error(msg);
     },
-  });
-
-  const saveCollectionsMutation = useMutation({
-    mutationFn: async () => {
-      await updateSiteSettings({
-        data: {
-          key: "collections_settings",
-          value: collectionsDraft,
-        },
-      });
-    },
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["portal-settings"] });
-      setCollectionsDirty(false);
-      toast.success("Collections settings saved successfully");
-    },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed to save collections"),
   });
 
   const saveDistrictMutation = useMutation({
@@ -924,11 +880,10 @@ function HomepageEditorPage() {
         <div>
           <h1 className="portal-page-title">Homepage & Content Editor</h1>
           <p className="portal-page-desc">
-            Manage landing page sections, property collections, and district showcases.
+            Manage landing page sections, district showcases, and supporting content.
           </p>
         </div>
-        {activeTab !== "collections" &&
-          activeTab !== "featured_district" &&
+        {activeTab !== "featured_district" &&
           activeTab !== "marketing_pages" &&
           dirty && (
           <button
@@ -939,17 +894,6 @@ function HomepageEditorPage() {
           >
             <Save size={15} />
             {saveMutation.isPending ? "Saving…" : "Save Changes"}
-          </button>
-        )}
-        {activeTab === "collections" && collectionsDirty && (
-          <button
-            onClick={() => saveCollectionsMutation.mutate()}
-            disabled={saveCollectionsMutation.isPending}
-            className="portal-btn-primary"
-            id="collections-save-btn"
-          >
-            <Save size={15} />
-            {saveCollectionsMutation.isPending ? "Saving…" : "Save Changes"}
           </button>
         )}
         {activeTab === "featured_district" && districtDirty && (
@@ -1133,13 +1077,6 @@ function HomepageEditorPage() {
             Testimonials
           </button>
           <button
-            onClick={() => setActiveTab("collections")}
-            className={`portal-settings-nav-item ${activeTab === "collections" ? "active" : ""}`}
-          >
-            <Layers size={15} />
-            Lifestyle Collections
-          </button>
-          <button
             onClick={() => setActiveTab("featured_district")}
             className={`portal-settings-nav-item ${activeTab === "featured_district" ? "active" : ""}`}
           >
@@ -1303,7 +1240,7 @@ function HomepageEditorPage() {
             </>
           )}
 
-          {/* ─── LIFESTYLE COLLECTIONS TAB ─── */}
+          {/* ─── MARKETING PAGES TAB ─── */}
           {activeTab === "marketing_pages" && (
             <div className="portal-card portal-settings-fields">
               <div className="portal-card-header">
@@ -1430,113 +1367,6 @@ function HomepageEditorPage() {
               </div>
             </div>
           )}
-
-          {activeTab === "collections" &&
-            (() => {
-              const categories = ["Metro Core", "Suburban Enclaves", "Resort & Leisure"];
-              return (
-                <div className="portal-card portal-settings-fields">
-                  <div className="portal-card-header">
-                    <div className="portal-card-title">
-                      <Layers size={16} />
-                      Lifestyle Collections Settings
-                    </div>
-                  </div>
-                  <p
-                    style={{
-                      fontSize: "0.75rem",
-                      color: "var(--zinc-400)",
-                      marginBottom: "1.5rem",
-                    }}
-                  >
-                    Customize the taglines, descriptions, and cover images for the three core
-                    property collections displayed on the Residences Gallery.
-                  </p>
-
-                  <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
-                    {categories.map((cat) => {
-                      const data = collectionsDraft[cat] ?? {};
-                      return (
-                        <div
-                          key={cat}
-                          style={{
-                            background: "rgba(255,255,255,0.02)",
-                            padding: "1.5rem",
-                            borderRadius: "12px",
-                            border: "1px solid rgba(255,255,255,0.06)",
-                          }}
-                        >
-                          <h3
-                            style={{
-                              fontSize: "15px",
-                              fontWeight: 700,
-                              color: "var(--zinc-100)",
-                              marginBottom: "1rem",
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "0.5rem",
-                            }}
-                          >
-                            <span
-                              style={{
-                                width: "8px",
-                                height: "8px",
-                                borderRadius: "50%",
-                                background: "oklch(0.74 0.137 79)",
-                              }}
-                            />
-                            {cat} Collection
-                          </h3>
-
-                          <div className="portal-field" style={{ marginBottom: "1rem" }}>
-                            <label className="portal-field-label">Collection Tagline</label>
-                            <input
-                              type="text"
-                              value={data.tagline ?? ""}
-                              onChange={(e) =>
-                                handleCollectionsChange(cat, "tagline", e.target.value)
-                              }
-                              className="portal-input"
-                              placeholder="e.g. High-yield urban spacing."
-                            />
-                          </div>
-
-                          <div className="portal-field" style={{ marginBottom: "1rem" }}>
-                            <label className="portal-field-label">
-                              Collection Description / Districts
-                            </label>
-                            <textarea
-                              rows={2}
-                              value={data.description ?? ""}
-                              onChange={(e) =>
-                                handleCollectionsChange(cat, "description", e.target.value)
-                              }
-                              className="portal-textarea"
-                              placeholder="e.g. Makati, Taguig, Pasig..."
-                            />
-                          </div>
-
-                          <div className="portal-field">
-                            <label className="portal-field-label">
-                              Cover Image URL (optional override)
-                            </label>
-                            <input
-                              type="text"
-                              value={data.image_url ?? ""}
-                              onChange={(e) =>
-                                handleCollectionsChange(cat, "image_url", e.target.value)
-                              }
-                              className="portal-input"
-                              placeholder="https://..."
-                            />
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })()}
 
           {/* ─── FEATURED DISTRICT TAB ─── */}
           {activeTab === "featured_district" && (

@@ -2355,3 +2355,61 @@
     display: none !important;
   }
 }
+
+/* Navbar Size Adjustments (approx. 14% reduction) */
+header.fixed.inset-x-0.top-0 {
+  padding-top: calc(0.4rem + env(safe-area-inset-top, 0px)) !important;
+}
+
+header.fixed.inset-x-0.top-0 nav {
+  height: 52px !important;
+}
+@media (min-width: 768px) {
+  header.fixed.inset-x-0.top-0 nav {
+    height: 64px !important;
+  }
+}
+
+/* Adjust logo heights */
+header.fixed.inset-x-0.top-0 nav img[alt="CityQlo"] {
+  height: 24px !important;
+}
+@media (min-width: 768px) {
+  header.fixed.inset-x-0.top-0 nav img[alt="CityQlo"] {
+    height: 30px !important;
+  }
+}
+
+/* Adjust DMCI Homes logo container and image height */
+header.fixed.inset-x-0.top-0 nav img[alt="DMCI Homes"] {
+  height: 14px !important;
+}
+@media (min-width: 1024px) {
+  header.fixed.inset-x-0.top-0 nav img[alt="DMCI Homes"] {
+    height: 18px !important;
+  }
+}
+
+header.fixed.inset-x-0.top-0 nav div.border-l.border-black\/10 {
+  height: 1.25rem !important; /* h-5 */
+}
+
+header.fixed.inset-x-0.top-0 nav div.border-l.border-black\/10 span {
+  font-size: 7px !important;
+}
+
+/* Adjust hamburger menu button size */
+header.fixed.inset-x-0.top-0 nav button[aria-label*="menu"] {
+  width: 2.25rem !important; /* w-9 */
+  height: 2.25rem !important; /* h-9 */
+}
+
+/* Adjust desktop Consultation button inside navbar */
+header.fixed.inset-x-0.top-0 nav a[href="/contact"] {
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+  padding-top: 0.5rem !important;
+  padding-bottom: 0.5rem !important;
+  font-size: 13px !important;
+}
+

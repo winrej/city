@@ -39,6 +39,7 @@ import {
 } from "lucide-react";
 import { Reveal } from "@/components/site/Reveal";
 import { BreadcrumbJsonLd } from "@/components/site/BreadcrumbJsonLd";
+import { TourViewer, PROJECT_TOURS } from "@/components/site/VirtualTourSection";
 import { PriceListMagnet } from "@/components/project/PriceListMagnet";
 import {
   getProjectBySlug,
@@ -834,6 +835,9 @@ function ProjectDetailPage() {
       : null;
   const lead = sections.lead_capture ?? {};
   const media = sections.media ?? { photos: [], videos: [], downloads: [] };
+  // 360° tours are keyed by slug (not stored in the CMS yet) so they render
+  // whether the page content came from the DB read model or the fallback.
+  const tours = PROJECT_TOURS[meta.id] ?? [];
   const rel = sections.related ?? { related_slugs: [] };
   const uts = sections.unit_types ?? {};
   const dg = sections.decision_guide ?? {};
@@ -869,7 +873,7 @@ function ProjectDetailPage() {
 
   // ── Media state
   const [mediaTab, setMediaTab] = useState<
-    "exterior" | "amenities" | "interiors" | "videos" | "downloads"
+    "exterior" | "amenities" | "interiors" | "tour" | "videos" | "downloads"
   >("exterior");
   const [lightboxImg, setLightboxImg] = useState<string | null>(null);
   const [videoModal, setVideoModal] = useState(false);
@@ -1473,6 +1477,203 @@ function ProjectDetailPage() {
       </section>
 
       {/* ═══════════════════════════════════════════════════
+          10. MEDIA EXPERIENCE
+      ═══════════════════════════════════════════════════ */}
+      <section className="px-4 py-20 md:py-28">
+        <div className="container-prose">
+          <div className="text-center max-w-2xl mx-auto mb-12">
+            <Reveal>
+              <p className="eyebrow">
+                <span className="gold-rule" />
+                Media
+              </p>
+            </Reveal>
+            <Reveal delay={100}>
+              <h2 className="display-2 mt-5">
+                Experience the <span className="text-primary">Property</span>
+              </h2>
+            </Reveal>
+            <Reveal delay={180}>
+              <p className="text-[15px] text-muted-foreground mt-3">Watch before you visit.</p>
+            </Reveal>
+          </div>
+
+          {/* Tabs */}
+          <Reveal delay={200}>
+            <div className="flex flex-wrap gap-2 mb-8">
+              {(
+                [
+                  "exterior",
+                  "amenities",
+                  "interiors",
+                  ...(tours.length ? (["tour"] as const) : []),
+                  "videos",
+                  "downloads",
+                ] as ("exterior" | "amenities" | "interiors" | "tour" | "videos" | "downloads")[]
+              ).map((tab) => {
+                  const labels: Record<
+                    "exterior" | "amenities" | "interiors" | "tour" | "videos" | "downloads",
+                    string
+                  > = {
+                    exterior: "🏙️ Exterior",
+                    amenities: "🌊 Amenities",
+                    interiors: "🛋️ Interiors",
+                    tour: "🌐 360° Tour",
+                    videos: "▶️ Videos",
+                    downloads: "📄 Downloads",
+                  };
+                  return (
+                    <button
+                      key={tab}
+                      id={`media-tab-${tab}`}
+                      onClick={() => setMediaTab(tab)}
+                      className={`px-5 py-2.5 rounded-full text-[12.5px] font-bold tracking-wide transition-all duration-300 cursor-pointer ${
+                        mediaTab === tab
+                          ? "bg-ink text-white shadow-sm"
+                          : "bg-surface border border-border/60 text-muted-foreground hover:text-ink"
+                      }`}
+                    >
+                      {labels[tab]}
+                    </button>
+                  );
+                },
+              )}
+            </div>
+          </Reveal>
+
+          {/* Photo grid */}
+          {mediaTab !== "videos" && mediaTab !== "downloads" && mediaTab !== "tour" && (
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              {visibleMedia.map((item, i) => (
+                <Reveal key={item.src + i} delay={i * 60}>
+                  <div
+                    className={`group relative overflow-hidden rounded-2xl cursor-pointer shadow-soft hover:shadow-lift transition-all duration-500 ${i === 0 ? "md:col-span-2 aspect-[16/9]" : "aspect-[4/3]"}`}
+                    onClick={() => setLightboxImg(item.src)}
+                  >
+                    <img
+                      src={item.thumb}
+                      alt={item.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[1500ms]"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-400 flex items-center justify-center">
+                      <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-lift">
+                        <ZoomIn size={16} className="text-ink" />
+                      </div>
+                    </div>
+                    <div className="absolute bottom-3 left-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <span className="bg-black/60 text-white text-[11px] font-semibold px-3 py-1 rounded-full">
+                        {item.title}
+                      </span>
+                    </div>
+                  </div>
+                </Reveal>
+              ))}
+            </div>
+          )}
+
+          {/* 360° Tour tab */}
+          {mediaTab === "tour" && (
+            <Reveal>
+              <TourViewer tours={tours} poster={poolImg} />
+              <p className="mt-3 text-[12.5px] text-muted-foreground text-center">
+                Drag to look around · tap the hotspots to move between rooms. Bare-unit tours show
+                actual turnover condition; the model unit is styled for illustration.
+              </p>
+            </Reveal>
+          )}
+
+          {/* Videos tab */}
+          {mediaTab === "videos" && (
+            <Reveal>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {(media.videos || []).map((vid) => (
+                  <div
+                    key={vid.title}
+                    className="group relative rounded-2xl overflow-hidden cursor-pointer shadow-soft hover:shadow-lift transition-all duration-400"
+                    onClick={() => setVideoModal(true)}
+                  >
+                    <img
+                      src={vid.thumb}
+                      alt={vid.title}
+                      className="w-full aspect-video object-cover group-hover:scale-105 transition-transform duration-[1200ms]"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors flex flex-col items-center justify-center gap-3">
+                      <div className="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center shadow-lift">
+                        <Play size={22} className="text-ink ml-1" />
+                      </div>
+                      <p className="text-white font-bold text-[13px]">{vid.title}</p>
+                      <p className="text-white/70 text-[11px] font-mono">{vid.duration}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Reveal>
+          )}
+
+          {/* Downloads tab */}
+          {mediaTab === "downloads" && (
+            <Reveal>
+              <div className="grid sm:grid-cols-2 gap-4 max-w-2xl">
+                {(media.downloads || []).map((doc) => (
+                  <button
+                    key={doc.name}
+                    onClick={scrollToForm}
+                    className="flex items-center gap-4 bg-surface rounded-2xl px-6 py-4 border border-border/40 hover:border-primary/30 hover:shadow-soft transition-all duration-300 text-left cursor-pointer group"
+                  >
+                    <span className="text-2xl">{doc.icon}</span>
+                    <div className="flex-1">
+                      <p className="font-bold text-[14px] text-ink group-hover:text-primary transition-colors">
+                        {doc.name}
+                      </p>
+                      <p className="text-[12px] text-muted-foreground mt-0.5">{doc.size}</p>
+                    </div>
+                    <Download
+                      size={16}
+                      className="text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0"
+                    />
+                  </button>
+                ))}
+                <p className="sm:col-span-2 text-[12.5px] text-muted-foreground text-center mt-2">
+                  Enter your contact details to unlock free downloads.
+                </p>
+              </div>
+            </Reveal>
+          )}
+
+          {/* Video modal */}
+          {videoModal && (
+            <div
+              className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
+              onClick={() => setVideoModal(false)}
+            >
+              <button
+                onClick={() => setVideoModal(false)}
+                className="absolute top-6 right-6 text-white/70 hover:text-white cursor-pointer"
+              >
+                <X size={28} />
+              </button>
+              <div
+                className="bg-black rounded-2xl overflow-hidden max-w-3xl w-full shadow-[0_32px_80px_rgba(0,0,0,0.8)]"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="aspect-video flex items-center justify-center bg-ink/80">
+                  <div className="text-center text-white/60">
+                    <Play size={48} className="mx-auto mb-4 opacity-40" />
+                    <p className="text-[14px]">Video will be embedded here.</p>
+                    <p className="text-[12px] mt-1 opacity-60">
+                      Contact us to schedule a live virtual tour.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════
           2. EMOTIONAL HOOK
       ═══════════════════════════════════════════════════ */}
       <section className="bg-ink text-white px-4 py-20 md:py-28 overflow-hidden relative">
@@ -2038,180 +2239,6 @@ function ProjectDetailPage() {
               </button>
             </div>
           </Reveal>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════
-          10. MEDIA EXPERIENCE
-      ═══════════════════════════════════════════════════ */}
-      <section className="px-4 py-20 md:py-28">
-        <div className="container-prose">
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <Reveal>
-              <p className="eyebrow">
-                <span className="gold-rule" />
-                Media
-              </p>
-            </Reveal>
-            <Reveal delay={100}>
-              <h2 className="display-2 mt-5">
-                Experience the <span className="text-primary">Property</span>
-              </h2>
-            </Reveal>
-            <Reveal delay={180}>
-              <p className="text-[15px] text-muted-foreground mt-3">Watch before you visit.</p>
-            </Reveal>
-          </div>
-
-          {/* Tabs */}
-          <Reveal delay={200}>
-            <div className="flex flex-wrap gap-2 mb-8">
-              {(["exterior", "amenities", "interiors", "videos", "downloads"] as const).map(
-                (tab) => {
-                  const labels: Record<typeof tab, string> = {
-                    exterior: "🏙️ Exterior",
-                    amenities: "🌊 Amenities",
-                    interiors: "🛋️ Interiors",
-                    videos: "▶️ Videos",
-                    downloads: "📄 Downloads",
-                  };
-                  return (
-                    <button
-                      key={tab}
-                      id={`media-tab-${tab}`}
-                      onClick={() => setMediaTab(tab)}
-                      className={`px-5 py-2.5 rounded-full text-[12.5px] font-bold tracking-wide transition-all duration-300 cursor-pointer ${
-                        mediaTab === tab
-                          ? "bg-ink text-white shadow-sm"
-                          : "bg-surface border border-border/60 text-muted-foreground hover:text-ink"
-                      }`}
-                    >
-                      {labels[tab]}
-                    </button>
-                  );
-                },
-              )}
-            </div>
-          </Reveal>
-
-          {/* Photo grid */}
-          {mediaTab !== "videos" && mediaTab !== "downloads" && (
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {visibleMedia.map((item, i) => (
-                <Reveal key={item.src + i} delay={i * 60}>
-                  <div
-                    className={`group relative overflow-hidden rounded-2xl cursor-pointer shadow-soft hover:shadow-lift transition-all duration-500 ${i === 0 ? "md:col-span-2 aspect-[16/9]" : "aspect-[4/3]"}`}
-                    onClick={() => setLightboxImg(item.src)}
-                  >
-                    <img
-                      src={item.thumb}
-                      alt={item.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[1500ms]"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-400 flex items-center justify-center">
-                      <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-lift">
-                        <ZoomIn size={16} className="text-ink" />
-                      </div>
-                    </div>
-                    <div className="absolute bottom-3 left-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <span className="bg-black/60 text-white text-[11px] font-semibold px-3 py-1 rounded-full">
-                        {item.title}
-                      </span>
-                    </div>
-                  </div>
-                </Reveal>
-              ))}
-            </div>
-          )}
-
-          {/* Videos tab */}
-          {mediaTab === "videos" && (
-            <Reveal>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                {(media.videos || []).map((vid) => (
-                  <div
-                    key={vid.title}
-                    className="group relative rounded-2xl overflow-hidden cursor-pointer shadow-soft hover:shadow-lift transition-all duration-400"
-                    onClick={() => setVideoModal(true)}
-                  >
-                    <img
-                      src={vid.thumb}
-                      alt={vid.title}
-                      className="w-full aspect-video object-cover group-hover:scale-105 transition-transform duration-[1200ms]"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors flex flex-col items-center justify-center gap-3">
-                      <div className="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center shadow-lift">
-                        <Play size={22} className="text-ink ml-1" />
-                      </div>
-                      <p className="text-white font-bold text-[13px]">{vid.title}</p>
-                      <p className="text-white/70 text-[11px] font-mono">{vid.duration}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </Reveal>
-          )}
-
-          {/* Downloads tab */}
-          {mediaTab === "downloads" && (
-            <Reveal>
-              <div className="grid sm:grid-cols-2 gap-4 max-w-2xl">
-                {(media.downloads || []).map((doc) => (
-                  <button
-                    key={doc.name}
-                    onClick={scrollToForm}
-                    className="flex items-center gap-4 bg-surface rounded-2xl px-6 py-4 border border-border/40 hover:border-primary/30 hover:shadow-soft transition-all duration-300 text-left cursor-pointer group"
-                  >
-                    <span className="text-2xl">{doc.icon}</span>
-                    <div className="flex-1">
-                      <p className="font-bold text-[14px] text-ink group-hover:text-primary transition-colors">
-                        {doc.name}
-                      </p>
-                      <p className="text-[12px] text-muted-foreground mt-0.5">{doc.size}</p>
-                    </div>
-                    <Download
-                      size={16}
-                      className="text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0"
-                    />
-                  </button>
-                ))}
-                <p className="sm:col-span-2 text-[12.5px] text-muted-foreground text-center mt-2">
-                  Enter your contact details to unlock free downloads.
-                </p>
-              </div>
-            </Reveal>
-          )}
-
-          {/* Video modal */}
-          {videoModal && (
-            <div
-              className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
-              onClick={() => setVideoModal(false)}
-            >
-              <button
-                onClick={() => setVideoModal(false)}
-                className="absolute top-6 right-6 text-white/70 hover:text-white cursor-pointer"
-              >
-                <X size={28} />
-              </button>
-              <div
-                className="bg-black rounded-2xl overflow-hidden max-w-3xl w-full shadow-[0_32px_80px_rgba(0,0,0,0.8)]"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className="aspect-video flex items-center justify-center bg-ink/80">
-                  <div className="text-center text-white/60">
-                    <Play size={48} className="mx-auto mb-4 opacity-40" />
-                    <p className="text-[14px]">Video will be embedded here.</p>
-                    <p className="text-[12px] mt-1 opacity-60">
-                      Contact us to schedule a live virtual tour.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </section>
 

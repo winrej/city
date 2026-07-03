@@ -76,18 +76,6 @@ export const FeaturedDistrictSchema = z
     }
   });
 
-export const CollectionItemSchema = z.object({
-  tagline: z.string().min(1, "Tagline is required"),
-  description: z.string().min(1, "Description is required"),
-  image_url: z.string().nullable().optional(),
-});
-
-export const CollectionsSettingsSchema = z.object({
-  "Metro Core": CollectionItemSchema,
-  "Suburban Enclaves": CollectionItemSchema,
-  "Resort & Leisure": CollectionItemSchema,
-});
-
 const JsonRecordSchema = z.record(z.unknown());
 
 export const MarketingPageSettingsSchema = z
@@ -552,8 +540,6 @@ export const updateSiteSettings = createServerFn({ method: "POST" })
     // Validate specific setting keys before saving
     if (data.key === "featured_district") {
       FeaturedDistrictSchema.parse(data.value);
-    } else if (data.key === "collections_settings") {
-      CollectionsSettingsSchema.parse(data.value);
     } else if (data.key.startsWith("page_")) {
       MarketingPageSettingsSchema.parse(data.value);
     } else if (data.key.startsWith("seo_")) {
@@ -1525,17 +1511,14 @@ export const getPublicPropertiesPageContent = createServerFn({ method: "GET" }).
       const { data: settings, error: settingsError } = await sb
         .from("site_settings")
         .select("*")
-        .in("key", ["collections_settings", "featured_district"]);
+        .eq("key", "featured_district");
 
       if (settingsError) throw new Error(settingsError.message);
 
-      const collectionsSettings =
-        settings?.find((r) => r.key === "collections_settings")?.value ?? null;
       const featuredDistrict = settings?.find((r) => r.key === "featured_district")?.value ?? null;
 
       return {
         properties: properties ?? [],
-        collectionsSettings,
         featuredDistrict,
       };
     } catch (err: any) {

@@ -468,7 +468,7 @@ function Home() {
               <div className="rise rise-delay-3 mt-8 flex flex-row flex-wrap gap-3 md:mt-12">
                 <Link
                   to={homepageSettings.hero_cta_link || "/contact"}
-                  className="inline-flex flex-1 min-h-[50px] items-center justify-center gap-2 rounded-full bg-white px-5 py-3 text-[13px] font-semibold tracking-[0.02em] text-ink transition-all duration-700 hover:-translate-y-[2px] hover:shadow-lift"
+                  className="inline-flex flex-1 min-h-[42px] md:min-h-[50px] items-center justify-center gap-2 rounded-full bg-white px-4 md:px-5 py-2 md:py-3 text-[12px] md:text-[13px] font-semibold tracking-[0.02em] text-ink transition-all duration-700 hover:-translate-y-[2px] hover:shadow-lift"
                   style={{ transitionTimingFunction: "var(--ease-luxe)" }}
                 >
                   {homepageSettings.hero_cta_text || "Book consultation"}
@@ -476,7 +476,7 @@ function Home() {
                 </Link>
                 <Link
                   to={homepageSettings.hero_secondary_cta_link || "/why-invest"}
-                  className="inline-flex flex-1 min-h-[50px] items-center justify-center gap-2 rounded-full border-2 border-white/60 px-5 py-3 text-[13px] font-semibold tracking-[0.02em] text-white transition-all duration-700 hover:border-white hover:bg-white/10"
+                  className="inline-flex flex-1 min-h-[42px] md:min-h-[50px] items-center justify-center gap-2 rounded-full border-2 border-white/60 px-4 md:px-5 py-2 md:py-3 text-[12px] md:text-[13px] font-semibold tracking-[0.02em] text-white transition-all duration-700 hover:border-white hover:bg-white/10"
                   style={{ transitionTimingFunction: "var(--ease-luxe)" }}
                 >
                   {homepageSettings.hero_secondary_cta_text || "Why invest"}
