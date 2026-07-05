@@ -7,8 +7,8 @@ import { cn } from "@/lib/utils";
 // Your Facebook Page Messenger handle.
 const MESSENGER_URL = "https://m.me/cityqlo";
 
-// Show the teaser nudge after this many ms of presence (once per browser session).
-const NUDGE_DELAY = 6000;
+// Show the teaser nudge this long after the visitor first engages (once per browser session).
+const NUDGE_DELAY = 2500;
 const SESSION_KEY = "cq_messenger_seen";
 
 /** Authentic Facebook Messenger logo (gradient bubble + bolt). */
@@ -42,17 +42,57 @@ export function FloatingMessenger() {
   const [interacted, setInteracted] = useState(false);
   const cardRef = useRef<HTMLDivElement | null>(null);
 
+  const isHome = pathname === "/";
   const isPortal = pathname.startsWith("/portal");
 
-  // One-time attention nudge per session.
+  // The FAB hides behind the home hero and reveals once it's scrolled away.
+  // On every other page it's present from the start; once shown it stays (persistent).
+  const [revealed, setRevealed] = useState(!isHome);
+  // Gate the teaser bubble on real engagement (a meaningful scroll) rather than a raw timer.
+  const [engaged, setEngaged] = useState(false);
+
+  // Reset reveal state on route changes: hidden behind the home hero, shown elsewhere.
   useEffect(() => {
     if (isPortal) return;
+    setRevealed(!isHome);
+  }, [isHome, isPortal]);
+
+  // Scroll-driven reveal (past the hero) and engagement detection.
+  useEffect(() => {
+    if (isPortal) return;
+    if (typeof window === "undefined") return;
+
+    let raf = 0;
+    const evaluate = () => {
+      raf = 0;
+      const y = window.scrollY;
+      const engageThreshold = isHome ? window.innerHeight * 0.8 : 240;
+      // Latch on only — never re-hide, so it stays persistent once revealed.
+      if (isHome && y > window.innerHeight * 0.8) setRevealed(true);
+      if (y > engageThreshold) setEngaged(true);
+    };
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(evaluate);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    evaluate(); // account for restored scroll positions / deep links
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [isHome, isPortal]);
+
+  // One-time attention nudge per session — held back until the visitor engages.
+  useEffect(() => {
+    if (isPortal) return;
+    if (!engaged) return;
     if (typeof window === "undefined") return;
     if (sessionStorage.getItem(SESSION_KEY)) return;
 
     const t = setTimeout(() => setNudge(true), NUDGE_DELAY);
     return () => clearTimeout(t);
-  }, [isPortal]);
+  }, [isPortal, engaged]);
 
   // Close on Escape and on outside click.
   useEffect(() => {
@@ -97,7 +137,14 @@ export function FloatingMessenger() {
         "fixed right-4 z-40 flex flex-col items-end gap-3 md:right-6",
         // Sit above the mobile BottomNav on phones; comfortable corner on desktop.
         "bottom-[calc(5.5rem+env(safe-area-inset-bottom))] md:bottom-6",
+        // Smoothly reveal once the home hero is scrolled past (always visible elsewhere).
+        "transition-all duration-500 will-change-transform",
+        revealed
+          ? "translate-y-0 scale-100 opacity-100"
+          : "pointer-events-none translate-y-6 scale-95 opacity-0",
       )}
+      style={{ transitionTimingFunction: "var(--ease-luxe)" }}
+      aria-hidden={!revealed}
     >
       {/* Expanded card */}
       <div

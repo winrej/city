@@ -30,6 +30,8 @@ export const Route = createFileRoute("/portal/blogs/$id")({
 function mdToHtml(md: string): string {
   if (!md) return "";
   let html = md
+    .replace(/\r\n/g, "\n")
+    .replace(/\r/g, "\n")
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
@@ -50,9 +52,32 @@ function mdToHtml(md: string): string {
     .replace(/^---$/gm, "<hr />")
     .replace(/^[-*] (.+)$/gm, "<li>$1</li>")
     .replace(/^\d+\. (.+)$/gm, "<li>$1</li>")
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+
+  // GFM tables → <table> (must run before paragraph/line-break processing)
+  html = html.replace(
+    /^\|.+\|[ \t]*\n\|[ \t:|-]+\|[ \t]*\n(?:\|.+\|[ \t]*\n?)+/gm,
+    (block) => {
+      const lines = block.trim().split("\n");
+      const splitRow = (row: string) =>
+        row
+          .replace(/^\s*\|/, "")
+          .replace(/\|\s*$/, "")
+          .split("|")
+          .map((c) => c.trim());
+      const head = splitRow(lines[0]).map((c) => `<th>${c}</th>`).join("");
+      const body = lines
+        .slice(2)
+        .map((r) => "<tr>" + splitRow(r).map((c) => `<td>${c}</td>`).join("") + "</tr>")
+        .join("");
+      return `<table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
+    },
+  );
+
+  html = html
     .replace(/\n\n/g, "</p><p>")
     .replace(/\n/g, "<br />");
+
   html = `<p>${html}</p>`;
   html = html
     .replace(/(<li>[\s\S]*?<\/li>)/g, (m) => `<ul>${m}</ul>`)
@@ -65,7 +90,11 @@ function mdToHtml(md: string): string {
     .replace(/(<\/pre>)<\/p>/g, "$1")
     .replace(/<p>(<ul>)/g, "$1")
     .replace(/(<\/ul>)<\/p>/g, "$1")
-    .replace(/<p>(<hr\s*\/>)<\/p>/g, "$1");
+    .replace(/<p>(<hr\s*\/>)<\/p>/g, "$1")
+    .replace(/<p>(<table>)/g, "$1")
+    .replace(/(<\/table>)<\/p>/g, "$1")
+    .replace(/<br \/>(<table>)/g, "$1")
+    .replace(/(<\/table>)<br \/>/g, "$1");
   return html;
 }
 

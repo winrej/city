@@ -551,7 +551,6 @@ create table if not exists public.projects (
   city text not null,
   full_address text not null,
   status project_publish_state not null default 'draft',
-  category text not null check (category in ('Metro Core', 'Suburban Enclaves', 'Resort & Leisure')),
   architectural_theme text,
   land_area text,
   floors text,
@@ -718,6 +717,27 @@ create policy "Anyone can view project units" on public.project_units for select
 
 drop policy if exists "Admins can manage project units" on public.project_units;
 create policy "Admins can manage project units" on public.project_units for all using (public.is_admin(auth.uid()));
+
+-- 13.9.5 Project Buildings Table
+create table if not exists public.project_buildings (
+  id uuid primary key default gen_random_uuid(),
+  project_id uuid not null references public.projects(id) on delete cascade,
+  name text not null,
+  description text,
+  floors text,
+  total_units text,
+  status text not null default 'Under Construction' check (status in ('Under Construction', 'Coming Soon', 'RFO')),
+  image_url text,
+  display_order integer not null default 0,
+  created_at timestamptz default now()
+);
+
+alter table public.project_buildings enable row level security;
+drop policy if exists "Anyone can view project buildings" on public.project_buildings;
+create policy "Anyone can view project buildings" on public.project_buildings for select using (true);
+
+drop policy if exists "Admins can manage project buildings" on public.project_buildings;
+create policy "Admins can manage project buildings" on public.project_buildings for all using (public.is_admin(auth.uid()));
 
 -- 13.10 Landmarks junction
 create table if not exists public.landmarks (

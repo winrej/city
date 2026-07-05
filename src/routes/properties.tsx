@@ -100,7 +100,6 @@ interface Property {
   unit_types: string[] | null;
   description: string;
   highlights: string[] | any[];
-  category: "Metro Core" | "Suburban Enclaves" | "Resort & Leisure";
   is_featured: boolean;
   is_active: boolean;
   display_order: number;

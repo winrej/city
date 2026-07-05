@@ -487,20 +487,63 @@ function Home() {
         </div>
 
         {/* Floating Consultant Card — bottom right, glassmorphism */}
-        <div className="rise rise-delay-4 absolute right-6 bottom-[calc(7.5rem+20%)] z-20 hidden w-[320px] max-w-[calc(100vw-3rem)] lg:block">
+        <div className="rise rise-delay-4 absolute right-6 bottom-[calc(7.5rem+20%)] z-20 hidden w-[360px] max-w-[calc(100vw-3rem)] lg:block">
           <div className="flex items-start gap-4 rounded-[28px] border border-white/20 bg-white/10 p-5 shadow-[0_8px_40px_-8px_rgba(0,0,0,0.5)] backdrop-blur-2xl">
-            <img
-              src="https://res.cloudinary.com/dcnohpztl/image/upload/q_auto/f_auto/v1780922893/photo_2026-06-06_09-41-17_drf5cu.jpg"
-              alt="Jerwin Daliva"
-              className="h-20 w-20 shrink-0 rounded-full border border-white/30 object-cover"
-            />
+            <div className="relative shrink-0">
+              <img
+                src="https://res.cloudinary.com/dcnohpztl/image/upload/q_auto/f_auto/v1780922893/photo_2026-06-06_09-41-17_drf5cu.jpg"
+                alt="Jerwin Daliva"
+                className="h-[104px] w-[104px] rounded-full border border-white/30 object-cover"
+              />
+              {/* Verified badge */}
+              <span
+                className="absolute bottom-0.5 right-0.5 flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-[#1A56DB] shadow-md"
+                title="Verified DMCI Accredited Consultant"
+                aria-label="Verified"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  className="h-3.5 w-3.5 text-white"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M5 12.5l4 4 10-10"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </span>
+            </div>
             <div className="min-w-0">
-              <p className="text-[15px] font-semibold leading-tight text-white">Jerwin Daliva</p>
+              <div className="flex items-center gap-1.5">
+                <p className="text-[15px] font-semibold leading-tight text-white">Jerwin Daliva</p>
+                <svg
+                  viewBox="0 0 24 24"
+                  className="h-4 w-4 shrink-0 text-[#93B4FF]"
+                  aria-hidden="true"
+                >
+                  <path
+                    fill="currentColor"
+                    d="M12 1l2.9 2.1 3.5-.4 1.1 3.4 2.9 2.1-1.1 3.4 1.1 3.4-2.9 2.1-1.1 3.4-3.5-.4L12 23l-2.9-2.1-3.5.4-1.1-3.4L1.6 15l1.1-3.4L1.6 8.2l2.9-2.1 1.1-3.4 3.5.4L12 1z"
+                  />
+                  <path
+                    d="M8 12l2.5 2.5L16 9"
+                    stroke="#0B1220"
+                    strokeWidth="2"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </div>
               <p className="mt-1 text-[11.5px] font-medium uppercase tracking-[0.06em] text-[#93B4FF]">
                 Official DMCI Accredited Property Consultant
               </p>
               <p className="mt-3 text-[13px] leading-snug text-white/80">
-                Helping you make confident property decisions.
+                Helping buyers make informed property decisions.
               </p>
             </div>
           </div>

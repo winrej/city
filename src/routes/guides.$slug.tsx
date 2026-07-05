@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { getPublicBlogBySlug } from "@/lib/api/admin.functions";
 import { Share2, Link2, Check, Facebook, Linkedin, Send } from "lucide-react";
 import { BreadcrumbJsonLd } from "../components/site/BreadcrumbJsonLd";
+import { FaqJsonLd, extractFaqs } from "../components/site/FaqJsonLd";
 
 // Normalize any cover image into a crisp 1200×630 (1.91:1) social-share preview.
 // Handles the two sources used across the site — Unsplash and Cloudinary — and
@@ -126,6 +127,8 @@ function markdownToHtml(md: string): string {
     text.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
 
   let html = md
+    .replace(/\r\n/g, "\n")
+    .replace(/\r/g, "\n")
     // Escape HTML tags in content
     .replace(/&/g, "&amp;")
     .replace(/<(?!\/?(br|b|i|em|strong|code|a)\b)/g, "&lt;")
@@ -399,6 +402,7 @@ function BlogPost() {
   }
 
   const htmlContent = markdownToHtml(post.content ?? "");
+  const faqs = extractFaqs(post.content ?? "");
 
   return (
     <>
@@ -409,23 +413,23 @@ function BlogPost() {
           { name: post.title, href: `/guides/${post.slug}` },
         ]}
       />
+      <FaqJsonLd items={faqs} />
       <ScrollProgress />
 
       <article className="min-h-screen">
         {/* ── Hero ───────────────────────────────────────────────── */}
-        <header className="relative px-4 pb-16 pt-32 md:pt-52">
+        <header className="relative overflow-hidden bg-surface px-4 pb-16 pt-28 md:min-h-screen md:pb-20 md:pt-36">
           {post.cover_image_url && (
-            <div className="absolute inset-0 z-0 overflow-hidden">
-              <img
-                src={post.cover_image_url}
-                alt=""
-                className="h-full w-full object-cover"
-                aria-hidden="true"
-              />
-              <div className="absolute inset-0 bg-gradient-to-b from-white/0 via-white/60 to-white" />
-            </div>
+            <img
+              src={post.cover_image_url}
+              alt=""
+              className="absolute inset-0 h-full w-full object-cover opacity-[0.06] blur-sm"
+              aria-hidden="true"
+            />
           )}
-          <div className="container-prose relative z-10 max-w-3xl">
+          <div className="absolute inset-0 bg-gradient-to-b from-white/90 via-white/75 to-white" aria-hidden="true" />
+          <div className="container-wide relative z-10 grid min-h-[calc(100vh-9rem)] items-center gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(420px,0.82fr)] lg:gap-16">
+            <div>
             {/* Breadcrumb */}
             <Link
               to="/guides"
@@ -450,7 +454,7 @@ function BlogPost() {
             )}
 
             {/* Title */}
-            <h1 className="display-1 mt-6 text-ink">{post.title}</h1>
+            <h1 className="display-1 mt-6 max-w-3xl text-ink">{post.title}</h1>
 
             {/* Excerpt */}
             {post.excerpt && (
@@ -458,24 +462,34 @@ function BlogPost() {
             )}
 
             {/* Meta */}
-            <div className="mt-8 flex flex-wrap items-center justify-between gap-6">
-              <div className="flex flex-wrap items-center gap-6">
-                {post.published_at && (
-                  <time className="font-mono text-[11px] tracking-[0.16em] uppercase text-muted-foreground">
-                    {formatDate(post.published_at)}
-                  </time>
-                )}
-                {post.read_time && (
-                  <span className="font-mono text-[11px] tracking-[0.16em] uppercase text-muted-foreground">
-                    {post.read_time} min read
-                  </span>
-                )}
-              </div>
+            <div className="mt-8 flex flex-wrap items-center gap-6">
+              {post.published_at && (
+                <time className="font-mono text-[11px] tracking-[0.16em] uppercase text-muted-foreground">
+                  {formatDate(post.published_at)}
+                </time>
+              )}
+              {post.read_time && (
+                <span className="font-mono text-[11px] tracking-[0.16em] uppercase text-muted-foreground">
+                  {post.read_time} min read
+                </span>
+              )}
               <ShareButton title={post.title} slug={post.slug} />
             </div>
 
             {/* Divider */}
-            <div className="mt-12 h-px w-full bg-gradient-to-r from-gold/60 via-border to-transparent" />
+            <div className="mt-12 h-px w-full max-w-xl bg-gradient-to-r from-gold/60 via-border to-transparent" />
+            </div>
+
+            {post.cover_image_url && (
+              <figure className="order-first overflow-hidden rounded-2xl border border-border bg-white shadow-lift lg:order-none">
+                <img
+                  src={post.cover_image_url}
+                  alt={post.title}
+                  className="max-h-[72vh] w-full object-contain"
+                  loading="eager"
+                />
+              </figure>
+            )}
           </div>
         </header>
 

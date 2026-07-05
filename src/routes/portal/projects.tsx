@@ -1,4 +1,4 @@
-﻿import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect, useMemo } from "react";
 import {
@@ -27,6 +27,10 @@ import {
   DollarSign,
   ExternalLink,
   RefreshCw,
+  Image,
+  Link,
+  Rocket,
+  Globe,
 } from "lucide-react";
 import {
   getAdminProjects,
@@ -37,6 +41,10 @@ import {
   publishProject,
   getProjectBySlug,
   getAdminProperties,
+  createBuilding,
+  updateBuilding,
+  deleteBuilding,
+  reorderBuildings,
 } from "../../lib/api/admin.functions";
 import { toast } from "sonner";
 
@@ -44,7 +52,186 @@ export const Route = createFileRoute("/portal/projects")({
   component: ProjectsPage,
 });
 
-type TabType = "general" | "sections" | "units" | "preview" | "raw";
+type TabType =
+  | "general"
+  | "gallery"
+  | "pricing"
+  | "buildings"
+  | "sections"
+  | "seo"
+  | "publish"
+  | "preview"
+  | "raw";
+
+/** Reusable Cloudinary-aware image URL input with live preview & error detection */
+function CloudinaryImageField({
+  label,
+  value,
+  onChange,
+  aspectRatioLabel,
+  description,
+  className = "portal-input",
+  optional = false,
+}: {
+  label: string;
+  value: string;
+  onChange: (val: string) => void;
+  aspectRatioLabel: string;
+  description?: string;
+  className?: string;
+  optional?: boolean;
+}) {
+  const [imageError, setImageError] = useState(false);
+  const isCloudinary = value ? value.includes("res.cloudinary.com") : false;
+
+  return (
+    <div className="portal-field">
+      <label
+        className="portal-field-label"
+        style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
+      >
+        <span>
+          {label}{" "}
+          {optional && (
+            <span style={{ color: "var(--zinc-500)", fontWeight: 400, fontSize: "11px" }}>
+              (Optional)
+            </span>
+          )}
+        </span>
+        <span
+          style={{
+            fontSize: "10px",
+            padding: "2px 6px",
+            borderRadius: "4px",
+            background: "rgba(255,255,255,0.05)",
+            border: "1px solid rgba(255,255,255,0.1)",
+            color: "var(--zinc-400)",
+            fontFamily: "monospace",
+          }}
+        >
+          {aspectRatioLabel}
+        </span>
+      </label>
+
+      <div style={{ position: "relative" }}>
+        <input
+          type="text"
+          className={className}
+          style={{ paddingRight: value ? "8rem" : undefined }}
+          placeholder="https://res.cloudinary.com/..."
+          value={value}
+          onChange={(e) => {
+            setImageError(false);
+            onChange(e.target.value);
+          }}
+        />
+        {value && (
+          <div
+            style={{
+              position: "absolute",
+              right: "10px",
+              top: "50%",
+              transform: "translateY(-50%)",
+              pointerEvents: "none",
+            }}
+          >
+            {isCloudinary ? (
+              <span
+                style={{
+                  fontSize: "10px",
+                  color: "oklch(0.65 0.18 145)",
+                  fontWeight: 700,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.04em",
+                }}
+              >
+                Cloudinary ✓
+              </span>
+            ) : (
+              <span
+                style={{
+                  fontSize: "10px",
+                  color: "oklch(0.74 0.137 79)",
+                  fontWeight: 700,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.04em",
+                }}
+              >
+                External
+              </span>
+            )}
+          </div>
+        )}
+      </div>
+
+      <p
+        style={{
+          fontSize: "11px",
+          color: "var(--zinc-400)",
+          marginTop: "0.25rem",
+          marginBottom: 0,
+        }}
+      >
+        💡 {description || "Paste a direct Cloudinary image URL (starts with https://res.cloudinary.com/…)"}
+      </p>
+
+      {value && (
+        <div
+          style={{
+            marginTop: "0.5rem",
+            padding: "0.5rem 0.65rem",
+            background: "rgba(255,255,255,0.02)",
+            border: "1px solid rgba(255,255,255,0.06)",
+            borderRadius: "8px",
+            display: "flex",
+            alignItems: "center",
+            gap: "0.75rem",
+          }}
+        >
+          <div
+            style={{
+              width: "60px",
+              height: "44px",
+              background: "rgba(0,0,0,0.3)",
+              border: "1px solid rgba(255,255,255,0.08)",
+              borderRadius: "5px",
+              overflow: "hidden",
+              flexShrink: 0,
+            }}
+          >
+            <img
+              src={value}
+              alt="Preview"
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              onLoad={() => setImageError(false)}
+              onError={() => setImageError(true)}
+            />
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            {imageError ? (
+              <p style={{ fontSize: "12px", color: "#f87171", fontWeight: 600, margin: 0 }}>
+                ⚠️ Could not load image. Check the URL is a valid, publicly accessible link.
+              </p>
+            ) : (
+              <p
+                style={{
+                  fontSize: "11.5px",
+                  color: "oklch(0.65 0.18 145)",
+                  fontWeight: 600,
+                  margin: 0,
+                }}
+              >
+                ✓ Image preview loaded
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+
 
 function ProjectsPage() {
   const qc = useQueryClient();
@@ -53,7 +240,6 @@ function ProjectsPage() {
   const [activeProjectTitle, setActiveProjectTitle] = useState<string | null>(null);
 
   const [search, setSearch] = useState("");
-  const [filterCategory, setFilterCategory] = useState<string>("all");
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [bulkDeleteConfirm, setBulkDeleteConfirm] = useState(false);
@@ -63,7 +249,6 @@ function ProjectsPage() {
   const [newProj, setNewProj] = useState({
     title: "",
     slug: "",
-    category: "Metro Core" as const,
     developer: "DMCI Homes",
     city: "",
     full_address: "",
@@ -164,7 +349,6 @@ function ProjectsPage() {
       setNewProj({
         title: "",
         slug: "",
-        category: "Metro Core",
         developer: "DMCI Homes",
         city: "",
         full_address: "",
@@ -214,7 +398,6 @@ function ProjectsPage() {
 
   const filteredProjects = useMemo(() => {
     return projects.filter((p: any) => {
-      if (filterCategory !== "all" && p.category !== filterCategory) return false;
       if (filterStatus !== "all" && p.status !== filterStatus) return false;
       
       if (search) {
@@ -229,7 +412,7 @@ function ProjectsPage() {
       }
       return true;
     });
-  }, [projects, search, filterCategory, filterStatus]);
+  }, [projects, search, filterStatus]);
 
   const toggleSelectAll = () => {
     if (selectedIds.length === filteredProjects.length) {
@@ -342,20 +525,6 @@ function ProjectsPage() {
         </div>
 
         <div className="portal-toolbar-filters">
-          <div className="portal-select-wrap" style={{ minWidth: "150px" }}>
-            <select
-              className="portal-select"
-              value={filterCategory}
-              onChange={(e) => { setFilterCategory(e.target.value); setSelectedIds([]); }}
-            >
-              <option value="all">All Categories</option>
-              <option value="Metro Core">Metro Core</option>
-              <option value="Suburban Enclaves">Suburban Enclaves</option>
-              <option value="Resort & Leisure">Resort & Leisure</option>
-            </select>
-            <ChevronDown size={13} className="portal-select-icon" />
-          </div>
-
           <div className="portal-select-wrap" style={{ minWidth: "120px" }}>
             <select
               className="portal-select"
@@ -433,7 +602,6 @@ function ProjectsPage() {
                     <div className="portal-item-card-title">{proj.title}</div>
                     <div className="portal-item-card-slug">/{proj.slug}</div>
                     <div className="portal-item-card-badges" style={{ marginTop: "0.4rem" }}>
-                      <span className="portal-source-chip">{proj.category}</span>
                       <span className={`portal-status-badge status-${proj.status}`}>{proj.status}</span>
                       {duplicateIds.has(proj.id) && (
                         <span
@@ -528,7 +696,6 @@ function ProjectsPage() {
                     />
                   </th>
                   <th>Project</th>
-                  <th className="hide-mobile">Category</th>
                   <th className="hide-mobile">Developer</th>
                   <th className="hide-mobile">City</th>
                   <th>Status</th>
@@ -563,9 +730,6 @@ function ProjectsPage() {
                         </span>
                         <span style={{ fontSize: "11px", fontFamily: "var(--font-mono)", color: "var(--portal-text-muted)" }}>/{proj.slug}</span>
                       </div>
-                    </td>
-                    <td className="hide-mobile">
-                      <span className="portal-source-chip">{proj.category}</span>
                     </td>
                     <td className="hide-mobile" style={{ fontSize: "13px", color: "var(--portal-text)" }}>{proj.developer}</td>
                     <td className="hide-mobile" style={{ fontSize: "13px", color: "var(--portal-text-muted)" }}>{proj.city}</td>
@@ -645,7 +809,6 @@ function ProjectsPage() {
                           setNewProj({
                             title: p.name,
                             slug: p.slug,
-                            category: p.category,
                             developer: p.developer,
                             city: p.location,
                             full_address: p.city,
@@ -687,22 +850,9 @@ function ProjectsPage() {
                 )}
               </div>
 
-              <div className="portal-grid-2col">
-                <div className="portal-field">
-                  <label className="portal-field-label">Category</label>
-                  <div className="portal-select-wrap">
-                    <select value={newProj.category} onChange={(e) => setNewProj((prev) => ({ ...prev, category: e.target.value as any }))} className="portal-select">
-                      <option value="Metro Core">Metro Core</option>
-                      <option value="Suburban Enclaves">Suburban Enclaves</option>
-                      <option value="Resort & Leisure">Resort & Leisure</option>
-                    </select>
-                    <ChevronDown size={14} className="portal-select-icon" />
-                  </div>
-                </div>
-                <div className="portal-field">
-                  <label className="portal-field-label">Developer</label>
-                  <input type="text" value={newProj.developer} onChange={(e) => setNewProj((prev) => ({ ...prev, developer: e.target.value }))} className="portal-input" />
-                </div>
+              <div className="portal-field">
+                <label className="portal-field-label">Developer</label>
+                <input type="text" value={newProj.developer} onChange={(e) => setNewProj((prev) => ({ ...prev, developer: e.target.value }))} className="portal-input" />
               </div>
 
               <div className="portal-grid-2col">
@@ -754,18 +904,18 @@ interface EditorProps {
 
 const SECTION_TYPES = [
   { key: "hero", name: "Hero Banner" },
-  { key: "emotional-hook", name: "Emotional Hook / Intro" },
-  { key: "pricing-snapshot", name: "Pricing Snapshot Table" },
-  { key: "project-overview", name: "Project Specifications Grid" },
-  { key: "highlights", name: "Icon Highlights Deck" },
-  { key: "amenities", name: "Resort Amenities List" },
-  { key: "location-map", name: "Travel Time landmarks Map" },
-  { key: "unit-types", name: "Unit Configurations Slider" },
-  { key: "decision-guide", name: "Unit Decision Guide" },
-  { key: "media-experience", name: "Downloads & Video Tabs" },
-  { key: "testimonials-slider", name: "Client Reviews Slider" },
+  { key: "emotional-hook", name: "The Lifestyle (Experience the Property)" },
+  { key: "pricing-snapshot", name: "Pricing" },
+  { key: "project-overview", name: "Project Overview / Development" },
+  { key: "highlights", name: "Why Invest / Key Highlights" },
+  { key: "amenities", name: "Amenities / Lifestyle & Community Features" },
+  { key: "location-map", name: "Location / Near Everything That Matters" },
+  { key: "unit-types", name: "Configurations / Choose Your Space" },
+  { key: "decision-guide", name: "Decision Guide / Which Unit is Right?" },
+  { key: "media-experience", name: "Media / Experience the Property" },
+  { key: "testimonials-slider", name: "Client Stories" },
   { key: "faq-list", name: "Accordion FAQ List" },
-  { key: "lead-capture", name: "Form Capture Form" },
+  { key: "lead-capture", name: "Inquiries" },
   { key: "related", name: "Related Projects Feed" },
 ];
 
@@ -831,6 +981,31 @@ function ProjectEditor({ projectId, slug, projectTitle, onBack }: EditorProps) {
     setDirty(true);
   };
 
+  /** Auto-format slug: lowercase, hyphens, strip specials */
+  const autoSlug = (val: string) =>
+    val
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .trim();
+
+  /** Read a field from a specific section type's payload */
+  const getSectionField = (sectionType: string, key: string, fallback: any = "") => {
+    if (!draft?.layout_flow) return fallback;
+    const sec = (draft.layout_flow as any[]).find((s) => s.type === sectionType);
+    return sec?.payload?.[key] ?? fallback;
+  };
+
+  /** Write a field into a specific section type's payload */
+  const updateSectionField = (sectionType: string, key: string, value: any) => {
+    if (!draft?.layout_flow) return;
+    const nextFlow = (draft.layout_flow as any[]).map((s) =>
+      s.type === sectionType ? { ...s, payload: { ...s.payload, [key]: value } } : s
+    );
+    setDraft({ ...draft, layout_flow: nextFlow });
+    setDirty(true);
+  };
+
   const handleSave = () => {
     if (!draft) return;
     saveMutation.mutate({
@@ -883,6 +1058,14 @@ function ProjectEditor({ projectId, slug, projectTitle, onBack }: EditorProps) {
   const addSection = (key: string) => {
     if (!draft) return;
     const matching = SECTION_TYPES.find((s) => s.key === key);
+    // Each section type is a singleton — block duplicates and jump to the existing one.
+    const existingIdx = (draft.layout_flow || []).findIndex((s: any) => s.type === key);
+    if (existingIdx !== -1) {
+      setSelectedSectionIdx(existingIdx);
+      setShowAddSectionDropdown(false);
+      toast.error(`${matching?.name || key} is already added — you can only have one.`);
+      return;
+    }
     const newSection = {
       id: crypto.randomUUID ? crypto.randomUUID() : genId(),
       type: key,
@@ -1131,26 +1314,67 @@ function ProjectEditor({ projectId, slug, projectTitle, onBack }: EditorProps) {
       <div className="portal-settings-layout">
         {/* Sub tabs */}
         <aside className="portal-settings-nav">
+          {/* ── GROUP: Content ─────────────────── */}
+          <p style={{ fontSize: "9px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--portal-text-muted, #71717a)", padding: "0.25rem 0.75rem", marginBottom: "0.15rem", marginTop: "0.25rem" }}>Content</p>
           <button
             onClick={() => setActiveTab("general")}
             className={`portal-settings-nav-item ${activeTab === "general" ? "active" : ""}`}
           >
             <Settings size={15} />
-            General Settings
+            General Info
           </button>
+          <button
+            onClick={() => setActiveTab("gallery")}
+            className={`portal-settings-nav-item ${activeTab === "gallery" ? "active" : ""}`}
+          >
+            <Image size={15} />
+            Gallery &amp; Images
+          </button>
+          <button
+            onClick={() => setActiveTab("pricing")}
+            className={`portal-settings-nav-item ${activeTab === "pricing" ? "active" : ""}`}
+          >
+            <DollarSign size={15} />
+            Units &amp; Pricing ({(draft.units || []).length})
+          </button>
+          <button
+            onClick={() => setActiveTab("buildings")}
+            className={`portal-settings-nav-item ${activeTab === "buildings" ? "active" : ""}`}
+          >
+            <FolderOpen size={15} />
+            Buildings &amp; Towers ({(draft.buildings || []).length})
+          </button>
+
+          {/* ── GROUP: Page Layout ──────────────── */}
+          <p style={{ fontSize: "9px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--portal-text-muted, #71717a)", padding: "0.25rem 0.75rem", marginBottom: "0.15rem", marginTop: "0.75rem" }}>Page Layout</p>
           <button
             onClick={() => setActiveTab("sections")}
             className={`portal-settings-nav-item ${activeTab === "sections" ? "active" : ""}`}
           >
             <Layers size={15} />
-            Layout Sections ({(draft.layout_flow || []).length})
+            Page Sections ({(draft.layout_flow || []).length})
+          </button>
+
+          {/* ── GROUP: Publishing ───────────────── */}
+          <p style={{ fontSize: "9px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--portal-text-muted, #71717a)", padding: "0.25rem 0.75rem", marginBottom: "0.15rem", marginTop: "0.75rem" }}>Publishing</p>
+          <button
+            onClick={() => setActiveTab("seo")}
+            className={`portal-settings-nav-item ${activeTab === "seo" ? "active" : ""}`}
+          >
+            <Globe size={15} />
+            SEO &amp; URL
           </button>
           <button
-            onClick={() => setActiveTab("units")}
-            className={`portal-settings-nav-item ${activeTab === "units" ? "active" : ""}`}
+            onClick={() => setActiveTab("publish")}
+            className={`portal-settings-nav-item ${activeTab === "publish" ? "active" : ""}`}
           >
-            <Activity size={15} />
-            Unit Configurations ({(draft.units || []).length})
+            <Rocket size={15} />
+            Publish
+            {validationIssues.length > 0 && (
+              <span style={{ marginLeft: "auto", background: "oklch(0.65 0.2 25 / 0.8)", color: "#fff", borderRadius: "99px", fontSize: "9px", fontWeight: 700, padding: "1px 6px", lineHeight: 1.5 }}>
+                {validationIssues.length}
+              </span>
+            )}
           </button>
           <button
             onClick={() => setActiveTab("preview")}
@@ -1159,12 +1383,15 @@ function ProjectEditor({ projectId, slug, projectTitle, onBack }: EditorProps) {
             <Eye size={15} />
             Live Preview
           </button>
+
+          {/* ── GROUP: Advanced ─────────────────── */}
+          <p style={{ fontSize: "9px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--portal-text-muted, #71717a)", padding: "0.25rem 0.75rem", marginBottom: "0.15rem", marginTop: "0.75rem" }}>Advanced</p>
           <button
             onClick={() => setActiveTab("raw")}
             className={`portal-settings-nav-item ${activeTab === "raw" ? "active" : ""}`}
           >
             <FileText size={15} />
-            Raw JSON Snapshot
+            Raw JSON
           </button>
         </aside>
 
@@ -1187,32 +1414,14 @@ function ProjectEditor({ projectId, slug, projectTitle, onBack }: EditorProps) {
                 />
               </div>
 
-              <div className="portal-grid-2col">
-                <div className="portal-field">
-                  <label className="portal-field-label">Category</label>
-                  <div className="portal-select-wrap">
-                    <select
-                      value={draft.project_meta.category || "Suburban Enclaves"}
-                      onChange={(e) => updateMeta("category", e.target.value)}
-                      className="portal-select"
-                    >
-                      <option value="Metro Core">Metro Core</option>
-                      <option value="Suburban Enclaves">Suburban Enclaves</option>
-                      <option value="Resort & Leisure">Resort & Leisure</option>
-                    </select>
-                    <ChevronDown size={14} className="portal-select-icon" />
-                  </div>
-                </div>
-
-                <div className="portal-field">
-                  <label className="portal-field-label">Developer Group</label>
-                  <input
-                    type="text"
-                    value={draft.project_meta.developer || "DMCI Homes"}
-                    onChange={(e) => updateMeta("developer", e.target.value)}
-                    className="portal-input"
-                  />
-                </div>
+              <div className="portal-field">
+                <label className="portal-field-label">Developer Group</label>
+                <input
+                  type="text"
+                  value={draft.project_meta.developer || "DMCI Homes"}
+                  onChange={(e) => updateMeta("developer", e.target.value)}
+                  className="portal-input"
+                />
               </div>
 
               <div className="portal-field">
@@ -1277,22 +1486,28 @@ function ProjectEditor({ projectId, slug, projectTitle, onBack }: EditorProps) {
 
               <div className="portal-grid-2col">
                 <div className="portal-field">
-                  <label className="portal-field-label">Min Price Starting (₱)</label>
+                  <label className="portal-field-label">Starting Price (₱)</label>
                   <input
                     type="number"
                     value={draft.project_meta.min_price || 0}
                     onChange={(e) => updateMeta("min_price", parseInt(e.target.value) || 0)}
                     className="portal-input"
                   />
+                  <p style={{ fontSize: "11px", color: draft.project_meta.min_price ? "oklch(0.65 0.18 145)" : "var(--zinc-500)", marginTop: "0.25rem", marginBottom: 0, fontWeight: draft.project_meta.min_price ? 600 : 400 }}>
+                    {draft.project_meta.min_price ? `✓ ₱${(draft.project_meta.min_price).toLocaleString()} PHP` : "Enter the minimum price in full Pesos (e.g. 4500000 = ₱4.5M)."}
+                  </p>
                 </div>
                 <div className="portal-field">
-                  <label className="portal-field-label">Max Price Limit (₱)</label>
+                  <label className="portal-field-label">Maximum Price Ceiling (₱)</label>
                   <input
                     type="number"
                     value={draft.project_meta.max_price || 0}
                     onChange={(e) => updateMeta("max_price", parseInt(e.target.value) || 0)}
                     className="portal-input"
                   />
+                  <p style={{ fontSize: "11px", color: draft.project_meta.max_price ? "oklch(0.65 0.18 145)" : "var(--zinc-500)", marginTop: "0.25rem", marginBottom: 0, fontWeight: draft.project_meta.max_price ? 600 : 400 }}>
+                    {draft.project_meta.max_price ? `✓ ₱${(draft.project_meta.max_price).toLocaleString()} PHP` : "Enter the maximum price in full Pesos (e.g. 13500000 = ₱13.5M)."}
+                  </p>
                 </div>
               </div>
 
@@ -1353,8 +1568,150 @@ function ProjectEditor({ projectId, slug, projectTitle, onBack }: EditorProps) {
                 />
               </div>
 
-              <div className="portal-card-header mt-6">
-                <div className="portal-card-title">SEO & Sharing Configuration</div>
+              <div
+                className="border-t border-[var(--portal-border)] pt-4 mt-4"
+                style={{ display: "flex", alignItems: "flex-start", gap: "0.5rem" }}
+              >
+                <Globe size={15} style={{ color: "var(--portal-text-muted)", flexShrink: 0, marginTop: "2px" }} />
+                <p style={{ fontSize: "12px", color: "var(--portal-text-muted)", margin: 0, lineHeight: 1.5 }}>
+                  Page title, meta description, and the public URL slug now live in the{" "}
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("seo")}
+                    style={{ background: "none", border: "none", color: "var(--portal-accent)", cursor: "pointer", padding: 0, font: "inherit", textDecoration: "underline" }}
+                  >
+                    SEO &amp; URL
+                  </button>{" "}
+                  tab.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* GALLERY & IMAGES TAB */}
+          {activeTab === "gallery" && (
+            <div className="portal-card portal-settings-fields">
+              <div className="portal-card-header">
+                <div className="portal-card-title">Gallery &amp; Images</div>
+              </div>
+              <p className="text-[11px] text-zinc-400 mt-1 mb-4 leading-relaxed">
+                Manage the hero carousel here, and review every image used across this project in one place.
+              </p>
+
+              {/* Hero carousel images */}
+              {(() => {
+                const heroExists = (draft.layout_flow || []).some((s: any) => s.type === "hero");
+                const heroImages: string[] = getSectionField("hero", "hero_images", []);
+                if (!heroExists) {
+                  return (
+                    <div className="p-4 rounded-lg border border-[var(--portal-border)] bg-[var(--portal-bg)]">
+                      <p className="text-[12px] text-zinc-300 m-0">
+                        No <strong>Hero</strong> section yet. Add one in the{" "}
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab("sections")}
+                          style={{ background: "none", border: "none", color: "var(--portal-accent)", cursor: "pointer", padding: 0, font: "inherit", textDecoration: "underline" }}
+                        >
+                          Page Sections
+                        </button>{" "}
+                        tab to manage the hero carousel images.
+                      </p>
+                    </div>
+                  );
+                }
+                return (
+                  <div className="portal-field">
+                    <label className="portal-field-label">Hero Carousel Images</label>
+                    <textarea
+                      rows={4}
+                      className="portal-input"
+                      style={{ resize: "vertical", fontFamily: "monospace", fontSize: "12px" }}
+                      placeholder={`Paste one Cloudinary URL per line:\nhttps://res.cloudinary.com/.../banner1.jpg`}
+                      value={heroImages.join("\n")}
+                      onChange={(e) => {
+                        const urls = e.target.value.split(/[,\n]/).map((s) => s.trim()).filter(Boolean);
+                        updateSectionField("hero", "hero_images", urls);
+                      }}
+                    />
+                    <p style={{ fontSize: "11px", color: "var(--zinc-400)", marginTop: "0.25rem", marginBottom: 0 }}>
+                      💡 One image URL per line. Shown in the hero banner slideshow (16:9 landscape recommended).
+                    </p>
+                    {heroImages.length > 0 && (
+                      <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginTop: "0.75rem" }}>
+                        {heroImages.map((url, index) => (
+                          <div key={index} style={{ position: "relative", width: "96px", height: "60px", borderRadius: "6px", overflow: "hidden", border: "1px solid rgba(255,255,255,0.1)", background: "rgba(0,0,0,0.2)" }}>
+                            <img
+                              src={url}
+                              alt={`Slide ${index + 1}`}
+                              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                              onError={(e) => { (e.currentTarget as HTMLImageElement).style.outline = "2px solid #f87171"; (e.currentTarget as HTMLImageElement).style.outlineOffset = "-2px"; }}
+                            />
+                            <span style={{ position: "absolute", bottom: "3px", right: "4px", fontSize: "9px", fontWeight: 700, color: "white", background: "rgba(0,0,0,0.6)", padding: "1px 4px", borderRadius: "3px" }}>{index + 1}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+
+              {/* Image inventory across the project */}
+              {(() => {
+                const inv: { src: string; label: string }[] = [];
+                (draft.buildings || []).forEach((b: any) => { if (b.image_url) inv.push({ src: b.image_url, label: `Building · ${b.name || "Untitled"}` }); });
+                (draft.units || []).forEach((u: any) => { if (u.image_url) inv.push({ src: u.image_url, label: `Unit · ${u.name || "Untitled"}` }); });
+                const media = (draft.layout_flow || []).find((s: any) => s.type === "media-experience");
+                (media?.payload?.photos || []).forEach((p: any) => { if (p.src) inv.push({ src: p.src, label: `Media · ${p.title || p.tab || "Photo"}` }); });
+
+                return (
+                  <div className="portal-field border-t border-[var(--portal-border)] pt-4 mt-4">
+                    <label className="portal-field-label">Images used across this project ({inv.length})</label>
+                    {inv.length === 0 ? (
+                      <p className="text-[11px] text-zinc-400 mt-1 mb-0">
+                        No building, unit, or media images added yet. Add them in the Buildings, Units &amp; Pricing, or Page Sections tabs.
+                      </p>
+                    ) : (
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))", gap: "0.6rem", marginTop: "0.5rem" }}>
+                        {inv.map((im, i) => (
+                          <div key={i} style={{ borderRadius: "8px", overflow: "hidden", border: "1px solid rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.02)" }}>
+                            <div style={{ height: "80px", background: "rgba(0,0,0,0.25)" }}>
+                              <img src={im.src} alt={im.label} style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
+                            </div>
+                            <div style={{ padding: "4px 6px", fontSize: "9.5px", color: "var(--zinc-400)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{im.label}</div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+            </div>
+          )}
+
+          {/* SEO & URL TAB */}
+          {activeTab === "seo" && (
+            <div className="portal-card portal-settings-fields">
+              <div className="portal-card-header">
+                <div className="portal-card-title">SEO &amp; URL</div>
+              </div>
+
+              <div className="portal-field">
+                <label className="portal-field-label">URL Slug</label>
+                <input
+                  type="text"
+                  value={draft.project_meta.slug || ""}
+                  onChange={(e) => updateMeta("slug", autoSlug(e.target.value))}
+                  className="portal-input"
+                  placeholder="sonora-garden-residences"
+                />
+                <p style={{ fontSize: "11px", color: "var(--zinc-400)", marginTop: "0.25rem", marginBottom: 0, lineHeight: 1.5 }}>
+                  Public URL:{" "}
+                  <span style={{ fontFamily: "var(--font-mono)", color: "var(--portal-text)" }}>
+                    cityqlo.com/projects/{draft.project_meta.slug || "…"}
+                  </span>
+                  <br />
+                  ⚠️ Changing the slug changes the public link — update any shared URLs after publishing.
+                </p>
               </div>
 
               <div className="portal-field">
@@ -1366,18 +1723,98 @@ function ProjectEditor({ projectId, slug, projectTitle, onBack }: EditorProps) {
                   onChange={(e) => updateMeta("meta_title", e.target.value)}
                   className="portal-input"
                 />
+                <p style={{ fontSize: "11px", color: (draft.project_meta.meta_title || "").length > 60 ? "oklch(0.74 0.137 79)" : "var(--zinc-400)", marginTop: "0.25rem", marginBottom: 0 }}>
+                  {(draft.project_meta.meta_title || "").length}/60 characters{(draft.project_meta.meta_title || "").length > 60 ? " · a bit long for Google" : ""}
+                </p>
               </div>
 
               <div className="portal-field">
-                <label className="portal-field-label">SEO Meta Description Description</label>
+                <label className="portal-field-label">SEO Meta Description</label>
                 <textarea
-                  rows={2}
-                  placeholder="Insert search indexing summary snippet..."
+                  rows={3}
+                  placeholder="A short, compelling summary shown in Google search results..."
                   value={draft.project_meta.meta_description || ""}
                   onChange={(e) => updateMeta("meta_description", e.target.value)}
                   className="portal-textarea"
                 />
+                <p style={{ fontSize: "11px", color: (draft.project_meta.meta_description || "").length > 160 ? "oklch(0.74 0.137 79)" : "var(--zinc-400)", marginTop: "0.25rem", marginBottom: 0 }}>
+                  {(draft.project_meta.meta_description || "").length}/160 characters{(draft.project_meta.meta_description || "").length > 160 ? " · a bit long for Google" : ""}
+                </p>
               </div>
+
+              {/* Google-style search preview */}
+              <div className="portal-field border-t border-[var(--portal-border)] pt-4 mt-2">
+                <label className="portal-field-label">Search Result Preview</label>
+                <div style={{ background: "#fff", borderRadius: "8px", padding: "12px 14px", border: "1px solid var(--portal-border)" }}>
+                  <div style={{ color: "#202124", fontSize: "12px" }}>cityqlo.com › projects › {draft.project_meta.slug || "…"}</div>
+                  <div style={{ color: "#1a0dab", fontSize: "18px", lineHeight: 1.3, margin: "2px 0" }}>
+                    {draft.project_meta.meta_title || draft.project_meta.title || "Project title"}
+                  </div>
+                  <div style={{ color: "#4d5156", fontSize: "13px", lineHeight: 1.4 }}>
+                    {draft.project_meta.meta_description || draft.project_meta.description || "Add a meta description to control the snippet shown here."}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* PUBLISH TAB */}
+          {activeTab === "publish" && (
+            <div className="portal-card portal-settings-fields">
+              <div className="portal-card-header">
+                <div className="portal-card-title">Publish</div>
+              </div>
+
+              {/* Status row */}
+              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1rem" }}>
+                <span className="portal-field-label" style={{ margin: 0 }}>Current status:</span>
+                <span className={`portal-status-badge status-${draft.project_meta.status || "draft"}`}>
+                  {draft.project_meta.status || "draft"}
+                </span>
+                {dirty && <span style={{ fontSize: "0.72rem", color: "oklch(0.7 0.18 25)", fontWeight: 600 }}>Unsaved changes</span>}
+              </div>
+
+              {/* Readiness checklist */}
+              {validationIssues.length === 0 ? (
+                <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", background: "oklch(0.65 0.18 145 / 0.1)", border: "1px solid oklch(0.65 0.18 145 / 0.35)", borderRadius: "10px", padding: "0.85rem 1rem" }}>
+                  <CheckCircle size={18} style={{ color: "oklch(0.72 0.16 145)", flexShrink: 0 }} />
+                  <p style={{ margin: 0, fontSize: "0.82rem", fontWeight: 600, color: "oklch(0.72 0.16 145)" }}>
+                    Everything looks good — this project is ready to publish.
+                  </p>
+                </div>
+              ) : (
+                <div style={{ background: "oklch(0.65 0.2 25 / 0.08)", border: "1px solid oklch(0.65 0.2 25 / 0.35)", borderRadius: "10px", padding: "0.85rem 1rem" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
+                    <AlertCircle size={16} style={{ color: "oklch(0.7 0.18 25)", flexShrink: 0 }} />
+                    <p style={{ margin: 0, fontSize: "0.82rem", fontWeight: 700, color: "oklch(0.7 0.18 25)" }}>
+                      Fix {validationIssues.length} item{validationIssues.length > 1 ? "s" : ""} before publishing
+                    </p>
+                  </div>
+                  <ul style={{ margin: 0, paddingLeft: "1.5rem", display: "flex", flexDirection: "column", gap: "0.25rem" }}>
+                    {validationIssues.map((issue, i) => (
+                      <li key={i} style={{ fontSize: "0.78rem", color: "var(--portal-text-muted)" }}>{issue}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Actions */}
+              <div style={{ display: "flex", gap: "0.6rem", marginTop: "1.25rem", flexWrap: "wrap" }}>
+                <button onClick={handleSave} disabled={!dirty || saveMutation.isPending} className="portal-btn-secondary">
+                  <Save size={15} /> {saveMutation.isPending ? "Saving..." : "Save Draft"}
+                </button>
+                <button onClick={handlePublish} disabled={publishMutation.isPending || validationIssues.length > 0} className="portal-btn-primary">
+                  <Sparkles size={15} /> {publishMutation.isPending ? "Publishing..." : "Publish Live"}
+                </button>
+                <a href={`/projects/${draft.project_meta.slug}?preview=true`} target="_blank" rel="noreferrer" className="portal-btn-secondary">
+                  <Eye size={15} /> Preview Draft
+                </a>
+              </div>
+
+              <p className="text-[11px] text-zinc-400 mt-4 leading-relaxed">
+                Publishing compiles your saved draft and makes it live at{" "}
+                <span style={{ fontFamily: "var(--font-mono)" }}>cityqlo.com/projects/{draft.project_meta.slug}</span>.
+              </p>
             </div>
           )}
 
@@ -1487,26 +1924,41 @@ function ProjectEditor({ projectId, slug, projectTitle, onBack }: EditorProps) {
                         padding: "4px",
                       }}
                     >
-                      {SECTION_TYPES.map((st) => (
-                        <button
-                          key={st.key}
-                          onClick={() => addSection(st.key)}
-                          style={{
-                            width: "100%",
-                            padding: "8px 12px",
-                            textAlign: "left",
-                            background: "none",
-                            border: "none",
-                            color: "#d4d4d8",
-                            fontSize: "11.5px",
-                            cursor: "pointer",
-                            borderRadius: "4px",
-                          }}
-                          className="hover:bg-white/5 hover:text-white"
-                        >
-                          {st.name}
-                        </button>
-                      ))}
+                      {SECTION_TYPES.map((st) => {
+                        const added = (draft.layout_flow || []).some(
+                          (s: any) => s.type === st.key,
+                        );
+                        return (
+                          <button
+                            key={st.key}
+                            onClick={() => addSection(st.key)}
+                            disabled={added}
+                            style={{
+                              width: "100%",
+                              padding: "8px 12px",
+                              textAlign: "left",
+                              background: "none",
+                              border: "none",
+                              color: added ? "#52525b" : "#d4d4d8",
+                              fontSize: "11.5px",
+                              cursor: added ? "not-allowed" : "pointer",
+                              borderRadius: "4px",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "space-between",
+                              gap: "8px",
+                            }}
+                            className={added ? "" : "hover:bg-white/5 hover:text-white"}
+                          >
+                            <span>{st.name}</span>
+                            {added && (
+                              <span className="text-[9.5px] font-mono text-emerald-500/80">
+                                Added ✓
+                              </span>
+                            )}
+                          </button>
+                        );
+                      })}
                     </div>
                   )}
                 </div>
@@ -1534,8 +1986,217 @@ function ProjectEditor({ projectId, slug, projectTitle, onBack }: EditorProps) {
             </div>
           )}
 
-          {/* UNIT CONFIGURATION TAB */}
-          {activeTab === "units" && (
+          {/* BUILDINGS CONFIGURATION TAB */}
+          {activeTab === "buildings" && (
+            <div className="portal-card">
+              <div className="portal-card-header flex justify-between items-center">
+                <div className="portal-card-title">Project Buildings &amp; Towers</div>
+                <button
+                  onClick={() => {
+                    const nextBuildings = [
+                      ...(draft.buildings || []),
+                      {
+                        name: "Building A",
+                        description: "",
+                        floors: "40 Floors",
+                        total_units: "500 Units",
+                        status: "Under Construction",
+                        image_url: "",
+                      },
+                    ];
+                    setDraft({ ...draft, buildings: nextBuildings });
+                    setDirty(true);
+                  }}
+                  className="portal-btn-secondary sm"
+                >
+                  <Plus size={14} /> Add Building
+                </button>
+              </div>
+
+              <div
+                style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+                className="mt-4"
+              >
+                {(draft.buildings || []).length === 0 ? (
+                  <p className="portal-empty-state sm">
+                    No buildings configured. Click "Add Building" to create one.
+                  </p>
+                ) : (
+                  (draft.buildings || []).map((bld: any, idx: number) => (
+                    <div
+                      key={idx}
+                      style={{
+                        padding: "1rem",
+                        background: "rgba(255,255,255,0.02)",
+                        border: "1px solid rgba(255,255,255,0.06)",
+                        borderRadius: "8px",
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "0.75rem",
+                      }}
+                    >
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs font-bold text-zinc-100">
+                          Building / Tower #{idx + 1}
+                        </span>
+                        <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+                          {/* Reordering */}
+                          <button
+                            onClick={() => {
+                              if (idx === 0) return;
+                              const next = [...draft.buildings];
+                              const temp = next[idx];
+                              next[idx] = next[idx - 1];
+                              next[idx - 1] = temp;
+                              setDraft({ ...draft, buildings: next });
+                              setDirty(true);
+                            }}
+                            disabled={idx === 0}
+                            className="portal-icon-btn disabled:opacity-30"
+                          >
+                            <ArrowUp size={13} />
+                          </button>
+                          <button
+                            onClick={() => {
+                              if (idx === draft.buildings.length - 1) return;
+                              const next = [...draft.buildings];
+                              const temp = next[idx];
+                              next[idx] = next[idx + 1];
+                              next[idx + 1] = temp;
+                              setDraft({ ...draft, buildings: next });
+                              setDirty(true);
+                            }}
+                            disabled={idx === draft.buildings.length - 1}
+                            className="portal-icon-btn disabled:opacity-30"
+                          >
+                            <ArrowDown size={13} />
+                          </button>
+                          <button
+                            onClick={() => {
+                              if (confirm("Remove this building?")) {
+                                const next = [...draft.buildings];
+                                next.splice(idx, 1);
+                                setDraft({ ...draft, buildings: next });
+                                setDirty(true);
+                              }
+                            }}
+                            className="portal-icon-btn hover:text-red-500"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="portal-grid-3col">
+                        <div className="portal-field">
+                          <label className="portal-field-label">Building Name *</label>
+                          <input
+                            type="text"
+                            placeholder="e.g. Cadence Tower"
+                            value={bld.name || ""}
+                            onChange={(e) => {
+                              const next = [...draft.buildings];
+                              next[idx] = { ...next[idx], name: e.target.value };
+                              setDraft({ ...draft, buildings: next });
+                              setDirty(true);
+                            }}
+                            className="portal-input"
+                          />
+                        </div>
+                        <div className="portal-field">
+                          <label className="portal-field-label">Status</label>
+                          <div className="portal-select-wrap">
+                            <select
+                              value={bld.status || "Under Construction"}
+                              onChange={(e) => {
+                                const next = [...draft.buildings];
+                                next[idx] = { ...next[idx], status: e.target.value };
+                                setDraft({ ...draft, buildings: next });
+                                setDirty(true);
+                              }}
+                              className="portal-select"
+                            >
+                              <option value="Under Construction">Under Construction</option>
+                              <option value="Coming Soon">Coming Soon</option>
+                              <option value="RFO">RFO</option>
+                            </select>
+                            <ChevronDown size={14} className="portal-select-icon" />
+                          </div>
+                        </div>
+                        <div className="portal-field">
+                          <label className="portal-field-label">Number of Floors</label>
+                          <input
+                            type="text"
+                            placeholder="e.g. 45 Floors"
+                            value={bld.floors || ""}
+                            onChange={(e) => {
+                              const next = [...draft.buildings];
+                              next[idx] = { ...next[idx], floors: e.target.value };
+                              setDraft({ ...draft, buildings: next });
+                              setDirty(true);
+                            }}
+                            className="portal-input"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="portal-grid-3col">
+                        <div className="portal-field">
+                          <label className="portal-field-label">Total Units</label>
+                          <input
+                            type="text"
+                            placeholder="e.g. 430 Units"
+                            value={bld.total_units || ""}
+                            onChange={(e) => {
+                              const next = [...draft.buildings];
+                              next[idx] = { ...next[idx], total_units: e.target.value };
+                              setDraft({ ...draft, buildings: next });
+                              setDirty(true);
+                            }}
+                            className="portal-input"
+                          />
+                        </div>
+                        <div className="portal-field">
+                          <label className="portal-field-label">Description / Tagline</label>
+                          <input
+                            type="text"
+                            placeholder="Short description..."
+                            value={bld.description || ""}
+                            onChange={(e) => {
+                              const next = [...draft.buildings];
+                              next[idx] = { ...next[idx], description: e.target.value };
+                              setDraft({ ...draft, buildings: next });
+                              setDirty(true);
+                            }}
+                            className="portal-input"
+                          />
+                        </div>
+                        <div className="portal-field">
+                          <label className="portal-field-label">Building Image URL</label>
+                          <CloudinaryImageField
+                            label="Building Cover Photo"
+                            aspectRatioLabel="Ratio 4:3"
+                            value={bld.image_url || ""}
+                            onChange={(val) => {
+                              const next = [...draft.buildings];
+                              next[idx] = { ...next[idx], image_url: val };
+                              setDraft({ ...draft, buildings: next });
+                              setDirty(true);
+                            }}
+                            description="Cover image shown on the building card (e.g. tower facade photo)."
+                            optional
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* UNITS & PRICING TAB */}
+          {activeTab === "pricing" && (
             <div className="portal-card">
               <div className="portal-card-header flex justify-between items-center">
                 <div className="portal-card-title">Interactive Unit Specifications</div>
@@ -1687,17 +2348,18 @@ function ProjectEditor({ projectId, slug, projectTitle, onBack }: EditorProps) {
                         </div>
                         <div className="portal-field">
                           <label className="portal-field-label">Unit Image URL</label>
-                          <input
-                            type="text"
-                            placeholder="e.g. /src/assets/interior-living.jpg"
+                          <CloudinaryImageField
+                            label="Unit Interior Photo"
+                            aspectRatioLabel="Ratio 4:3"
                             value={unit.image_url || ""}
-                            onChange={(e) => {
+                            onChange={(val) => {
                               const next = [...draft.units];
-                              next[idx] = { ...next[idx], image_url: e.target.value };
+                              next[idx] = { ...next[idx], image_url: val };
                               setDraft({ ...draft, units: next });
                               setDirty(true);
                             }}
-                            className="portal-input"
+                            description="Interior photo for this unit type (e.g. living area, bedroom)."
+                            optional
                           />
                         </div>
                       </div>
@@ -1881,57 +2543,64 @@ function SectionEditorBlock({ section, onChange }: SectionBlockProps) {
               />
             </div>
           </div>
+          <CloudinaryImageField
+            label="Property Logo Image"
+            aspectRatioLabel="Any ratio"
+            value={getVal("logo_url") || ""}
+            onChange={(val) => handleFieldChange("logo_url", val)}
+            description="Logo image displayed in the hero section header. Use a transparent PNG on Cloudinary for best results."
+            optional
+          />
           <div className="portal-field">
-            <label className="portal-field-label">Property Logo Image URL</label>
-            <input
-              type="text"
-              placeholder="e.g. https://supabase.co/.../logo.png"
-              value={getVal("logo_url")}
-              onChange={(e) => handleFieldChange("logo_url", e.target.value)}
-              className="portal-input"
-            />
-            {getVal("logo_url") && (
-              <div style={{ marginTop: "0.5rem", padding: "0.5rem", background: "rgba(255,255,255,0.03)", borderRadius: "6px", border: "1px solid rgba(255,255,255,0.06)", display: "inline-block" }}>
-                <span className="text-[10px] text-zinc-400 block mb-1 font-mono">Logo Preview:</span>
-                <img
-                  src={getVal("logo_url")}
-                  alt="Property Logo Preview"
-                  style={{ maxHeight: "60px", maxWidth: "200px", objectFit: "contain" }}
-                  onError={(e) => {
-                    (e.target as HTMLElement).style.display = "none";
-                  }}
-                />
-              </div>
-            )}
-          </div>
-          <div className="portal-field">
-            <label className="portal-field-label">
-              Hero Carousel Images (comma separated URLs)
+            <label
+              className="portal-field-label"
+              style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
+            >
+              <span>Hero Carousel Images</span>
+              <span
+                style={{
+                  fontSize: "10px",
+                  padding: "2px 6px",
+                  borderRadius: "4px",
+                  background: "rgba(255,255,255,0.05)",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  color: "var(--zinc-400)",
+                  fontFamily: "monospace",
+                }}
+              >
+                Ratio 16:9
+              </span>
             </label>
-            <input
-              type="text"
-              placeholder="e.g. https://supabase.co/.../banner1.jpg, https://supabase.co/.../banner2.jpg"
-              value={getVal("hero_images", []).join(", ")}
+            <textarea
+              rows={3}
+              className="portal-input"
+              style={{ resize: "vertical", fontFamily: "monospace", fontSize: "12px" }}
+              placeholder={`Paste one Cloudinary URL per line, or separate with commas:\nhttps://res.cloudinary.com/.../banner1.jpg\nhttps://res.cloudinary.com/.../banner2.jpg`}
+              value={getVal("hero_images", []).join("\n")}
               onChange={(e) => {
                 const urls = e.target.value
-                  .split(",")
+                  .split(/[,\n]/)
                   .map((s) => s.trim())
                   .filter(Boolean);
                 handleFieldChange("hero_images", urls);
               }}
-              className="portal-input"
             />
+            <p style={{ fontSize: "11px", color: "var(--zinc-400)", marginTop: "0.25rem", marginBottom: 0 }}>
+              💡 Paste one Cloudinary image URL per line. These are the photos shown in the homepage hero banner slideshow. Recommended: 16:9 wide landscape photos.
+            </p>
             {getVal("hero_images", []).length > 0 && (
-              <div style={{ marginTop: "0.5rem" }}>
-                <span className="text-[10px] text-zinc-400 block mb-2 font-mono">Hero Images Preview:</span>
+              <div style={{ marginTop: "0.75rem" }}>
+                <span style={{ fontSize: "10px", color: "var(--zinc-400)", display: "block", marginBottom: "0.5rem", fontWeight: 600 }}>
+                  Hero Images Preview ({getVal("hero_images", []).length} image{getVal("hero_images", []).length !== 1 ? "s" : ""}):
+                </span>
                 <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
                   {getVal("hero_images", []).map((url: string, index: number) => (
                     <div
                       key={index}
                       style={{
                         position: "relative",
-                        width: "80px",
-                        height: "50px",
+                        width: "96px",
+                        height: "60px",
                         borderRadius: "6px",
                         overflow: "hidden",
                         border: "1px solid rgba(255,255,255,0.1)",
@@ -1940,12 +2609,16 @@ function SectionEditorBlock({ section, onChange }: SectionBlockProps) {
                     >
                       <img
                         src={url}
-                        alt={`Preview ${index + 1}`}
+                        alt={`Slide ${index + 1}`}
                         style={{ width: "100%", height: "100%", objectFit: "cover" }}
                         onError={(e) => {
-                          (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=100&q=50";
+                          (e.target as HTMLImageElement).style.outline = "2px solid #f87171";
+                          (e.target as HTMLImageElement).style.outlineOffset = "-2px";
                         }}
                       />
+                      <span style={{ position: "absolute", bottom: "3px", right: "4px", fontSize: "9px", fontWeight: 700, color: "white", background: "rgba(0,0,0,0.6)", padding: "1px 4px", borderRadius: "3px" }}>
+                        {index + 1}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -2410,16 +3083,14 @@ function SectionEditorBlock({ section, onChange }: SectionBlockProps) {
             </div>
           </div>
 
-          <div className="portal-field">
-            <label className="portal-field-label">Map Graphic Image URL</label>
-            <input
-              type="text"
-              placeholder="e.g. /src/assets/loc-pasig.png or any public url"
-              value={getVal("map_image_url")}
-              onChange={(e) => handleFieldChange("map_image_url", e.target.value)}
-              className="portal-input"
-            />
-          </div>
+          <CloudinaryImageField
+            label="Map Graphic Image"
+            aspectRatioLabel="Ratio 16:9"
+            value={getVal("map_image_url") || ""}
+            onChange={(val) => handleFieldChange("map_image_url", val)}
+            description="A visual map or aerial photo of the project location. Upload to Cloudinary and paste the URL here."
+            optional
+          />
 
           <div className="portal-field border-t border-[var(--portal-border)] pt-4 mt-2">
             <label className="portal-field-label flex justify-between items-center">
@@ -2584,7 +3255,25 @@ function SectionEditorBlock({ section, onChange }: SectionBlockProps) {
             />
           </div>
 
-          <div className="portal-field border-t border-[var(--portal-border)] pt-4 mt-2">
+          {/* How-to callout: where the Cloudinary link goes */}
+          <div
+            className="border-t border-[var(--portal-border)] pt-4 mt-2"
+            style={{
+              background: "rgba(59,130,246,0.06)",
+              border: "1px solid rgba(59,130,246,0.25)",
+              borderRadius: "10px",
+              padding: "12px 14px",
+            }}
+          >
+            <p className="text-[12px] font-bold text-[#3B82F6] mb-1">📷 How to add media</p>
+            <ol className="text-[11px] text-zinc-300 leading-relaxed" style={{ paddingLeft: "16px", listStyle: "decimal" }}>
+              <li>Open your image in Cloudinary and copy its link (it starts with <span className="font-mono">https://res.cloudinary.com/…</span>).</li>
+              <li>Click <span className="font-bold">+ Add Photo</span> below, pick the tab it belongs to (Exterior / Amenities / Interiors), then paste the link into <span className="font-bold">Image link</span>.</li>
+              <li>A preview appears once the link is valid. If no preview shows, the link is wrong.</li>
+            </ol>
+          </div>
+
+          <div className="portal-field pt-2">
             <label className="portal-field-label flex justify-between items-center">
               <span>Photo Gallery</span>
               <button
@@ -2600,60 +3289,115 @@ function SectionEditorBlock({ section, onChange }: SectionBlockProps) {
                 + Add Photo
               </button>
             </label>
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }} className="mt-2">
+            {getVal("photos", []).length === 0 && (
+              <p className="text-[11px] text-zinc-400 mt-1 leading-relaxed">
+                No photos yet. Click <span className="font-bold">+ Add Photo</span> to add your first Cloudinary image.
+              </p>
+            )}
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }} className="mt-2">
               {getVal("photos", []).map((ph: any, i: number) => (
-                <div key={i} className="flex gap-2 items-center">
-                  <div className="portal-select-wrap" style={{ flex: 1 }}>
-                    <select
-                      value={ph.tab || "exterior"}
-                      onChange={(e) => {
-                        const next = [...payload.photos];
-                        next[i] = { ...next[i], tab: e.target.value };
-                        handleFieldChange("photos", next);
-                      }}
-                      className="portal-select"
-                    >
-                      <option value="exterior">Exterior</option>
-                      <option value="amenities">Amenities</option>
-                      <option value="interiors">Interiors</option>
-                    </select>
-                    <ChevronDown size={14} className="portal-select-icon" />
-                  </div>
-                  <input
-                    type="text"
-                    placeholder="Title"
-                    value={ph.title || ""}
-                    onChange={(e) => {
-                      const next = [...payload.photos];
-                      next[i] = { ...next[i], title: e.target.value };
-                      handleFieldChange("photos", next);
+                <div
+                  key={i}
+                  className="flex gap-3 p-3 rounded-lg border border-white/5"
+                  style={{ background: "rgba(255,255,255,0.02)" }}
+                >
+                  {/* Live thumbnail preview */}
+                  <div
+                    style={{
+                      width: "84px",
+                      height: "84px",
+                      flexShrink: 0,
+                      borderRadius: "8px",
+                      overflow: "hidden",
+                      border: "1px solid rgba(255,255,255,0.1)",
+                      background: "rgba(0,0,0,0.25)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
                     }}
-                    className="portal-input"
-                    style={{ flex: 2 }}
-                  />
-                  <input
-                    type="text"
-                    placeholder="Image URL"
-                    value={ph.src || ""}
-                    onChange={(e) => {
-                      const next = [...payload.photos];
-                      next[i] = { ...next[i], src: e.target.value, thumb: e.target.value };
-                      handleFieldChange("photos", next);
-                    }}
-                    className="portal-input"
-                    style={{ flex: 3 }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const next = [...payload.photos];
-                      next.splice(i, 1);
-                      handleFieldChange("photos", next);
-                    }}
-                    className="portal-icon-btn hover:text-red-500"
                   >
-                    <Trash2 size={13} />
-                  </button>
+                    {ph.src ? (
+                      <img
+                        src={ph.src}
+                        alt={ph.title || "Preview"}
+                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).style.display = "none";
+                        }}
+                      />
+                    ) : (
+                      <span className="text-[9px] text-zinc-500 text-center px-1">No image yet</span>
+                    )}
+                  </div>
+
+                  {/* Fields */}
+                  <div className="flex-1 flex flex-col gap-2 min-w-0">
+                    <div className="flex justify-between items-center">
+                      <span className="text-[10px] font-mono text-zinc-400">Photo #{i + 1}</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const next = [...payload.photos];
+                          next.splice(i, 1);
+                          handleFieldChange("photos", next);
+                        }}
+                        className="portal-icon-btn hover:text-red-500"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    </div>
+                    <div className="flex gap-2">
+                      <div className="portal-field" style={{ flex: 1 }}>
+                        <label className="portal-field-label text-[10px]">Tab / Category</label>
+                        <div className="portal-select-wrap">
+                          <select
+                            value={ph.tab || "exterior"}
+                            onChange={(e) => {
+                              const next = [...payload.photos];
+                              next[i] = { ...next[i], tab: e.target.value };
+                              handleFieldChange("photos", next);
+                            }}
+                            className="portal-select"
+                          >
+                            <option value="exterior">🏙️ Exterior</option>
+                            <option value="amenities">🌊 Amenities</option>
+                            <option value="interiors">🛋️ Interiors</option>
+                          </select>
+                          <ChevronDown size={14} className="portal-select-icon" />
+                        </div>
+                      </div>
+                      <div className="portal-field" style={{ flex: 2 }}>
+                        <label className="portal-field-label text-[10px]">Caption / Title</label>
+                        <input
+                          type="text"
+                          placeholder="e.g. Resort-style pool"
+                          value={ph.title || ""}
+                          onChange={(e) => {
+                            const next = [...payload.photos];
+                            next[i] = { ...next[i], title: e.target.value };
+                            handleFieldChange("photos", next);
+                          }}
+                          className="portal-input"
+                        />
+                      </div>
+                    </div>
+                    <div className="portal-field">
+                      <label className="portal-field-label text-[10px]">
+                        Image link (paste your Cloudinary URL here)
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="https://res.cloudinary.com/.../your-photo.jpg"
+                        value={ph.src || ""}
+                        onChange={(e) => {
+                          const next = [...payload.photos];
+                          next[i] = { ...next[i], src: e.target.value, thumb: e.target.value };
+                          handleFieldChange("photos", next);
+                        }}
+                        className="portal-input font-mono text-[11px]"
+                      />
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
@@ -2675,56 +3419,107 @@ function SectionEditorBlock({ section, onChange }: SectionBlockProps) {
                 + Add Video
               </button>
             </label>
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }} className="mt-2">
+            <p className="text-[11px] text-zinc-400 mt-1 leading-relaxed">
+              The <span className="font-bold">Thumbnail</span> is the preview image shown before the video plays — paste a Cloudinary image link for it.
+            </p>
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }} className="mt-2">
               {getVal("videos", []).map((vd: any, i: number) => (
-                <div key={i} className="flex gap-2 items-center">
-                  <input
-                    type="text"
-                    placeholder="Video Title"
-                    value={vd.title || ""}
-                    onChange={(e) => {
-                      const next = [...payload.videos];
-                      next[i] = { ...next[i], title: e.target.value };
-                      handleFieldChange("videos", next);
+                <div
+                  key={i}
+                  className="flex gap-3 p-3 rounded-lg border border-white/5"
+                  style={{ background: "rgba(255,255,255,0.02)" }}
+                >
+                  {/* Live thumbnail preview */}
+                  <div
+                    style={{
+                      width: "84px",
+                      height: "84px",
+                      flexShrink: 0,
+                      borderRadius: "8px",
+                      overflow: "hidden",
+                      border: "1px solid rgba(255,255,255,0.1)",
+                      background: "rgba(0,0,0,0.25)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
                     }}
-                    className="portal-input"
-                    style={{ flex: 3 }}
-                  />
-                  <input
-                    type="text"
-                    placeholder="Duration e.g. 3:24"
-                    value={vd.duration || ""}
-                    onChange={(e) => {
-                      const next = [...payload.videos];
-                      next[i] = { ...next[i], duration: e.target.value };
-                      handleFieldChange("videos", next);
-                    }}
-                    className="portal-input"
-                    style={{ flex: 1 }}
-                  />
-                  <input
-                    type="text"
-                    placeholder="Thumbnail URL"
-                    value={vd.thumb || ""}
-                    onChange={(e) => {
-                      const next = [...payload.videos];
-                      next[i] = { ...next[i], thumb: e.target.value };
-                      handleFieldChange("videos", next);
-                    }}
-                    className="portal-input"
-                    style={{ flex: 3 }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const next = [...payload.videos];
-                      next.splice(i, 1);
-                      handleFieldChange("videos", next);
-                    }}
-                    className="portal-icon-btn hover:text-red-500"
                   >
-                    <Trash2 size={13} />
-                  </button>
+                    {vd.thumb ? (
+                      <img
+                        src={vd.thumb}
+                        alt={vd.title || "Preview"}
+                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).style.display = "none";
+                        }}
+                      />
+                    ) : (
+                      <span className="text-[9px] text-zinc-500 text-center px-1">No image yet</span>
+                    )}
+                  </div>
+
+                  <div className="flex-1 flex flex-col gap-2 min-w-0">
+                    <div className="flex justify-between items-center">
+                      <span className="text-[10px] font-mono text-zinc-400">Video #{i + 1}</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const next = [...payload.videos];
+                          next.splice(i, 1);
+                          handleFieldChange("videos", next);
+                        }}
+                        className="portal-icon-btn hover:text-red-500"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    </div>
+                    <div className="flex gap-2">
+                      <div className="portal-field" style={{ flex: 3 }}>
+                        <label className="portal-field-label text-[10px]">Video Title</label>
+                        <input
+                          type="text"
+                          placeholder="e.g. Project Walkthrough"
+                          value={vd.title || ""}
+                          onChange={(e) => {
+                            const next = [...payload.videos];
+                            next[i] = { ...next[i], title: e.target.value };
+                            handleFieldChange("videos", next);
+                          }}
+                          className="portal-input"
+                        />
+                      </div>
+                      <div className="portal-field" style={{ flex: 1 }}>
+                        <label className="portal-field-label text-[10px]">Duration</label>
+                        <input
+                          type="text"
+                          placeholder="3:24"
+                          value={vd.duration || ""}
+                          onChange={(e) => {
+                            const next = [...payload.videos];
+                            next[i] = { ...next[i], duration: e.target.value };
+                            handleFieldChange("videos", next);
+                          }}
+                          className="portal-input"
+                        />
+                      </div>
+                    </div>
+                    <div className="portal-field">
+                      <label className="portal-field-label text-[10px]">
+                        Thumbnail image link (Cloudinary URL)
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="https://res.cloudinary.com/.../thumbnail.jpg"
+                        value={vd.thumb || ""}
+                        onChange={(e) => {
+                          const next = [...payload.videos];
+                          next[i] = { ...next[i], thumb: e.target.value };
+                          handleFieldChange("videos", next);
+                        }}
+                        className="portal-input font-mono text-[11px]"
+                      />
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>

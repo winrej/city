@@ -751,6 +751,7 @@ async function compileProjectPayload(sb: any, projectId: string) {
     .select(
       `
       *,
+      buildings:project_buildings(*),
       units:project_units(*),
       sections:project_sections(
         *,
@@ -776,7 +777,6 @@ async function compileProjectPayload(sb: any, projectId: string) {
       city: project.city,
       full_address: project.full_address,
       status: project.status,
-      category: project.category,
       min_price: Number(project.min_price),
       max_price: Number(project.max_price),
       meta_title: project.meta_title,
@@ -796,6 +796,16 @@ async function compileProjectPayload(sb: any, projectId: string) {
       description: u.description,
       profile_target: u.profile_target,
       image_url: u.image_url,
+    })),
+    buildings: (project.buildings || []).map((b: any) => ({
+      id: b.id,
+      name: b.name,
+      description: b.description,
+      floors: b.floors,
+      total_units: b.total_units,
+      status: b.status,
+      image_url: b.image_url,
+      display_order: b.display_order,
     })),
     landmarks: [],
   };
@@ -1008,7 +1018,6 @@ export const publishProject = createServerFn({ method: "POST" })
         location_district: meta.location_district || "",
         city: meta.city || "",
         full_address: meta.full_address || "",
-        category: meta.category || "Suburban Enclaves",
         architectural_theme: meta.architectural_theme || "",
         land_area: meta.land_area || "",
         floors: meta.floors || "",
@@ -1122,7 +1131,6 @@ export const createProject = createServerFn({ method: "POST" })
     z.object({
       title: z.string().min(1),
       slug: z.string().min(1),
-      category: z.enum(["Metro Core", "Suburban Enclaves", "Resort & Leisure"]),
       developer: z.string().default("DMCI Homes"),
       city: z.string().min(1),
       full_address: z.string().min(1),
@@ -1162,12 +1170,12 @@ export const createProject = createServerFn({ method: "POST" })
         city: data.city,
         full_address: data.full_address,
         status: "draft",
-        category: data.category,
         min_price: data.min_price,
         max_price: data.max_price,
       },
       layout_flow: [],
       units: [],
+      buildings: [],
       landmarks: [],
     };
 
@@ -1249,7 +1257,6 @@ export const PropertyCreateSchema = z.object({
   unit_types: z.array(z.string()).default([]),
   description: z.string().default(""),
   highlights: z.array(z.string()).default([]),
-  category: z.enum(["Metro Core", "Suburban Enclaves", "Resort & Leisure"]).default("Metro Core"),
   image_url: z.string().url().nullable().optional(),
   is_featured: z.boolean().default(false),
   is_active: z.boolean().default(true),
@@ -1277,7 +1284,6 @@ export const PropertyUpdateSchema = z.object({
   unit_types: z.array(z.string()).optional(),
   description: z.string().optional(),
   highlights: z.array(z.string()).optional(),
-  category: z.enum(["Metro Core", "Suburban Enclaves", "Resort & Leisure"]).optional(),
   image_url: z.string().nullable().optional(),
   is_featured: z.boolean().optional(),
   is_active: z.boolean().optional(),
@@ -1355,7 +1361,6 @@ export const createProperty = createServerFn({ method: "POST" })
         .insert({
           title: data.name,
           slug: slug,
-          category: data.category,
           developer: data.developer,
           location_district: data.location,
           city: data.city.includes(",") ? data.city.split(",").pop()?.trim() || data.city : data.city,
@@ -1383,12 +1388,12 @@ export const createProperty = createServerFn({ method: "POST" })
             city: data.city.includes(",") ? data.city.split(",").pop()?.trim() || data.city : data.city,
             full_address: data.city,
             status: "draft",
-            category: data.category,
             min_price: Math.round(data.price_min * 1000000),
             max_price: Math.round(data.price_min * 1000000 * 1.5),
           },
           layout_flow: [],
           units: [],
+          buildings: [],
           landmarks: [],
         };
 
@@ -1497,7 +1502,7 @@ export const getPublicPropertiesPageContent = createServerFn({ method: "GET" }).
       const { data: properties, error: propertiesError } = await sb
         .from("properties")
         .select(
-          "id, name, slug, developer, city, location, price_display, price_min, price_max, price_max_display, status, beds, baths, area, unit_types, description, highlights, category, image_url, is_featured, is_spotlight, promo_badge, display_order, featured_rank",
+          "id, name, slug, developer, city, location, price_display, price_min, price_max, price_max_display, status, beds, baths, area, unit_types, description, highlights, image_url, is_featured, is_spotlight, promo_badge, display_order, featured_rank",
         )
         .eq("is_active", true)
         .eq("is_deleted", false)
@@ -1773,5 +1778,91 @@ export const deleteApplication = createServerFn({ method: "POST" })
     const sb = await getServerClient();
     const { error } = await sb.from("job_applications").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
+    return { success: true };
+  });
+
+// ─── Project Buildings CRUD ────────────────────────────────────────────────────
+
+const BuildingStatusEnum = z.enum(["Under Construction", "Coming Soon", "RFO"]);
+
+export const createBuilding = createServerFn({ method: "POST" })
+  .validator(
+    z.object({
+      project_id: z.string().uuid(),
+      name: z.string().min(1),
+      description: z.string().optional(),
+      floors: z.string().optional(),
+      total_units: z.string().optional(),
+      status: BuildingStatusEnum.default("Under Construction"),
+      image_url: z.string().url().nullable().optional(),
+      display_order: z.number().int().default(0),
+    }),
+  )
+  .handler(async ({ data }) => {
+    await requireAdminSession();
+    const sb = await getServerClient();
+    const { data: building, error } = await sb
+      .from("project_buildings")
+      .insert(data)
+      .select()
+      .single();
+    if (error) throw new Error(error.message);
+    return building;
+  });
+
+export const updateBuilding = createServerFn({ method: "POST" })
+  .validator(
+    z.object({
+      id: z.string().uuid(),
+      name: z.string().min(1).optional(),
+      description: z.string().optional(),
+      floors: z.string().optional(),
+      total_units: z.string().optional(),
+      status: BuildingStatusEnum.optional(),
+      image_url: z.string().url().nullable().optional(),
+      display_order: z.number().int().optional(),
+    }),
+  )
+  .handler(async ({ data }) => {
+    await requireAdminSession();
+    const sb = await getServerClient();
+    const { id, ...fields } = data;
+    const { data: building, error } = await sb
+      .from("project_buildings")
+      .update(fields)
+      .eq("id", id)
+      .select()
+      .single();
+    if (error) throw new Error(error.message);
+    return building;
+  });
+
+export const deleteBuilding = createServerFn({ method: "POST" })
+  .validator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .handler(async ({ data }) => {
+    await requireAdminSession();
+    const sb = await getServerClient();
+    const { error } = await sb.from("project_buildings").delete().eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { success: true };
+  });
+
+export const reorderBuildings = createServerFn({ method: "POST" })
+  .validator(
+    (d: unknown) =>
+      z
+        .object({
+          updates: z.array(z.object({ id: z.string().uuid(), display_order: z.number().int() })),
+        })
+        .parse(d),
+  )
+  .handler(async ({ data }) => {
+    await requireAdminSession();
+    const sb = await getServerClient();
+    await Promise.all(
+      data.updates.map(({ id, display_order }) =>
+        sb.from("project_buildings").update({ display_order }).eq("id", id),
+      ),
+    );
     return { success: true };
   });

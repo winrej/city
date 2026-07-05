@@ -68,12 +68,12 @@ function BlogCard({ post, index }: { post: BlogPost; index: number }) {
       >
         <article className="relative overflow-hidden rounded-2xl border border-border bg-white transition-all duration-700 hover:-translate-y-1 hover:shadow-lift" style={{ transitionTimingFunction: "var(--ease-luxe)" }}>
           {/* Cover image */}
-          <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+          <div className="relative aspect-[16/10] overflow-hidden bg-muted">
             {post.cover_image_url ? (
               <img
                 src={post.cover_image_url}
                 alt={post.title}
-                className="h-full w-full object-cover transition-transform duration-[2000ms] group-hover:scale-105"
+                className="h-full w-full object-contain transition-transform duration-[2000ms] group-hover:scale-[1.02]"
                 style={{ transitionTimingFunction: "var(--ease-luxe)" }}
                 loading="lazy"
               />

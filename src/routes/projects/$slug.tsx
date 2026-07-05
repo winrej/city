@@ -71,7 +71,6 @@ const FALLBACK_PROJECTS: Record<string, ProjectPageData> = {
       city: "Las Piñas",
       fullAddress: "Alabang-Zapote Road, Pamplona Tres, Las Piñas City",
       status: "Pre-selling",
-      category: "Mid-Rise Condominium",
       architecturalTheme: "Modern Resort Tropical",
       landArea: "1.8 Hectares",
       floors: "5–7 Floors (Low-Rise Cluster)",
@@ -429,13 +428,22 @@ interface ProjectMeta {
   city: string;
   fullAddress: string;
   status: string;
-  category: string;
   architecturalTheme?: string;
   landArea?: string;
   floors?: string;
   totalUnits?: string;
   turnover?: string;
   description: string;
+}
+
+interface BuildingData {
+  id?: string;
+  name: string;
+  description?: string;
+  floors?: string;
+  total_units?: string;
+  status: "Under Construction" | "Coming Soon" | "RFO";
+  image_url?: string;
 }
 
 interface UnitData {
@@ -525,6 +533,7 @@ type SectionPayloads = {
 interface ProjectPageData {
   meta: ProjectMeta;
   units: UnitData[];
+  buildings?: BuildingData[];
   sections: Partial<SectionPayloads>;
 }
 
@@ -543,6 +552,16 @@ function adaptReadModel(rm: any): ProjectPageData | null {
     description: u.description,
     profile_target: u.profile_target,
     image_url: u.image_url,
+  }));
+
+  const buildings: BuildingData[] = (rm.buildings || []).map((b: any) => ({
+    id: b.id,
+    name: b.name,
+    description: b.description,
+    floors: b.floors,
+    total_units: b.total_units,
+    status: b.status,
+    image_url: b.image_url,
   }));
 
   // Extract section payloads from layout_flow keyed by section type.
@@ -583,7 +602,6 @@ function adaptReadModel(rm: any): ProjectPageData | null {
       city: pm.city,
       fullAddress: pm.full_address,
       status: pm.listing_status || "",
-      category: pm.category,
       architecturalTheme: pm.architectural_theme,
       landArea: pm.land_area,
       floors: pm.floors,
@@ -592,6 +610,7 @@ function adaptReadModel(rm: any): ProjectPageData | null {
       description: pm.description,
     },
     units,
+    buildings,
     sections: sectionMap,
   };
 }
@@ -1412,17 +1431,6 @@ function ProjectDetailPage() {
         <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/40 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
 
-        {/* Status badge */}
-        {meta.status && (
-          <div className="absolute top-28 left-0 right-0 z-10">
-            <div className="container-prose">
-              <span className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-md border border-white/20 text-white text-[10.5px] font-bold uppercase tracking-widest px-4 py-1.5 rounded-full">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-                {meta.status}
-              </span>
-            </div>
-          </div>
-        )}
 
         {/* Content */}
         <div className="relative z-10 flex h-full items-end pb-20 md:pb-28">
@@ -1897,7 +1905,6 @@ function ProjectDetailPage() {
                   {[
                     { label: "Developer", value: meta.developer },
                     { label: "Location", value: meta.fullAddress },
-                    { label: "Property Type", value: meta.category },
                     { label: "Architectural Theme", value: meta.architecturalTheme || "" },
                     { label: "Land Area", value: meta.landArea || "" },
                     { label: "Building Height", value: meta.floors || "" },
@@ -1922,6 +1929,101 @@ function ProjectDetailPage() {
           </div>
         </div>
       </section>
+
+      {/* ═══════════════════════════════════════════════════
+          BUILDINGS & TOWERS SECTION
+      ═══════════════════════════════════════════════════ */}
+      {p.buildings && p.buildings.length > 0 && (
+        <section className="px-4 py-20 md:py-28 bg-surface">
+          <div className="container-prose">
+            <div className="text-center max-w-2xl mx-auto mb-16">
+              <Reveal>
+                <p className="eyebrow">
+                  <span className="gold-rule" />
+                  Development
+                </p>
+              </Reveal>
+              <Reveal delay={100}>
+                <h2 className="display-2 mt-5">
+                  Buildings &amp; <span className="text-primary">Towers</span>
+                </h2>
+              </Reveal>
+              <Reveal delay={180}>
+                <p className="text-[15px] text-muted-foreground mt-3">
+                  Explore the specific towers and building phases of this project.
+                </p>
+              </Reveal>
+            </div>
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {p.buildings.map((bld, i) => {
+                const statusColors = {
+                  "Under Construction": "bg-[#3B82F6]/10 text-[#3B82F6] border-[#3B82F6]/25",
+                  "Coming Soon": "bg-[#7309F3]/10 text-[#7309F3] border-[#7309F3]/25",
+                  "RFO": "bg-emerald-500/10 text-emerald-600 border-emerald-500/25",
+                };
+                const badgeClass = statusColors[bld.status as keyof typeof statusColors] || "bg-zinc-500/10 text-zinc-600 border-zinc-500/25";
+
+                return (
+                  <Reveal key={bld.id || bld.name + i} delay={i * 80}>
+                    <div className="bg-white rounded-3xl border border-border/40 overflow-hidden shadow-soft hover:shadow-lift transition-all duration-500 group flex flex-col h-full">
+                      {/* Image container */}
+                      <div className="aspect-[4/3] w-full overflow-hidden bg-zinc-100 relative">
+                        {bld.image_url ? (
+                          <img
+                            src={bld.image_url}
+                            alt={bld.name}
+                            className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-[1200ms]"
+                            loading="lazy"
+                          />
+                        ) : (
+                          // Fallback to building placeholder
+                          <div className="w-full h-full flex flex-col items-center justify-center p-8 bg-zinc-950 text-white/40">
+                            <Building2 size={40} className="stroke-[1.5] mb-2 opacity-50 text-primary" />
+                            <span className="text-[11px] uppercase tracking-wider font-mono font-bold">Image coming soon</span>
+                          </div>
+                        )}
+                        <div className="absolute top-4 left-4">
+                          <span className={`inline-flex items-center text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border backdrop-blur-md ${badgeClass}`}>
+                            {bld.status}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Content */}
+                      <div className="p-6 flex flex-col flex-1">
+                        <h3 className="text-[18px] font-bold text-ink leading-tight mb-2 group-hover:text-primary transition-colors">
+                          {bld.name}
+                        </h3>
+                        {bld.description && (
+                          <p className="text-[13.5px] text-muted-foreground leading-relaxed mb-4">
+                            {bld.description}
+                          </p>
+                        )}
+                        
+                        <div className="mt-auto pt-4 border-t border-border/50 grid grid-cols-2 gap-4">
+                          {bld.floors && (
+                            <div>
+                              <p className="text-[9.5px] font-bold uppercase tracking-wider text-muted-foreground mb-0.5">Floors</p>
+                              <p className="text-[13px] font-semibold text-ink leading-none">{bld.floors}</p>
+                            </div>
+                          )}
+                          {bld.total_units && (
+                            <div>
+                              <p className="text-[9.5px] font-bold uppercase tracking-wider text-muted-foreground mb-0.5">Total Units</p>
+                              <p className="text-[13px] font-semibold text-ink leading-none">{bld.total_units}</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </Reveal>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ═══════════════════════════════════════════════════
           5. KEY HIGHLIGHTS

@@ -1,4 +1,4 @@
-﻿import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useMemo } from "react";
 import {
@@ -21,6 +21,7 @@ import {
   MapPin,
   DollarSign,
   BedDouble,
+  Image as ImageIcon,
 } from "lucide-react";
 
 import {
@@ -55,7 +56,6 @@ type Property = {
   unit_types: string[];
   description: string;
   highlights: string[];
-  category: "Metro Core" | "Suburban Enclaves" | "Resort & Leisure";
   image_url: string | null;
   is_featured: boolean;
   is_active: boolean;
@@ -84,7 +84,6 @@ type FormState = {
   unit_types: string[];
   description: string;
   highlights: string[];
-  category: "Metro Core" | "Suburban Enclaves" | "Resort & Leisure";
   image_url: string;
   is_featured: boolean;
   is_active: boolean;
@@ -111,7 +110,6 @@ const EMPTY_FORM: FormState = {
   unit_types: [],
   description: "",
   highlights: [],
-  category: "Metro Core",
   image_url: "",
   is_featured: false,
   is_active: true,
@@ -121,6 +119,101 @@ const EMPTY_FORM: FormState = {
   featured_rank: 0,
   autoCreateProject: true,
 };
+
+function CloudinaryImageInput({
+  label,
+  value,
+  onChange,
+  aspectRatioLabel,
+  description,
+  optional = false,
+}: {
+  label: string;
+  value: string;
+  onChange: (val: string) => void;
+  aspectRatioLabel: string;
+  description?: string;
+  optional?: boolean;
+}) {
+  const [imageError, setImageError] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  // Check if it's a Cloudinary link
+  const isCloudinary = value ? value.includes("res.cloudinary.com") : false;
+
+  return (
+    <div className="portal-field">
+      <label className="portal-field-label" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <span>
+          {label} {optional && <span style={{ color: "var(--zinc-500)", fontWeight: 400, fontSize: "11px" }}>(Optional)</span>}
+        </span>
+        <span style={{ fontSize: "11px", padding: "2px 6px", borderRadius: "4px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "var(--zinc-400)", fontFamily: "monospace" }}>
+          {aspectRatioLabel}
+        </span>
+      </label>
+      
+      <div style={{ position: "relative" }}>
+        <input
+          type="url"
+          className="portal-input"
+          style={{ paddingRight: "7.5rem" }}
+          placeholder="https://res.cloudinary.com/..."
+          value={value}
+          onChange={(e) => {
+            setImageError(false);
+            onChange(e.target.value);
+          }}
+        />
+        {value && (
+          <div style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", display: "flex", alignItems: "center" }}>
+            {isCloudinary ? (
+              <span style={{ fontSize: "10px", color: "oklch(0.65 0.18 145)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" }}>Cloudinary ✓</span>
+            ) : (
+              <span style={{ fontSize: "10px", color: "oklch(0.74 0.137 79)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" }}>External Link</span>
+            )}
+          </div>
+        )}
+      </div>
+
+      <p style={{ fontSize: "11.5px", color: "var(--zinc-400)", marginTop: "0.25rem", marginBottom: 0, display: "flex", alignItems: "center", gap: "0.25rem" }}>
+        <span>💡</span> {description || "Please paste a direct Cloudinary image URL link."}
+      </p>
+
+      {value && (
+        <div style={{ marginTop: "0.75rem", padding: "0.5rem", background: "rgba(255,255,255,0.01)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "10px", display: "flex", alignItems: "center", gap: "0.75rem" }}>
+          <div style={{ width: "64px", height: "48px", background: "rgba(0,0,0,0.2)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "6px", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", flexShrink: 0 }}>
+            {loading && <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.6)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "10px" }}>...</div>}
+            <img
+              src={value}
+              alt="Preview"
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              onLoadStart={() => setLoading(true)}
+              onLoad={() => {
+                setImageError(false);
+                setLoading(false);
+              }}
+              onError={() => {
+                setImageError(true);
+                setLoading(false);
+              }}
+            />
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            {imageError ? (
+              <p style={{ fontSize: "12px", color: "#f87171", fontWeight: 600, margin: 0, display: "flex", alignItems: "center", gap: "0.35rem" }}>
+                ⚠️ Could not load image. Make sure the URL is valid.
+              </p>
+            ) : (
+              <p style={{ fontSize: "11.5px", color: "oklch(0.65 0.18 145)", fontWeight: 600, margin: 0, display: "flex", alignItems: "center", gap: "0.35rem" }}>
+                ✓ Image loaded successfully
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 function PropertyFormModal({
   mode,
@@ -226,603 +319,666 @@ function PropertyFormModal({
     );
   };
 
+  const [activeTab, setActiveTab] = useState<"general" | "gallery" | "units" | "amenities" | "seo" | "publish">("general");
+
   return (
     <div className="portal-detail-overlay" onClick={onClose}>
       <div
         className="portal-detail-panel"
         onClick={(e) => e.stopPropagation()}
-        style={{ maxWidth: "640px" }}
+        style={{
+          maxWidth: "800px",
+          width: "95vw",
+          height: "85vh",
+          display: "flex",
+          flexDirection: "column",
+          borderRadius: "16px",
+          border: "1px solid var(--portal-border)",
+          boxShadow: "0 24px 64px rgba(0, 0, 0, 0.4)",
+          overflow: "hidden"
+        }}
       >
         {/* Header */}
-        <div className="portal-detail-header">
-          <h2 className="portal-detail-name">
-            {mode === "create" ? "Add New Property" : "Edit Property"}
-          </h2>
-          <button className="portal-detail-close" onClick={onClose}>
+        <div className="portal-detail-header" style={{ flexShrink: 0, padding: "1.25rem 1.5rem" }}>
+          <div>
+            <h2 className="portal-detail-name" style={{ fontSize: "1.25rem", fontWeight: 800 }}>
+              {mode === "create" ? "Add New Property Listing" : "Edit Property Listing"}
+            </h2>
+            <p style={{ margin: "0.25rem 0 0 0", fontSize: "12px", color: "var(--portal-text-muted)" }}>
+              {mode === "create" ? "Create a new public card layout and link it to projects." : `Editing: ${form.name}`}
+            </p>
+          </div>
+          <button className="portal-detail-close" onClick={onClose} style={{ fontSize: "1.5rem" }}>
             ✕
           </button>
         </div>
 
-        <div
-          className="portal-detail-body"
-          style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
-        >
-          {/* Name */}
-          <div className="portal-field">
-            <label className="portal-field-label">Property Name *</label>
-            <input
-              className="portal-input"
-              placeholder="e.g. Sonora Garden Residences"
-              value={form.name}
-              onChange={(e) => set("name", e.target.value)}
-            />
-            {mode === "create" && (
-              <span
-                style={{
-                  fontSize: "11px",
-                  color: "var(--zinc-500)",
-                  marginTop: "0.25rem",
-                  display: "block",
-                }}
-              >
-                Slug will be auto-generated:{" "}
-                <code>
-                  {form.name
-                    ? form.name
-                        .toLowerCase()
-                        .replace(/[^a-z0-9\s-]/g, "")
-                        .trim()
-                        .replace(/\s+/g, "-")
-                    : "…"}
-                </code>
-              </span>
-            )}
-            {duplicateWarning && (
-              <div
-                style={{
-                  marginTop: "0.5rem",
-                  padding: "0.6rem 0.8rem",
-                  background: "rgba(212, 163, 89, 0.08)",
-                  border: "1px solid rgba(212, 163, 89, 0.25)",
-                  borderRadius: "6px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.5rem",
-                  fontSize: "12px",
-                  color: "oklch(0.74 0.137 79)",
-                }}
-              >
-                <AlertTriangle size={14} style={{ flexShrink: 0 }} />
-                <span>
-                  <strong>Warning:</strong> Similar active property detected ({duplicateWarning.count} match(es) on {duplicateWarning.reasons}: <em>{duplicateWarning.names}</em>).
-                </span>
-              </div>
-            )}
-          </div>
-
-          {/* Developer + City */}
-          <div className="portal-grid-2col">
-            <div className="portal-field">
-              <label className="portal-field-label">Developer</label>
-              <input
-                className="portal-input"
-                value={form.developer}
-                onChange={(e) => set("developer", e.target.value)}
-              />
-            </div>
-            <div className="portal-field">
-              <label className="portal-field-label">City / Address *</label>
-              <input
-                className="portal-input"
-                placeholder="e.g. Alabang-Zapote Road, Las Piñas"
-                value={form.city}
-                onChange={(e) => set("city", e.target.value)}
-              />
-            </div>
-          </div>
-
-          {/* Location + Category */}
-          <div className="portal-grid-2col">
-            <div className="portal-field">
-              <label className="portal-field-label">Location / District *</label>
-              <input
-                className="portal-input"
-                placeholder="e.g. Las Piñas"
-                value={form.location}
-                onChange={(e) => set("location", e.target.value)}
-              />
-            </div>
-            <div className="portal-field">
-              <label className="portal-field-label">Category</label>
-              <div className="portal-select-wrap">
-                <select
-                  className="portal-select"
-                  value={form.category}
-                  onChange={(e) => set("category", e.target.value as any)}
-                >
-                  <option value="Metro Core">Metro Core</option>
-                  <option value="Suburban Enclaves">Suburban Enclaves</option>
-                  <option value="Resort & Leisure">Resort & Leisure</option>
-                </select>
-                <ChevronDown size={14} className="portal-select-icon" />
-              </div>
-            </div>
-          </div>
-
-          {/* Price + Status */}
-          <div className="portal-grid-2col">
-            <div className="portal-field">
-              <label className="portal-field-label">Price Display *</label>
-              <input
-                className="portal-input"
-                placeholder="e.g. ₱5.6M"
-                value={form.price_display}
-                onChange={(e) => set("price_display", e.target.value)}
-              />
-            </div>
-            <div className="portal-field">
-              <label className="portal-field-label">Price Min (millions) *</label>
-              <input
-                className="portal-input"
-                type="number"
-                step="0.1"
-                min="0"
-                placeholder="e.g. 5.6"
-                value={form.price_min || ""}
-                onChange={(e) => set("price_min", parseFloat(e.target.value) || 0)}
-              />
-            </div>
-          </div>
-
-          {/* Max Price (optional — shows "Up to …" on the card) */}
-          <div className="portal-grid-2col">
-            <div className="portal-field">
-              <label className="portal-field-label">Max Price Display</label>
-              <input
-                className="portal-input"
-                placeholder="e.g. ₱11.2M"
-                value={form.price_max_display}
-                onChange={(e) => set("price_max_display", e.target.value)}
-              />
-            </div>
-            <div className="portal-field">
-              <label className="portal-field-label">Price Max (millions)</label>
-              <input
-                className="portal-input"
-                type="number"
-                step="0.1"
-                min="0"
-                placeholder="e.g. 11.2"
-                value={form.price_max || ""}
-                onChange={(e) => set("price_max", parseFloat(e.target.value) || 0)}
-              />
-            </div>
-          </div>
-
-          {/* Beds + Baths + Area + Status */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 2fr 1fr", gap: "0.75rem" }}>
-            <div className="portal-field">
-              <label className="portal-field-label">Beds</label>
-              <input
-                className="portal-input"
-                type="number"
-                min="0"
-                value={form.beds}
-                onChange={(e) => set("beds", parseInt(e.target.value) || 0)}
-              />
-            </div>
-            <div className="portal-field">
-              <label className="portal-field-label">Baths</label>
-              <input
-                className="portal-input"
-                type="number"
-                min="0"
-                step="0.5"
-                value={form.baths}
-                onChange={(e) => set("baths", parseFloat(e.target.value) || 0)}
-              />
-            </div>
-            <div className="portal-field">
-              <label className="portal-field-label">Area</label>
-              <input
-                className="portal-input"
-                placeholder="e.g. 58.5 sq.m."
-                value={form.area}
-                onChange={(e) => set("area", e.target.value)}
-              />
-            </div>
-            <div className="portal-field">
-              <label className="portal-field-label">Status</label>
-              <div className="portal-select-wrap">
-                <select
-                  className="portal-select"
-                  value={form.status}
-                  onChange={(e) => set("status", e.target.value as any)}
-                >
-                  <option value="Pre-selling">Pre-selling</option>
-                  <option value="RFO">RFO</option>
-                </select>
-                <ChevronDown size={14} className="portal-select-icon" />
-              </div>
-            </div>
-          </div>
-
-          {/* Description */}
-          <div className="portal-field">
-            <label className="portal-field-label">Description</label>
-            <textarea
-              className="portal-input"
-              rows={3}
-              style={{ resize: "vertical", minHeight: "80px" }}
-              placeholder="Short paragraph about this property…"
-              value={form.description}
-              onChange={(e) => set("description", e.target.value)}
-            />
-          </div>
-
-          {/* Unit Types */}
-          <div className="portal-field">
-            <label className="portal-field-label">Unit Types</label>
-            <div style={{ display: "flex", gap: "0.5rem" }}>
-              <input
-                className="portal-input"
-                placeholder="e.g. 1BR, 2BR, 3BR — type and press Enter"
-                value={unitTypeInput}
-                onChange={(e) => setUnitTypeInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    addUnitType(unitTypeInput);
-                  }
-                }}
-                style={{ flex: 1 }}
-              />
-              <button
-                type="button"
-                className="portal-btn-primary"
-                style={{ padding: "0 0.75rem", flexShrink: 0 }}
-                onClick={() => addUnitType(unitTypeInput)}
-              >
-                <Plus size={14} />
-              </button>
-            </div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem", marginTop: "0.5rem" }}>
-              {["Studio", "1BR", "2BR", "3BR", "Penthouse"]
-                .filter((t) => !form.unit_types.includes(t))
-                .map((t) => (
-                  <button
-                    key={t}
-                    type="button"
-                    onClick={() => addUnitType(t)}
-                    style={{
-                      background: "none",
-                      border: "1px dashed oklch(0.4 0.02 258)",
-                      borderRadius: "999px",
-                      padding: "0.2rem 0.65rem",
-                      fontSize: "12px",
-                      color: "var(--zinc-400)",
-                      cursor: "pointer",
-                    }}
-                  >
-                    + {t}
-                  </button>
-                ))}
-            </div>
-            {form.unit_types.length > 0 && (
-              <div
-                style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem", marginTop: "0.5rem" }}
-              >
-                {form.unit_types.map((u, i) => (
-                  <span
-                    key={i}
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "0.35rem",
-                      background: "oklch(0.25 0.015 258)",
-                      border: "1px solid oklch(0.32 0.02 258)",
-                      borderRadius: "999px",
-                      padding: "0.2rem 0.65rem",
-                      fontSize: "12px",
-                      color: "var(--zinc-200)",
-                    }}
-                  >
-                    {u}
-                    <button
-                      type="button"
-                      onClick={() => removeUnitType(i)}
-                      style={{
-                        background: "none",
-                        border: "none",
-                        cursor: "pointer",
-                        color: "var(--zinc-400)",
-                        lineHeight: 1,
-                        padding: 0,
-                      }}
-                    >
-                      ✕
-                    </button>
-                  </span>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Highlights */}
-          <div className="portal-field">
-            <label className="portal-field-label">Highlights</label>
-            <div style={{ display: "flex", gap: "0.5rem" }}>
-              <input
-                className="portal-input"
-                placeholder="Add a highlight, then press Enter"
-                value={highlightInput}
-                onChange={(e) => setHighlightInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    addHighlight();
-                  }
-                }}
-                style={{ flex: 1 }}
-              />
-              <button
-                type="button"
-                className="portal-btn-primary"
-                style={{ padding: "0 0.75rem", flexShrink: 0 }}
-                onClick={addHighlight}
-              >
-                <Plus size={14} />
-              </button>
-            </div>
-            {form.highlights.length > 0 && (
-              <div
-                style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem", marginTop: "0.5rem" }}
-              >
-                {form.highlights.map((h, i) => (
-                  <span
-                    key={i}
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "0.35rem",
-                      background: "oklch(0.25 0.015 258)",
-                      border: "1px solid oklch(0.32 0.02 258)",
-                      borderRadius: "999px",
-                      padding: "0.2rem 0.65rem",
-                      fontSize: "12px",
-                      color: "var(--zinc-200)",
-                    }}
-                  >
-                    {h}
-                    <button
-                      type="button"
-                      onClick={() => removeHighlight(i)}
-                      style={{
-                        background: "none",
-                        border: "none",
-                        cursor: "pointer",
-                        color: "var(--zinc-400)",
-                        lineHeight: 1,
-                        padding: 0,
-                      }}
-                    >
-                      ✕
-                    </button>
-                  </span>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Promo Badge */}
-          <div className="portal-field">
-            <label className="portal-field-label">Promo Badge / Tag</label>
-            <input
-              className="portal-input"
-              placeholder="e.g. Featured Development, Premium Luxury..."
-              value={form.promo_badge || ""}
-              onChange={(e) => set("promo_badge", e.target.value)}
-            />
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem", marginTop: "0.4rem" }}>
-              {[
-                "Featured Development",
-                "Spotlight Residence",
-                "Premium Luxury",
-                "Limited Offer",
-              ].map((badge) => (
-                <button
-                  type="button"
-                  key={badge}
-                  onClick={() => set("promo_badge", badge)}
-                  style={{
-                    fontSize: "11px",
-                    background: "rgba(255,255,255,0.06)",
-                    border: "1px solid rgba(255,255,255,0.12)",
-                    borderRadius: "4px",
-                    padding: "2.5px 8px",
-                    color: "var(--zinc-350)",
-                    cursor: "pointer",
-                    transition: "all 0.2s",
-                  }}
-                  onMouseOver={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.12)")}
-                  onMouseOut={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.06)")}
-                >
-                  {badge}
-                </button>
-              ))}
-              {form.promo_badge && (
-                <button
-                  type="button"
-                  onClick={() => set("promo_badge", "")}
-                  style={{
-                    fontSize: "11px",
-                    background: "rgba(239,68,68,0.1)",
-                    border: "1px solid rgba(239,68,68,0.25)",
-                    borderRadius: "4px",
-                    padding: "2.5px 8px",
-                    color: "#f87171",
-                    cursor: "pointer",
-                  }}
-                >
-                  Clear
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Image URL */}
-          <div className="portal-field">
-            <label className="portal-field-label">
-              Image URL{" "}
-              <span style={{ color: "var(--zinc-500)", fontWeight: 400 }}>(optional override)</span>
-            </label>
-            <input
-              className="portal-input"
-              type="url"
-              placeholder="https://…"
-              value={form.image_url}
-              onChange={(e) => set("image_url", e.target.value)}
-            />
-          </div>
-
-          {/* Display order + Featured Rank */}
-          <div className="portal-grid-2col">
-            <div className="portal-field">
-              <label className="portal-field-label">Display Order</label>
-              <input
-                className="portal-input"
-                type="number"
-                value={form.display_order}
-                onChange={(e) => set("display_order", parseInt(e.target.value) || 0)}
-              />
-            </div>
-            <div className="portal-field">
-              <label className="portal-field-label">Featured Rank (Homepage Order)</label>
-              <input
-                className="portal-input"
-                type="number"
-                placeholder="Higher ranks first"
-                value={form.featured_rank}
-                onChange={(e) => set("featured_rank", parseInt(e.target.value) || 0)}
-              />
-            </div>
-          </div>
-
-          {/* Flags */}
-          <div className="portal-field">
-            <label className="portal-field-label">Flags</label>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                gap: "1.5rem",
-                flexWrap: "wrap",
-                paddingTop: "0.25rem",
-              }}
-            >
-              <label
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.5rem",
-                  cursor: "pointer",
-                  fontSize: "13px",
-                  color: "var(--zinc-200)",
-                }}
-              >
-                <input
-                  type="checkbox"
-                  checked={form.is_active}
-                  onChange={(e) => set("is_active", e.target.checked)}
-                />
-                Active (visible publicly)
-              </label>
-              <label
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.5rem",
-                  cursor: "pointer",
-                  fontSize: "13px",
-                  color: "var(--zinc-200)",
-                }}
-              >
-                <input
-                  type="checkbox"
-                  checked={form.is_featured}
-                  onChange={(e) => set("is_featured", e.target.checked)}
-                />
-                Featured property
-              </label>
-              <label
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.5rem",
-                  cursor: "pointer",
-                  fontSize: "13px",
-                  color: "var(--zinc-200)",
-                }}
-              >
-                <input
-                  type="checkbox"
-                  checked={form.is_spotlight}
-                  onChange={(e) => set("is_spotlight", e.target.checked)}
-                />
-                <span style={{ color: "oklch(0.78 0.18 75)", fontWeight: "bold" }}>
-                  ★ Spotlight Property
-                </span>
-              </label>
-              {mode === "create" && (
-                <label
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.5rem",
-                    cursor: "pointer",
-                    fontSize: "13px",
-                    color: "oklch(0.74 0.137 79)",
-                    fontWeight: "bold",
-                  }}
-                >
-                  <input
-                    type="checkbox"
-                    checked={form.autoCreateProject}
-                    onChange={(e) => set("autoCreateProject", e.target.checked)}
-                  />
-                  Auto-create matching Project page
-                </label>
-              )}
-            </div>
-          </div>
-
-          {/* Actions */}
+        {/* Main Panel Content with Sidebar */}
+        <div style={{ display: "flex", flex: 1, overflow: "hidden", background: "var(--portal-bg)" }}>
+          {/* Sidebar Navigation */}
           <div
             style={{
+              width: "200px",
+              borderRight: "1px solid var(--portal-border)",
+              background: "rgba(0, 0, 0, 0.15)",
               display: "flex",
-              justifyContent: "flex-end",
-              gap: "0.75rem",
-              paddingTop: "0.5rem",
+              flexDirection: "column",
+              gap: "0.35rem",
+              padding: "1.25rem 0.75rem",
+              overflowY: "auto",
+              flexShrink: 0
             }}
           >
-            <button className="portal-btn-ghost" onClick={onClose} disabled={isSubmitting}>
-              Cancel
-            </button>
-            <button
-              className="portal-btn-primary"
-              onClick={() => onSubmit(form)}
-              disabled={
-                isSubmitting ||
-                !form.name ||
-                !form.city ||
-                !form.location ||
-                !form.price_display ||
-                !form.price_min
-              }
-            >
-              {isSubmitting ? "Saving…" : mode === "create" ? "Create Property" : "Save Changes"}
-            </button>
+            {[
+              { id: "general", label: "General Info", icon: "📋" },
+              { id: "gallery", label: "Gallery & Cover", icon: "🖼️" },
+              { id: "units", label: "Units & Pricing", icon: "🏢" },
+              { id: "amenities", label: "Details & Tags", icon: "✨" },
+              { id: "seo", label: "Web Link Address", icon: "🌐" },
+              { id: "publish", label: "Publish Settings", icon: "🚀" }
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(tab.id as any)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.6rem",
+                  padding: "0.75rem 0.85rem",
+                  borderRadius: "8px",
+                  fontSize: "13px",
+                  fontWeight: activeTab === tab.id ? 700 : 500,
+                  color: activeTab === tab.id ? "var(--portal-text)" : "var(--portal-text-muted)",
+                  background: activeTab === tab.id ? "var(--portal-accent-dim)" : "transparent",
+                  border: "none",
+                  cursor: "pointer",
+                  textAlign: "left",
+                  transition: "all 0.2s"
+                }}
+              >
+                <span style={{ fontSize: "15px" }}>{tab.icon}</span>
+                {tab.label}
+              </button>
+            ))}
           </div>
+
+          {/* Form Fields Panel */}
+          <div
+            style={{
+              flex: 1,
+              padding: "1.75rem",
+              overflowY: "auto",
+              display: "flex",
+              flexDirection: "column",
+              gap: "1.5rem"
+            }}
+          >
+            {/* GENERAL TAB */}
+            {activeTab === "general" && (
+              <>
+                <div className="portal-field">
+                  <label className="portal-field-label">Property Name *</label>
+                  <input
+                    className="portal-input"
+                    placeholder="e.g. Sonora Garden Residences"
+                    value={form.name}
+                    onChange={(e) => set("name", e.target.value)}
+                  />
+                  <p style={{ fontSize: "11px", color: "var(--zinc-500)", marginTop: "0.25rem", marginBottom: 0 }}>
+                    The public name of the project. A web link address will be generated automatically.
+                  </p>
+                  {duplicateWarning && (
+                    <div
+                      style={{
+                        marginTop: "0.75rem",
+                        padding: "0.75rem 1rem",
+                        background: "rgba(212, 163, 89, 0.08)",
+                        border: "1px solid rgba(212, 163, 89, 0.25)",
+                        borderRadius: "8px",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.5rem",
+                        fontSize: "12px",
+                        color: "oklch(0.74 0.137 79)"
+                      }}
+                    >
+                      <AlertTriangle size={15} style={{ flexShrink: 0 }} />
+                      <span>
+                        <strong>Warning:</strong> Similar active property detected ({duplicateWarning.count} match(es) on {duplicateWarning.reasons}: <em>{duplicateWarning.names}</em>).
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="portal-grid-2col">
+                  <div className="portal-field">
+                    <label className="portal-field-label">Developer Group</label>
+                    <input
+                      className="portal-input"
+                      placeholder="e.g. DMCI Homes"
+                      value={form.developer}
+                      onChange={(e) => set("developer", e.target.value)}
+                    />
+                    <p style={{ fontSize: "11px", color: "var(--zinc-500)", marginTop: "0.25rem", marginBottom: 0 }}>
+                      The developer building the project. Default is <strong>DMCI Homes</strong>.
+                    </p>
+                  </div>
+                  <div className="portal-field">
+                    <label className="portal-field-label">City / Address *</label>
+                    <input
+                      className="portal-input"
+                      placeholder="e.g. Alabang-Zapote Road, Las Piñas"
+                      value={form.city}
+                      onChange={(e) => set("city", e.target.value)}
+                    />
+                    <p style={{ fontSize: "11px", color: "var(--zinc-500)", marginTop: "0.25rem", marginBottom: 0 }}>
+                      Full location address displayed on public pages.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="portal-field">
+                  <label className="portal-field-label">Location / District *</label>
+                  <input
+                    className="portal-input"
+                    placeholder="e.g. Las Piñas"
+                    value={form.location}
+                    onChange={(e) => set("location", e.target.value)}
+                  />
+                  <p style={{ fontSize: "11px", color: "var(--zinc-500)", marginTop: "0.25rem", marginBottom: 0 }}>
+                    The target district/city name used for search filters (e.g. <strong>Las Piñas</strong>).
+                  </p>
+                </div>
+              </>
+            )}
+
+            {/* GALLERY & COVER TAB */}
+            {activeTab === "gallery" && (
+              <>
+                <CloudinaryImageInput
+                  label="Listing Cover Image"
+                  aspectRatioLabel="Ratio 4:3"
+                  value={form.image_url || ""}
+                  onChange={(val) => set("image_url", val)}
+                  description="Paste the direct Cloudinary URL link for the main cover photo (shown on the listings card)."
+                />
+              </>
+            )}
+
+            {/* UNITS & PRICING TAB */}
+            {activeTab === "units" && (
+              <>
+                <div className="portal-grid-2col">
+                  <div className="portal-field">
+                    <label className="portal-field-label">Price Label text *</label>
+                    <input
+                      className="portal-input"
+                      placeholder="e.g. ₱5.6M"
+                      value={form.price_display}
+                      onChange={(e) => set("price_display", e.target.value)}
+                    />
+                    <p style={{ fontSize: "11px", color: "var(--zinc-500)", marginTop: "0.25rem", marginBottom: 0 }}>
+                      Starting price label shown on cards (e.g. <strong>₱5.6M</strong>).
+                    </p>
+                  </div>
+                  <div className="portal-field">
+                    <label className="portal-field-label">Starting Price (in Millions) *</label>
+                    <input
+                      className="portal-input"
+                      type="number"
+                      step="0.1"
+                      min="0"
+                      placeholder="e.g. 5.6"
+                      value={form.price_min || ""}
+                      onChange={(e) => set("price_min", parseFloat(e.target.value) || 0)}
+                    />
+                    <p style={{ fontSize: "11px", color: form.price_min ? "oklch(0.65 0.18 145)" : "var(--zinc-500)", marginTop: "0.25rem", marginBottom: 0, fontWeight: form.price_min ? 600 : 400 }}>
+                      {form.price_min ? `✓ Entering ${form.price_min} = ₱${(form.price_min * 1_000_000).toLocaleString()} PHP` : "Minimum numeric price value used for sorting."}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="portal-grid-2col">
+                  <div className="portal-field">
+                    <label className="portal-field-label">Max Price Label text</label>
+                    <input
+                      className="portal-input"
+                      placeholder="e.g. ₱11.2M"
+                      value={form.price_max_display}
+                      onChange={(e) => set("price_max_display", e.target.value)}
+                    />
+                    <p style={{ fontSize: "11px", color: "var(--zinc-500)", marginTop: "0.25rem", marginBottom: 0 }}>
+                      Optional maximum price label (e.g. <strong>₱11.2M</strong>).
+                    </p>
+                  </div>
+                  <div className="portal-field">
+                    <label className="portal-field-label">Max Price (in Millions)</label>
+                    <input
+                      className="portal-input"
+                      type="number"
+                      step="0.1"
+                      min="0"
+                      placeholder="e.g. 11.2"
+                      value={form.price_max || ""}
+                      onChange={(e) => set("price_max", parseFloat(e.target.value) || 0)}
+                    />
+                    <p style={{ fontSize: "11px", color: form.price_max ? "oklch(0.65 0.18 145)" : "var(--zinc-500)", marginTop: "0.25rem", marginBottom: 0, fontWeight: form.price_max ? 600 : 400 }}>
+                      {form.price_max ? `✓ Entering ${form.price_max} = ₱${(form.price_max * 1_000_000).toLocaleString()} PHP` : "Optional maximum numeric price value for range filter."}
+                    </p>
+                  </div>
+                </div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 2fr 1.5fr", gap: "0.75rem" }}>
+                  <div className="portal-field">
+                    <label className="portal-field-label">Beds</label>
+                    <input
+                      className="portal-input"
+                      type="number"
+                      min="0"
+                      value={form.beds}
+                      onChange={(e) => set("beds", parseInt(e.target.value) || 0)}
+                    />
+                  </div>
+                  <div className="portal-field">
+                    <label className="portal-field-label">Baths</label>
+                    <input
+                      className="portal-input"
+                      type="number"
+                      min="0"
+                      step="0.5"
+                      value={form.baths}
+                      onChange={(e) => set("baths", parseFloat(e.target.value) || 0)}
+                    />
+                  </div>
+                  <div className="portal-field">
+                    <label className="portal-field-label">Area (Size)</label>
+                    <input
+                      className="portal-input"
+                      placeholder="e.g. 58.5 sq.m."
+                      value={form.area}
+                      onChange={(e) => set("area", e.target.value)}
+                    />
+                  </div>
+                  <div className="portal-field">
+                    <label className="portal-field-label">Status</label>
+                    <div className="portal-select-wrap">
+                      <select
+                        className="portal-select"
+                        value={form.status}
+                        onChange={(e) => set("status", e.target.value as any)}
+                      >
+                        <option value="Pre-selling">Pre-selling</option>
+                        <option value="RFO">RFO</option>
+                      </select>
+                      <ChevronDown size={14} className="portal-select-icon" />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="portal-field">
+                  <label className="portal-field-label">Unit Layout Configurations</label>
+                  <div style={{ display: "flex", gap: "0.5rem" }}>
+                    <input
+                      className="portal-input"
+                      placeholder="e.g. Studio, 1BR, 2BR (press Add or Enter)"
+                      value={unitTypeInput}
+                      onChange={(e) => setUnitTypeInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          addUnitType(unitTypeInput);
+                        }
+                      }}
+                      style={{ flex: 1 }}
+                    />
+                    <button
+                      type="button"
+                      className="portal-btn-primary"
+                      style={{ padding: "0 0.75rem", flexShrink: 0 }}
+                      onClick={() => addUnitType(unitTypeInput)}
+                    >
+                      <Plus size={14} />
+                    </button>
+                  </div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem", marginTop: "0.5rem" }}>
+                    {["Studio", "1BR", "2BR", "3BR", "Penthouse"]
+                      .filter((t) => !form.unit_types.includes(t))
+                      .map((t) => (
+                        <button
+                          key={t}
+                          type="button"
+                          onClick={() => addUnitType(t)}
+                          style={{
+                            background: "none",
+                            border: "1px dashed rgba(255,255,255,0.15)",
+                            borderRadius: "999px",
+                            padding: "0.2rem 0.65rem",
+                            fontSize: "11px",
+                            color: "var(--zinc-400)",
+                            cursor: "pointer"
+                          }}
+                        >
+                          + {t}
+                        </button>
+                      ))}
+                  </div>
+                  {form.unit_types.length > 0 && (
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem", marginTop: "0.5rem" }}>
+                      {form.unit_types.map((u, i) => (
+                        <span
+                          key={i}
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "0.35rem",
+                            background: "rgba(255,255,255,0.06)",
+                            border: "1px solid rgba(255,255,255,0.12)",
+                            borderRadius: "999px",
+                            padding: "0.2rem 0.65rem",
+                            fontSize: "11px",
+                            color: "var(--zinc-200)"
+                          }}
+                        >
+                          {u}
+                          <button
+                            type="button"
+                            onClick={() => removeUnitType(i)}
+                            style={{
+                              background: "none",
+                              border: "none",
+                              cursor: "pointer",
+                              color: "var(--zinc-400)",
+                              lineHeight: 1,
+                              padding: 0
+                            }}
+                          >
+                            ✕
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+
+            {/* DETAILS & TAGS TAB */}
+            {activeTab === "amenities" && (
+              <>
+                <div className="portal-field">
+                  <label className="portal-field-label">Listing Description</label>
+                  <textarea
+                    className="portal-input"
+                    rows={4}
+                    style={{ resize: "vertical", minHeight: "100px" }}
+                    placeholder="Short paragraph summary highlighting features of this project…"
+                    value={form.description}
+                    onChange={(e) => set("description", e.target.value)}
+                  />
+                </div>
+
+                <div className="portal-field">
+                  <label className="portal-field-label">Core Highlights</label>
+                  <div style={{ display: "flex", gap: "0.5rem" }}>
+                    <input
+                      className="portal-input"
+                      placeholder="Type a feature/highlight and press Add or Enter"
+                      value={highlightInput}
+                      onChange={(e) => setHighlightInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          addHighlight();
+                        }
+                      }}
+                      style={{ flex: 1 }}
+                    />
+                    <button
+                      type="button"
+                      className="portal-btn-primary"
+                      style={{ padding: "0 0.75rem", flexShrink: 0 }}
+                      onClick={addHighlight}
+                    >
+                      <Plus size={14} />
+                    </button>
+                  </div>
+                  {form.highlights.length > 0 && (
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem", marginTop: "0.5rem" }}>
+                      {form.highlights.map((h, i) => (
+                        <span
+                          key={i}
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "0.35rem",
+                            background: "rgba(255,255,255,0.06)",
+                            border: "1px solid rgba(255,255,255,0.12)",
+                            borderRadius: "999px",
+                            padding: "0.2rem 0.65rem",
+                            fontSize: "11px",
+                            color: "var(--zinc-200)"
+                          }}
+                        >
+                          {h}
+                          <button
+                            type="button"
+                            onClick={() => removeHighlight(i)}
+                            style={{
+                              background: "none",
+                              border: "none",
+                              cursor: "pointer",
+                              color: "var(--zinc-400)",
+                              lineHeight: 1,
+                              padding: 0
+                            }}
+                          >
+                            ✕
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="portal-field">
+                  <label className="portal-field-label">Promo Tag / Ribbon Badge</label>
+                  <input
+                    className="portal-input"
+                    placeholder="e.g. Featured Development, Limited Promo Offers..."
+                    value={form.promo_badge || ""}
+                    onChange={(e) => set("promo_badge", e.target.value)}
+                  />
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem", marginTop: "0.5rem" }}>
+                    {[
+                      "Featured Development",
+                      "Spotlight Residence",
+                      "Premium Luxury",
+                      "Limited Offer"
+                    ].map((badge) => (
+                      <button
+                        type="button"
+                        key={badge}
+                        onClick={() => set("promo_badge", badge)}
+                        style={{
+                          fontSize: "11px",
+                          background: "rgba(255,255,255,0.06)",
+                          border: "1px solid rgba(255,255,255,0.12)",
+                          borderRadius: "6px",
+                          padding: "3px 8px",
+                          color: "var(--zinc-350)",
+                          cursor: "pointer",
+                          transition: "all 0.2s"
+                        }}
+                      >
+                        {badge}
+                      </button>
+                    ))}
+                    {form.promo_badge && (
+                      <button
+                        type="button"
+                        onClick={() => set("promo_badge", "")}
+                        style={{
+                          fontSize: "11px",
+                          background: "rgba(239,68,68,0.1)",
+                          border: "1px solid rgba(239,68,68,0.25)",
+                          borderRadius: "6px",
+                          padding: "3px 8px",
+                          color: "#f87171",
+                          cursor: "pointer"
+                        }}
+                      >
+                        Clear Tag
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* WEB LINK ADDRESS (SEO) TAB */}
+            {activeTab === "seo" && (
+              <>
+                <div className="portal-field">
+                  <label className="portal-field-label">Link Address Preview</label>
+                  <div
+                    style={{
+                      padding: "0.75rem 1rem",
+                      background: "rgba(0, 0, 0, 0.25)",
+                      border: "1px solid var(--portal-border)",
+                      borderRadius: "8px",
+                      fontSize: "12px",
+                      fontFamily: "monospace",
+                      color: "var(--zinc-400)"
+                    }}
+                  >
+                    <span>https://cityqlo.com/projects/</span>
+                    <span style={{ color: "oklch(0.74 0.137 79)", fontWeight: "bold" }}>
+                      {form.name
+                        ? form.name
+                            .toLowerCase()
+                            .replace(/[^a-z0-9\s-]/g, "")
+                            .trim()
+                            .replace(/\s+/g, "-")
+                        : "[property-name]"}
+                    </span>
+                  </div>
+                  <p style={{ fontSize: "11.5px", color: "var(--zinc-500)", marginTop: "0.5rem", marginBottom: 0, lineHeight: "1.4" }}>
+                    The webpage link address is generated automatically from the property name. It is clean, lowercase, and contains no special characters to ensure search engines (Google) index it correctly.
+                  </p>
+                </div>
+              </>
+            )}
+
+            {/* PUBLISH SETTINGS TAB */}
+            {activeTab === "publish" && (
+              <>
+                <div className="portal-grid-2col">
+                  <div className="portal-field">
+                    <label className="portal-field-label">Display Priority Order</label>
+                    <input
+                      className="portal-input"
+                      type="number"
+                      value={form.display_order}
+                      onChange={(e) => set("display_order", parseInt(e.target.value) || 0)}
+                    />
+                    <p style={{ fontSize: "11px", color: "var(--zinc-500)", marginTop: "0.25rem", marginBottom: 0 }}>
+                      Used for sorting. Higher numbers are listed first.
+                    </p>
+                  </div>
+                  <div className="portal-field">
+                    <label className="portal-field-label">Featured Rank (Home Sorting)</label>
+                    <input
+                      className="portal-input"
+                      type="number"
+                      placeholder="Higher ranks first"
+                      value={form.featured_rank}
+                      onChange={(e) => set("featured_rank", parseInt(e.target.value) || 0)}
+                    />
+                    <p style={{ fontSize: "11px", color: "var(--zinc-500)", marginTop: "0.25rem", marginBottom: 0 }}>
+                      Determines display sequence in the homepage showcase block.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="portal-field">
+                  <label className="portal-field-label">Visibility Status &amp; Flags</label>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", paddingTop: "0.25rem" }}>
+                    <label style={{ display: "flex", alignItems: "center", gap: "0.6rem", cursor: "pointer", fontSize: "13px" }}>
+                      <input
+                        type="checkbox"
+                        checked={form.is_active}
+                        onChange={(e) => set("is_active", e.target.checked)}
+                      />
+                      <span><strong>Active Visibility</strong> (visible publicly to visitors on the website)</span>
+                    </label>
+
+                    <label style={{ display: "flex", alignItems: "center", gap: "0.6rem", cursor: "pointer", fontSize: "13px" }}>
+                      <input
+                        type="checkbox"
+                        checked={form.is_featured}
+                        onChange={(e) => set("is_featured", e.target.checked)}
+                      />
+                      <span><strong>Featured Status</strong> (list inside the primary showcase rows)</span>
+                    </label>
+
+                    <label style={{ display: "flex", alignItems: "center", gap: "0.6rem", cursor: "pointer", fontSize: "13px" }}>
+                      <input
+                        type="checkbox"
+                        checked={form.is_spotlight}
+                        onChange={(e) => set("is_spotlight", e.target.checked)}
+                      />
+                      <span style={{ color: "oklch(0.78 0.18 75)", fontWeight: 700 }}>
+                        ★ Spotlight Selection (premium banner on homepage)
+                      </span>
+                    </label>
+
+                    {mode === "create" && (
+                      <label style={{ display: "flex", alignItems: "center", gap: "0.6rem", cursor: "pointer", fontSize: "13px", color: "oklch(0.74 0.137 79)", fontWeight: 700 }}>
+                        <input
+                          type="checkbox"
+                          checked={form.autoCreateProject}
+                          onChange={(e) => set("autoCreateProject", e.target.checked)}
+                        />
+                        <span>Auto-create custom Landing Page layout template</span>
+                      </label>
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Footer Actions */}
+        <div
+          style={{
+            flexShrink: 0,
+            padding: "1rem 1.5rem",
+            borderTop: "1px solid var(--portal-border)",
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: "0.75rem",
+            background: "rgba(0, 0, 0, 0.2)"
+          }}
+        >
+          <button className="portal-btn-ghost" onClick={onClose} disabled={isSubmitting}>
+            Cancel
+          </button>
+          <button
+            className="portal-btn-primary"
+            onClick={() => onSubmit(form)}
+            disabled={
+              isSubmitting ||
+              !form.name ||
+              !form.city ||
+              !form.location ||
+              !form.price_display ||
+              !form.price_min
+            }
+          >
+            {isSubmitting ? "Saving…" : mode === "create" ? "Create Property" : "Save Changes"}
+          </button>
         </div>
       </div>
     </div>
@@ -832,7 +988,6 @@ function PropertyFormModal({
 function PropertiesPage() {
   const qc = useQueryClient();
   const [search, setSearch] = useState("");
-  const [filterCategory, setFilterCategory] = useState<string>("all");
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [filterActive, setFilterActive] = useState<string>("all");
   const [filterFeatured, setFilterFeatured] = useState<string>("all");
@@ -853,7 +1008,6 @@ function PropertiesPage() {
     if (!properties) return [];
     return (properties as Property[]).filter((p) => {
       if (!showDeleted && p.is_deleted) return false;
-      if (filterCategory !== "all" && p.category !== filterCategory) return false;
       if (filterStatus !== "all" && p.status !== filterStatus) return false;
       if (filterActive === "active" && !p.is_active) return false;
       if (filterActive === "inactive" && p.is_active) return false;
@@ -870,7 +1024,7 @@ function PropertiesPage() {
       }
       return true;
     });
-  }, [properties, search, filterCategory, filterStatus, filterActive, filterFeatured, showDeleted]);
+  }, [properties, search, filterStatus, filterActive, filterFeatured, showDeleted]);
 
   const duplicateIds = useMemo(() => {
     if (!properties) return new Set<string>();
@@ -1026,20 +1180,6 @@ function PropertiesPage() {
 
         {/* Filters */}
         <div className="portal-toolbar-filters">
-          <div className="portal-select-wrap" style={{ minWidth: "150px" }}>
-            <select
-              className="portal-select"
-              value={filterCategory}
-              onChange={(e) => setFilterCategory(e.target.value)}
-            >
-              <option value="all">All Categories</option>
-              <option value="Metro Core">Metro Core</option>
-              <option value="Suburban Enclaves">Suburban Enclaves</option>
-              <option value="Resort & Leisure">Resort & Leisure</option>
-            </select>
-            <ChevronDown size={13} className="portal-select-icon" />
-          </div>
-
           <div className="portal-select-wrap" style={{ minWidth: "130px" }}>
             <select
               className="portal-select"
@@ -1150,9 +1290,6 @@ function PropertiesPage() {
                     <div className="portal-item-card-slug">/{prop.slug}</div>
                     {/* Badges */}
                     <div className="portal-item-card-badges" style={{ marginTop: "0.4rem" }}>
-                      <span className="portal-source-chip" style={{ fontSize: "11px" }}>
-                        {prop.category}
-                      </span>
                       <span
                         className={`portal-status-badge status-${prop.status === "RFO" ? "closed" : "new"}`}
                       >
@@ -1297,7 +1434,6 @@ function PropertiesPage() {
                 <tr>
                   <th>Property</th>
                   <th className="hide-mobile">Location</th>
-                  <th className="hide-mobile">Category</th>
                   <th>Price</th>
                   <th className="hide-mobile">Beds</th>
                   <th style={{ textAlign: "center" }}>Active</th>
@@ -1345,9 +1481,6 @@ function PropertiesPage() {
                         <span style={{ fontSize: "13px", color: "var(--zinc-200)" }}>{prop.location}</span>
                         <span style={{ fontSize: "11px", color: "var(--zinc-500)" }}>{prop.city}</span>
                       </div>
-                    </td>
-                    <td className="hide-mobile">
-                      <span className="portal-source-chip" style={{ fontSize: "11px" }}>{prop.category}</span>
                     </td>
                     <td>
                       <div style={{ display: "flex", flexDirection: "column", gap: "0.1rem" }}>
@@ -1452,7 +1585,6 @@ function PropertiesPage() {
             unit_types: Array.isArray(editingProp.unit_types) ? editingProp.unit_types : [],
             description: editingProp.description,
             highlights: Array.isArray(editingProp.highlights) ? editingProp.highlights : [],
-            category: editingProp.category,
             image_url: editingProp.image_url ?? "",
             is_featured: editingProp.is_featured,
             is_active: editingProp.is_active,
