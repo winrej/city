@@ -288,12 +288,6 @@ INSERT INTO project_sections (project_id, section_type_id, display_order, payloa
       { "title": "Project Walkthrough",  "duration": "3:24" },
       { "title": "Amenity Tour",         "duration": "2:08" },
       { "title": "Virtual Unit Preview", "duration": "4:15" }
-    ],
-    "downloads": [
-      { "name": "Project Brochure", "size": "PDF · 4.2 MB", "icon": "📋" },
-      { "name": "Floor Plans",      "size": "PDF · 8.5 MB", "icon": "📐" },
-      { "name": "Payment Terms",    "size": "PDF · 1.1 MB", "icon": "💳" },
-      { "name": "Location Map",     "size": "PDF · 2.3 MB", "icon": "🗺️" }
     ]
   }'::jsonb
 );

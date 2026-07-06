@@ -7,7 +7,6 @@ export { AmenitiesSection } from "./AmenitiesSection";
 export { LocationSection } from "./LocationSection";
 export { UnitsSection } from "./UnitsSection";
 export { DecisionGuideSection } from "./DecisionGuideSection";
-export { MediaSection } from "./MediaSection";
 export { TestimonialsSection } from "./TestimonialsSection";
 export { FaqSection } from "./FaqSection";
 export { LeadCaptureSection } from "./LeadCaptureSection";

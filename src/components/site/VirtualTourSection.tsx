@@ -67,11 +67,31 @@ export const PROJECT_TOURS: Record<string, Tour[]> = {
 export function TourViewer({ tours, poster }: { tours: Tour[]; poster: string }) {
   const [active, setActive] = useState(0);
   const [loaded, setLoaded] = useState(false);
+  // Tracks when the external 360° embed has finished loading so we can show a
+  // spinner in the meantime — the viewin360 host can take a couple of seconds,
+  // and a blank frame reads as "broken/slow".
+  const [iframeReady, setIframeReady] = useState(false);
   if (tours.length === 0) return null;
   const tour = tours[active];
 
+  // Warm up the DNS/TLS connection to the tour host as soon as this viewer is
+  // on screen, so the embed loads noticeably faster once the user taps play.
+  // React 19 hoists these <link> tags into <head>.
+  let tourOrigin: string | null = null;
+  try {
+    tourOrigin = new URL(tours[0].url).origin;
+  } catch {
+    tourOrigin = null;
+  }
+
   return (
     <div>
+      {tourOrigin && (
+        <>
+          <link rel="preconnect" href={tourOrigin} crossOrigin="anonymous" />
+          <link rel="dns-prefetch" href={tourOrigin} />
+        </>
+      )}
       <div className="mb-6 flex flex-wrap gap-2">
         {tours.map((t, i) => (
           <button
@@ -79,6 +99,7 @@ export function TourViewer({ tours, poster }: { tours: Tour[]; poster: string })
             onClick={() => {
               setActive(i);
               setLoaded(true);
+              setIframeReady(false);
             }}
             aria-pressed={i === active}
             className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-[13px] font-semibold transition-colors ${
@@ -95,15 +116,25 @@ export function TourViewer({ tours, poster }: { tours: Tour[]; poster: string })
       <div className="overflow-hidden rounded-2xl border border-hairline bg-ink/5">
         <div className="relative aspect-video w-full">
           {loaded ? (
-            <iframe
-              key={tour.url}
-              src={tour.url}
-              title={`Sonora Garden Residences — ${tour.label} 360° tour`}
-              className="absolute inset-0 h-full w-full"
-              allow="accelerometer; gyroscope; fullscreen; xr-spatial-tracking"
-              allowFullScreen
-              loading="lazy"
-            />
+            <>
+              <iframe
+                key={tour.url}
+                src={tour.url}
+                title={`Sonora Garden Residences — ${tour.label} 360° tour`}
+                onLoad={() => setIframeReady(true)}
+                className="absolute inset-0 h-full w-full"
+                allow="accelerometer; gyroscope; fullscreen; xr-spatial-tracking"
+                allowFullScreen
+              />
+              {!iframeReady && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-ink/5">
+                  <span className="h-8 w-8 animate-spin rounded-full border-2 border-ink/15 border-t-ink" />
+                  <span className="text-[12px] font-medium text-muted-foreground">
+                    Loading 360° tour…
+                  </span>
+                </div>
+              )}
+            </>
           ) : (
             <button
               onClick={() => setLoaded(true)}

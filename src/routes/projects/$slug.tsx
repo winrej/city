@@ -32,7 +32,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Eye,
-  Download,
   Award,
   Clock,
   Share2,
@@ -335,12 +334,6 @@ const FALLBACK_PROJECTS: Record<string, ProjectPageData> = {
           { title: "Amenity Tour", duration: "2:08", thumb: poolImg },
           { title: "Virtual Unit Preview", duration: "4:15", thumb: interiorImg },
         ],
-        downloads: [
-          { name: "Project Brochure", size: "PDF · 4.2 MB", icon: "📋" },
-          { name: "Floor Plans", size: "PDF · 8.5 MB", icon: "📐" },
-          { name: "Payment Terms", size: "PDF · 1.1 MB", icon: "💳" },
-          { name: "Location Map", size: "PDF · 2.3 MB", icon: "🗺️" },
-        ],
       },
       related: {
         related_slugs: ["allegra-garden", "satori-residences", "atherton"],
@@ -492,7 +485,13 @@ type SectionPayloads = {
     cta_secondary_text?: string;
     logo_url?: string;
   };
-  emotional_hook: { headline: string; sub: string; eyebrow?: string; points: string[] };
+  emotional_hook: {
+    headline: string;
+    sub: string;
+    eyebrow?: string;
+    points: string[];
+    visible?: boolean;
+  };
   pricing: {
     title?: string;
     sub_title?: string;
@@ -503,7 +502,7 @@ type SectionPayloads = {
   };
   overview: { title?: string; headline_span?: string };
   highlights: { eyebrow?: string; items: { icon: string; title: string; description: string }[] };
-  amenities: { eyebrow?: string; intro?: string; items: AmenityItem[] };
+  amenities: { eyebrow?: string; intro?: string; items: AmenityItem[]; visible?: boolean };
   location: {
     eyebrow?: string;
     intro?: string;
@@ -513,7 +512,12 @@ type SectionPayloads = {
     nearby: NearbyItem[];
   };
   unit_types: { eyebrow?: string; headline?: string };
-  decision_guide: { eyebrow?: string; headline?: string; headline_accent?: string };
+  decision_guide: {
+    eyebrow?: string;
+    headline?: string;
+    headline_accent?: string;
+    visible?: boolean;
+  };
   testimonials: {
     stats: { value: string; label: string }[];
     testimonials: { name: string; role: string; quote: string }[];
@@ -529,7 +533,6 @@ type SectionPayloads = {
   media: {
     photos: { tab: string; src: string; thumb: string; title: string }[];
     videos: { title: string; duration: string; thumb: string }[];
-    downloads: { name: string; size: string; icon: string }[];
   };
   related: { related_slugs: string[] };
 };
@@ -886,7 +889,7 @@ function ProjectDetailPage() {
         }
       : null;
   const lead = sections.lead_capture ?? {};
-  const media = sections.media ?? { photos: [], videos: [], downloads: [] };
+  const media = sections.media ?? { photos: [], videos: [] };
   // 360° tours are keyed by slug (not stored in the CMS yet) so they render
   // whether the page content came from the DB read model or the fallback.
   const tours = PROJECT_TOURS[meta.id] ?? [];
@@ -925,10 +928,10 @@ function ProjectDetailPage() {
 
   // ── Media state
   const [mediaTab, setMediaTab] = useState<
-    "exterior" | "amenities" | "interiors" | "tour" | "videos" | "downloads"
+    "exterior" | "amenities" | "interiors" | "tour" | "videos"
   >("exterior");
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
-  const [videoModal, setVideoModal] = useState(false);
+  const [activeVideo, setActiveVideo] = useState<any | null>(null);
   const touchStartX = useRef(0);
 
   // ── FAQ state
@@ -1040,7 +1043,7 @@ function ProjectDetailPage() {
 
   // ── Media filtering
   const visibleMedia = (media.photos || []).filter((m) =>
-    mediaTab !== "videos" && mediaTab !== "downloads" ? m.tab === mediaTab : false,
+    mediaTab !== "videos" ? m.tab === mediaTab : false,
   );
 
   // ── Media browser metadata (real counts, so the row stays honest as the CMS grows)
@@ -1646,13 +1649,19 @@ function ProjectDetailPage() {
                 { key: "interiors", label: "Interiors", Icon: Sofa },
                 { key: "videos", label: "Videos", Icon: Video },
                 ...(hasTour ? [{ key: "tour", label: "360° Tour", Icon: Globe }] : []),
-                { key: "downloads", label: "Downloads", Icon: Download },
               ].map(({ key, label, Icon }) => {
                 const active = mediaTab === key;
                 return (
                   <button
                     key={key}
-                    onClick={() => setMediaTab(key as typeof mediaTab)}
+                    onClick={(e) => {
+                      setMediaTab(key as typeof mediaTab);
+                      e.currentTarget.scrollIntoView({
+                        behavior: "smooth",
+                        inline: "center",
+                        block: "nearest",
+                      });
+                    }}
                     aria-pressed={active}
                     className={`inline-flex min-h-[48px] shrink-0 snap-start items-center gap-2 rounded-full px-5 text-[13px] font-bold tracking-wide transition-all duration-300 ${
                       active
@@ -1667,10 +1676,10 @@ function ProjectDetailPage() {
               })}
             </div>
 
-            {/* Tab content — subtle fade on switch (keyed remount) */}
-            <div key={mediaTab} className="animate-[cq-image-in_500ms_var(--ease-luxe)_both]">
+            {/* Tab content — quick opacity fade on switch (keyed remount) */}
+            <div key={mediaTab} className="animate-in fade-in-0 duration-300 ease-out">
               {/* Photo categories → horizontal swipe gallery */}
-              {mediaTab !== "videos" && mediaTab !== "downloads" && mediaTab !== "tour" && (
+              {mediaTab !== "videos" && mediaTab !== "tour" && (
                 <>
                   <div className="-mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth px-5 pb-2 [-ms-overflow-style:none] [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                     {visibleMedia.map((item, i) => (
@@ -1713,7 +1722,7 @@ function ProjectDetailPage() {
                   {(media.videos || []).map((vid) => (
                     <button
                       key={vid.title}
-                      onClick={() => setVideoModal(true)}
+                      onClick={() => setActiveVideo(vid)}
                       className="group relative aspect-[4/5] w-[78%] shrink-0 snap-center overflow-hidden rounded-[20px] shadow-soft transition-shadow duration-300 active:shadow-lift"
                     >
                       <MediaCardImage src={vid.thumb} alt={vid.title} />
@@ -1739,28 +1748,6 @@ function ProjectDetailPage() {
                 </div>
               )}
 
-              {/* Downloads → thumb-friendly stacked list */}
-              {mediaTab === "downloads" && (
-                <div className="flex flex-col gap-3">
-                  {(media.downloads || []).map((doc) => (
-                    <button
-                      key={doc.name}
-                      onClick={scrollToForm}
-                      className="group flex items-center gap-4 rounded-[20px] border border-border/50 bg-surface px-5 py-4 text-left shadow-soft transition-shadow duration-300 active:shadow-lift"
-                    >
-                      <span className="text-2xl">{doc.icon}</span>
-                      <div className="flex-1">
-                        <p className="text-[14px] font-bold text-ink">{doc.name}</p>
-                        <p className="mt-0.5 text-[12px] text-muted-foreground">{doc.size}</p>
-                      </div>
-                      <Download size={16} className="shrink-0 text-primary" />
-                    </button>
-                  ))}
-                  <p className="mt-1 text-center text-[12.5px] text-muted-foreground">
-                    Enter your contact details to unlock free downloads.
-                  </p>
-                </div>
-              )}
             </div>
           </div>
 
@@ -1778,11 +1765,10 @@ function ProjectDetailPage() {
                   "interiors",
                   ...(tours.length ? (["tour"] as const) : []),
                   "videos",
-                  "downloads",
-                ] as ("exterior" | "amenities" | "interiors" | "tour" | "videos" | "downloads")[]
+                ] as ("exterior" | "amenities" | "interiors" | "tour" | "videos")[]
               ).map((tab) => {
                   const labels: Record<
-                    "exterior" | "amenities" | "interiors" | "tour" | "videos" | "downloads",
+                    "exterior" | "amenities" | "interiors" | "tour" | "videos",
                     string
                   > = {
                     exterior: "🏙️ Exterior",
@@ -1790,7 +1776,6 @@ function ProjectDetailPage() {
                     interiors: "🛋️ Interiors",
                     tour: "🌐 360° Tour",
                     videos: "▶️ Videos",
-                    downloads: "📄 Downloads",
                   };
                   return (
                     <button
@@ -1812,7 +1797,7 @@ function ProjectDetailPage() {
           </Reveal>
 
           {/* Photo grid */}
-          {mediaTab !== "videos" && mediaTab !== "downloads" && mediaTab !== "tour" && (
+          {mediaTab !== "videos" && mediaTab !== "tour" && (
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {visibleMedia.map((item, i) => (
                 <Reveal key={item.src + i} delay={i * 60}>
@@ -1861,7 +1846,7 @@ function ProjectDetailPage() {
                   <div
                     key={vid.title}
                     className="group relative rounded-2xl overflow-hidden cursor-pointer shadow-soft hover:shadow-lift transition-all duration-400"
-                    onClick={() => setVideoModal(true)}
+                    onClick={() => setActiveVideo(vid)}
                   >
                     <img
                       src={vid.thumb}
@@ -1882,45 +1867,16 @@ function ProjectDetailPage() {
             </Reveal>
           )}
 
-          {/* Downloads tab */}
-          {mediaTab === "downloads" && (
-            <Reveal>
-              <div className="grid sm:grid-cols-2 gap-4 max-w-2xl">
-                {(media.downloads || []).map((doc) => (
-                  <button
-                    key={doc.name}
-                    onClick={scrollToForm}
-                    className="flex items-center gap-4 bg-surface rounded-2xl px-6 py-4 border border-border/40 hover:border-primary/30 hover:shadow-soft transition-all duration-300 text-left cursor-pointer group"
-                  >
-                    <span className="text-2xl">{doc.icon}</span>
-                    <div className="flex-1">
-                      <p className="font-bold text-[14px] text-ink group-hover:text-primary transition-colors">
-                        {doc.name}
-                      </p>
-                      <p className="text-[12px] text-muted-foreground mt-0.5">{doc.size}</p>
-                    </div>
-                    <Download
-                      size={16}
-                      className="text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0"
-                    />
-                  </button>
-                ))}
-                <p className="sm:col-span-2 text-[12.5px] text-muted-foreground text-center mt-2">
-                  Enter your contact details to unlock free downloads.
-                </p>
-              </div>
-            </Reveal>
-          )}
           </div>
 
           {/* Video modal — shared across breakpoints */}
-          {videoModal && (
+          {activeVideo && (
             <div
               className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
-              onClick={() => setVideoModal(false)}
+              onClick={() => setActiveVideo(null)}
             >
               <button
-                onClick={() => setVideoModal(false)}
+                onClick={() => setActiveVideo(null)}
                 className="absolute top-6 right-6 text-white/70 hover:text-white cursor-pointer"
               >
                 <X size={28} />
@@ -1930,13 +1886,58 @@ function ProjectDetailPage() {
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="aspect-video flex items-center justify-center bg-ink/80">
-                  <div className="text-center text-white/60">
-                    <Play size={48} className="mx-auto mb-4 opacity-40" />
-                    <p className="text-[14px]">Video will be embedded here.</p>
-                    <p className="text-[12px] mt-1 opacity-60">
-                      Contact us to schedule a live virtual tour.
-                    </p>
-                  </div>
+                  {(() => {
+                    const url = activeVideo.url;
+                    const title = activeVideo.title;
+                    if (!url) {
+                      return (
+                        <div className="text-center text-white/60">
+                          <Play size={48} className="mx-auto mb-4 opacity-40" />
+                          <p className="text-[14px]">No video link configured.</p>
+                          <p className="text-[12px] mt-1 opacity-60">Please add a link in the project editor.</p>
+                        </div>
+                      );
+                    }
+
+                    // YouTube Match
+                    const ytRegex = /^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+                    const ytMatch = url.match(ytRegex);
+                    if (ytMatch && ytMatch[1]) {
+                      return (
+                        <iframe
+                          src={`https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1`}
+                          title={title}
+                          className="w-full h-full border-0 aspect-video animate-in fade-in duration-300"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                          allowFullScreen
+                        />
+                      );
+                    }
+
+                    // Facebook Match
+                    if (url.includes("facebook.com") || url.includes("fb.watch")) {
+                      return (
+                        <iframe
+                          src={`https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url)}&show_text=false&t=0&autoplay=true`}
+                          title={title}
+                          className="w-full h-full border-0 aspect-video animate-in fade-in duration-300"
+                          allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                          allowFullScreen
+                        />
+                      );
+                    }
+
+                    // Direct/other video URL
+                    return (
+                      <video
+                        src={url}
+                        title={title}
+                        controls
+                        autoPlay
+                        className="w-full h-full aspect-video object-contain animate-in fade-in duration-300"
+                      />
+                    );
+                  })()}
                 </div>
               </div>
             </div>
@@ -1947,48 +1948,50 @@ function ProjectDetailPage() {
       {/* ═══════════════════════════════════════════════════
           2. EMOTIONAL HOOK
       ═══════════════════════════════════════════════════ */}
-      <section className="bg-ink text-white px-4 py-20 md:py-28 overflow-hidden relative">
-        <div
-          aria-hidden
-          className="absolute -right-48 top-0 w-[600px] h-[600px] rounded-full opacity-20 pointer-events-none"
-          style={{ background: "radial-gradient(closest-side, oklch(0.43 0.20 258), transparent)" }}
-        />
-        <div
-          aria-hidden
-          className="absolute -left-24 bottom-0 w-[400px] h-[400px] rounded-full opacity-10 pointer-events-none"
-          style={{ background: "radial-gradient(closest-side, oklch(0.74 0.137 79), transparent)" }}
-        />
+      {sections.emotional_hook && !sections.emotional_hook.hide && (
+        <section className="bg-ink text-white px-4 py-20 md:py-28 overflow-hidden relative">
+          <div
+            aria-hidden
+            className="absolute -right-48 top-0 w-[600px] h-[600px] rounded-full opacity-20 pointer-events-none"
+            style={{ background: "radial-gradient(closest-side, oklch(0.43 0.20 258), transparent)" }}
+          />
+          <div
+            aria-hidden
+            className="absolute -left-24 bottom-0 w-[400px] h-[400px] rounded-full opacity-10 pointer-events-none"
+            style={{ background: "radial-gradient(closest-side, oklch(0.74 0.137 79), transparent)" }}
+          />
 
-        <div className="container-prose relative z-10">
-          <div className="max-w-4xl">
-            <Reveal>
-              <p className="eyebrow text-white/40">
-                <span className="gold-rule" />
-                {hook.eyebrow || "The Lifestyle"}
-              </p>
-            </Reveal>
-            <Reveal delay={120}>
-              <h2 className="display-2 mt-6 text-white leading-[1.05]">
-                {hook.headline}
-                <span className="block text-primary mt-1">{hook.sub}</span>
-              </h2>
-            </Reveal>
-          </div>
-
-          <div className="mt-14 grid md:grid-cols-2 gap-4 max-w-3xl">
-            {(hook.points || []).map((point, i) => (
-              <Reveal key={point} delay={180 + i * 80}>
-                <div className="flex items-start gap-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl px-5 py-4">
-                  <div className="w-5 h-5 rounded-full bg-primary/30 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Check size={11} className="text-white" />
-                  </div>
-                  <p className="text-white/80 text-[14.5px] font-medium leading-snug">{point}</p>
-                </div>
+          <div className="container-prose relative z-10">
+            <div className="max-w-4xl">
+              <Reveal>
+                <p className="eyebrow text-white/40">
+                  <span className="gold-rule" />
+                  {hook.eyebrow || "The Lifestyle"}
+                </p>
               </Reveal>
-            ))}
+              <Reveal delay={120}>
+                <h2 className="display-2 mt-6 text-white leading-[1.05]">
+                  {hook.headline}
+                  <span className="block text-primary mt-1">{hook.sub}</span>
+                </h2>
+              </Reveal>
+            </div>
+
+            <div className="mt-14 grid md:grid-cols-2 gap-4 max-w-3xl">
+              {(hook.points || []).map((point, i) => (
+                <Reveal key={point} delay={180 + i * 80}>
+                  <div className="flex items-start gap-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl px-5 py-4">
+                    <div className="w-5 h-5 rounded-full bg-primary/30 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Check size={11} className="text-white" />
+                    </div>
+                    <p className="text-white/80 text-[14.5px] font-medium leading-snug">{point}</p>
+                  </div>
+                </Reveal>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ═══════════════════════════════════════════════════
           3. PRICING SNAPSHOT + SCARCITY
@@ -2220,13 +2223,6 @@ function ProjectDetailPage() {
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {p.buildings.map((bld, i) => {
-                const statusColors = {
-                  "Under Construction": "bg-[#3B82F6]/10 text-[#3B82F6] border-[#3B82F6]/25",
-                  "Coming Soon": "bg-[#7309F3]/10 text-[#7309F3] border-[#7309F3]/25",
-                  "RFO": "bg-emerald-500/10 text-emerald-600 border-emerald-500/25",
-                };
-                const badgeClass = statusColors[bld.status as keyof typeof statusColors] || "bg-zinc-500/10 text-zinc-600 border-zinc-500/25";
-
                 return (
                   <Reveal key={bld.id || bld.name + i} delay={i * 80}>
                     <div className="bg-white rounded-3xl border border-border/40 overflow-hidden shadow-soft hover:shadow-lift transition-all duration-500 group flex flex-col h-full">
@@ -2247,9 +2243,24 @@ function ProjectDetailPage() {
                           </div>
                         )}
                         <div className="absolute top-4 left-4">
-                          <span className={`inline-flex items-center text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border backdrop-blur-md ${badgeClass}`}>
-                            {bld.status}
-                          </span>
+                          {(() => {
+                            const statusLower = (bld.status || "").toLowerCase();
+                            let imgPath = "";
+                            if (statusLower === "rfo") {
+                              imgPath = "/building Status/rfo.png";
+                            } else if (statusLower === "coming soon" || statusLower === "comingsoon") {
+                              imgPath = "/building Status/comingsoon.png";
+                            } else {
+                              imgPath = "/building Status/underconstruction.png";
+                            }
+                            return (
+                              <img
+                                src={imgPath}
+                                alt={bld.status}
+                                className="h-7 w-auto object-contain"
+                              />
+                            );
+                          })()}
                         </div>
                       </div>
 
@@ -2291,97 +2302,101 @@ function ProjectDetailPage() {
       {/* ═══════════════════════════════════════════════════
           5. KEY HIGHLIGHTS
       ═══════════════════════════════════════════════════ */}
-      <section className="px-4 py-20 md:py-28 surface">
-        <div className="container-prose">
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <Reveal>
-              <p className="eyebrow">
-                <span className="gold-rule" />
-                {hlts.eyebrow || "Key Highlights"}
-              </p>
-            </Reveal>
-            <Reveal delay={100}>
-              <h2 className="display-2 mt-5">Key Highlights</h2>
-            </Reveal>
-          </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {(hlts.items || []).map((h, i) => (
-              <Reveal key={h.title} delay={i * 70}>
-                <div className="bg-white rounded-2xl p-6 border border-border/40 shadow-soft hover:shadow-lift hover:-translate-y-1 transition-all duration-500 group">
-                  <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center mb-5 group-hover:bg-primary/15 transition-colors">
-                    <IconRenderer name={h.icon} size={20} className="text-primary" />
-                  </div>
-                  <h3 className="text-[16px] font-bold text-ink mb-2">{h.title}</h3>
-                  <p className="text-[13.5px] text-muted-foreground leading-relaxed">
-                    {h.description}
-                  </p>
-                </div>
+      {sections.highlights && !sections.highlights.hide && (
+        <section className="px-4 py-20 md:py-28 surface">
+          <div className="container-prose">
+            <div className="text-center max-w-2xl mx-auto mb-16">
+              <Reveal>
+                <p className="eyebrow">
+                  <span className="gold-rule" />
+                  {hlts.eyebrow || "Key Highlights"}
+                </p>
               </Reveal>
-            ))}
+              <Reveal delay={100}>
+                <h2 className="display-2 mt-5">Key Highlights</h2>
+              </Reveal>
+            </div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {(hlts.items || []).map((h, i) => (
+                <Reveal key={h.title} delay={i * 70}>
+                  <div className="bg-white rounded-2xl p-6 border border-border/40 shadow-soft hover:shadow-lift hover:-translate-y-1 transition-all duration-500 group">
+                    <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center mb-5 group-hover:bg-primary/15 transition-colors">
+                      <IconRenderer name={h.icon} size={20} className="text-primary" />
+                    </div>
+                    <h3 className="text-[16px] font-bold text-ink mb-2">{h.title}</h3>
+                    <p className="text-[13.5px] text-muted-foreground leading-relaxed">
+                      {h.description}
+                    </p>
+                  </div>
+                </Reveal>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ═══════════════════════════════════════════════════
           6. AMENITIES
       ═══════════════════════════════════════════════════ */}
-      <section className="px-4 py-20 md:py-28">
-        <div className="container-prose">
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <Reveal>
-              <p className="eyebrow">
-                <span className="gold-rule" />
-                {amens.eyebrow || "Community"}
-              </p>
-            </Reveal>
-            <Reveal delay={100}>
-              <h2 className="display-2 mt-5">
-                Lifestyle & Community<span className="block text-primary">Features</span>
-              </h2>
-            </Reveal>
-            {amens.intro && (
-              <Reveal delay={180}>
-                <p className="lede mt-4 text-[15px]">{amens.intro}</p>
+      {sections.amenities && !sections.amenities.hide && (
+        <section className="px-4 py-20 md:py-28">
+          <div className="container-prose">
+            <div className="text-center max-w-2xl mx-auto mb-16">
+              <Reveal>
+                <p className="eyebrow">
+                  <span className="gold-rule" />
+                  {amens.eyebrow || "Community"}
+                </p>
               </Reveal>
-            )}
-          </div>
-
-          {(["wellness", "recreation", "social", "utility"] as const).map((cat) => {
-            const catItems = (amens.items || []).filter((a) => a.category === cat);
-            if (!catItems.length) return null;
-            const labels: Record<typeof cat, string> = {
-              wellness: "🌿 Wellness",
-              recreation: "🌊 Recreation",
-              social: "🤝 Social",
-              utility: "🏢 Building",
-            };
-            return (
-              <div key={cat} className="mb-12">
-                <Reveal>
-                  <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-5">
-                    {labels[cat]}
-                  </p>
+              <Reveal delay={100}>
+                <h2 className="display-2 mt-5">
+                  Lifestyle & Community<span className="block text-primary">Features</span>
+                </h2>
+              </Reveal>
+              {amens.intro && (
+                <Reveal delay={180}>
+                  <p className="lede mt-4 text-[15px]">{amens.intro}</p>
                 </Reveal>
-                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {catItems.map((a, i) => (
-                    <Reveal key={a.name} delay={i * 60}>
-                      <div className="bg-surface rounded-2xl p-5 border border-border/40 hover:border-primary/20 hover:shadow-soft transition-all duration-400">
-                        <div className="w-9 h-9 rounded-xl bg-ink/5 flex items-center justify-center mb-3">
-                          <IconRenderer name={a.icon} size={17} className="text-ink/60" />
+              )}
+            </div>
+
+            {(["wellness", "recreation", "social", "utility"] as const).map((cat) => {
+              const catItems = (amens.items || []).filter((a) => a.category === cat);
+              if (!catItems.length) return null;
+              const labels: Record<typeof cat, string> = {
+                wellness: "🌿 Wellness",
+                recreation: "🌊 Recreation",
+                social: "🤝 Social",
+                utility: "🏢 Building",
+              };
+              return (
+                <div key={cat} className="mb-12">
+                  <Reveal>
+                    <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-5">
+                      {labels[cat]}
+                    </p>
+                  </Reveal>
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {catItems.map((a, i) => (
+                      <Reveal key={a.name} delay={i * 60}>
+                        <div className="bg-surface rounded-2xl p-5 border border-border/40 hover:border-primary/20 hover:shadow-soft transition-all duration-400">
+                          <div className="w-9 h-9 rounded-xl bg-ink/5 flex items-center justify-center mb-3">
+                            <IconRenderer name={a.icon} size={17} className="text-ink/60" />
+                          </div>
+                          <p className="font-bold text-[14px] text-ink">{a.name}</p>
+                          <p className="text-[12.5px] text-muted-foreground mt-1 leading-relaxed">
+                            {a.description}
+                          </p>
                         </div>
-                        <p className="font-bold text-[14px] text-ink">{a.name}</p>
-                        <p className="text-[12.5px] text-muted-foreground mt-1 leading-relaxed">
-                          {a.description}
-                        </p>
-                      </div>
-                    </Reveal>
-                  ))}
+                      </Reveal>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
-      </section>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       {/* ═══════════════════════════════════════════════════
           7. LOCATION & NEARBY
@@ -2551,61 +2566,63 @@ function ProjectDetailPage() {
       {/* ═══════════════════════════════════════════════════
           9. DECISION GUIDE
       ═══════════════════════════════════════════════════ */}
-      <section className="px-4 py-20 md:py-24 surface">
-        <div className="container-prose">
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <Reveal>
-              <p className="eyebrow">
-                <span className="gold-rule" />
-                {dg.eyebrow || "Decision Guide"}
-              </p>
-            </Reveal>
-            <Reveal delay={100}>
-              <h2 className="display-2 mt-5">
-                {dg.headline || "Which unit is"}{" "}
-                <span className="text-primary">{dg.headline_accent || "right for you?"}</span>
-              </h2>
-            </Reveal>
-          </div>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {units.map((unit, i) => (
-              <Reveal key={unit.name} delay={i * 80}>
-                <div className="bg-white rounded-2xl p-6 border border-border/40 shadow-soft text-center hover:border-primary/30 hover:shadow-lift transition-all duration-400 cursor-default">
-                  <div className="w-12 h-12 rounded-2xl bg-primary/8 flex items-center justify-center mx-auto mb-5">
-                    <Users size={20} className="text-primary" />
-                  </div>
-                  <p className="font-extrabold text-ink text-[15px]">{unit.name}</p>
-                  <p className="font-mono text-[11.5px] text-muted-foreground mt-1">
-                    {unit.area_sqm} sq.m.
-                  </p>
-                  <div className="w-10 h-px bg-gold mx-auto my-4" />
-                  <p className="text-[13px] text-muted-foreground leading-relaxed">
-                    {unit.profile_target}
-                  </p>
-                  <p className="font-extrabold text-primary text-[14px] mt-3">
-                    {formatPrice(unit.starting_price)}
-                  </p>
-                </div>
+      {sections.decision_guide && !sections.decision_guide.hide && (
+        <section className="px-4 py-20 md:py-24 surface">
+          <div className="container-prose">
+            <div className="text-center max-w-2xl mx-auto mb-12">
+              <Reveal>
+                <p className="eyebrow">
+                  <span className="gold-rule" />
+                  {dg.eyebrow || "Decision Guide"}
+                </p>
               </Reveal>
-            ))}
-          </div>
-
-          <Reveal delay={200}>
-            <div className="mt-10 text-center">
-              <p className="text-[14px] text-muted-foreground mb-4">
-                Not sure which unit fits your budget and goals?
-              </p>
-              <button
-                onClick={scrollToForm}
-                className="inline-flex items-center gap-2 bg-ink text-white px-7 py-3.5 rounded-full text-[13px] font-bold tracking-wide hover:-translate-y-0.5 hover:shadow-lift transition-all duration-500 cursor-pointer"
-              >
-                Get a Free Personalized Computation <ArrowRight size={15} />
-              </button>
+              <Reveal delay={100}>
+                <h2 className="display-2 mt-5">
+                  {dg.headline || "Which unit is"}{" "}
+                  <span className="text-primary">{dg.headline_accent || "right for you?"}</span>
+                </h2>
+              </Reveal>
             </div>
-          </Reveal>
-        </div>
-      </section>
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {units.map((unit, i) => (
+                <Reveal key={unit.name} delay={i * 80}>
+                  <div className="bg-white rounded-2xl p-6 border border-border/40 shadow-soft text-center hover:border-primary/30 hover:shadow-lift transition-all duration-400 cursor-default">
+                    <div className="w-12 h-12 rounded-2xl bg-primary/8 flex items-center justify-center mx-auto mb-5">
+                      <Users size={20} className="text-primary" />
+                    </div>
+                    <p className="font-extrabold text-ink text-[15px]">{unit.name}</p>
+                    <p className="font-mono text-[11.5px] text-muted-foreground mt-1">
+                      {unit.area_sqm} sq.m.
+                    </p>
+                    <div className="w-10 h-px bg-gold mx-auto my-4" />
+                    <p className="text-[13px] text-muted-foreground leading-relaxed">
+                      {unit.profile_target}
+                    </p>
+                    <p className="font-extrabold text-primary text-[14px] mt-3">
+                      {formatPrice(unit.starting_price)}
+                    </p>
+                  </div>
+                </Reveal>
+              ))}
+            </div>
+
+            <Reveal delay={200}>
+              <div className="mt-10 text-center">
+                <p className="text-[14px] text-muted-foreground mb-4">
+                  Not sure which unit fits your budget and goals?
+                </p>
+                <button
+                  onClick={scrollToForm}
+                  className="inline-flex items-center gap-2 bg-ink text-white px-7 py-3.5 rounded-full text-[13px] font-bold tracking-wide hover:-translate-y-0.5 hover:shadow-lift transition-all duration-500 cursor-pointer"
+                >
+                  Get a Free Personalized Computation <ArrowRight size={15} />
+                </button>
+              </div>
+            </Reveal>
+          </div>
+        </section>
+      )}
 
       {/* ═══════════════════════════════════════════════════
           11. TRUST + SOCIAL PROOF

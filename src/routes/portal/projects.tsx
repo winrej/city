@@ -2630,6 +2630,17 @@ function SectionEditorBlock({ section, onChange }: SectionBlockProps) {
 
       {section.type === "emotional-hook" && (
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          <div className="portal-field border-b border-[var(--portal-border)] pb-3 mb-2">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={getVal("hide", false)}
+                onChange={(e) => handleFieldChange("hide", e.target.checked)}
+                style={{ accentColor: "var(--portal-accent)" }}
+              />
+              <span className="text-xs font-bold text-zinc-100">Hide this section on the project page</span>
+            </label>
+          </div>
           <div className="portal-field">
             <label className="portal-field-label">Eyebrow tagline</label>
             <input
@@ -2804,6 +2815,17 @@ function SectionEditorBlock({ section, onChange }: SectionBlockProps) {
 
       {section.type === "highlights" && (
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          <div className="portal-field border-b border-[var(--portal-border)] pb-3 mb-2">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={getVal("hide", false)}
+                onChange={(e) => handleFieldChange("hide", e.target.checked)}
+                style={{ accentColor: "var(--portal-accent)" }}
+              />
+              <span className="text-xs font-bold text-zinc-100">Hide this section on the project page</span>
+            </label>
+          </div>
           <div className="portal-field">
             <label className="portal-field-label">Eyebrow title</label>
             <input
@@ -2907,6 +2929,17 @@ function SectionEditorBlock({ section, onChange }: SectionBlockProps) {
 
       {section.type === "amenities" && (
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          <div className="portal-field border-b border-[var(--portal-border)] pb-3 mb-2">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={getVal("hide", false)}
+                onChange={(e) => handleFieldChange("hide", e.target.checked)}
+                style={{ accentColor: "var(--portal-accent)" }}
+              />
+              <span className="text-xs font-bold text-zinc-100">Hide this section on the project page</span>
+            </label>
+          </div>
           <div className="portal-grid-2col">
             <div className="portal-field">
               <label className="portal-field-label">Eyebrow tag</label>
@@ -3211,6 +3244,17 @@ function SectionEditorBlock({ section, onChange }: SectionBlockProps) {
 
       {section.type === "decision-guide" && (
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          <div className="portal-field border-b border-[var(--portal-border)] pb-3 mb-2">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={getVal("hide", false)}
+                onChange={(e) => handleFieldChange("hide", e.target.checked)}
+                style={{ accentColor: "var(--portal-accent)" }}
+              />
+              <span className="text-xs font-bold text-zinc-100">Hide this section on the project page</span>
+            </label>
+          </div>
           <div className="portal-field">
             <label className="portal-field-label">Eyebrow</label>
             <input
@@ -3410,7 +3454,7 @@ function SectionEditorBlock({ section, onChange }: SectionBlockProps) {
                 type="button"
                 onClick={() => {
                   const vd = [...getVal("videos", [])];
-                  vd.push({ title: "New Video", duration: "0:00", thumb: "" });
+                  vd.push({ title: "New Video", duration: "0:00", thumb: "", url: "" });
                   handleFieldChange("videos", vd);
                 }}
                 className="portal-btn-secondary sm"
@@ -3519,86 +3563,28 @@ function SectionEditorBlock({ section, onChange }: SectionBlockProps) {
                         className="portal-input font-mono text-[11px]"
                       />
                     </div>
+                    <div className="portal-field">
+                      <label className="portal-field-label text-[10px]">
+                        Video URL / Embed Link (YouTube, Facebook, or direct video link)
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="https://www.youtube.com/watch?v=... or Facebook Reel or .mp4 link"
+                        value={vd.url || ""}
+                        onChange={(e) => {
+                          const next = [...payload.videos];
+                          next[i] = { ...next[i], url: e.target.value };
+                          handleFieldChange("videos", next);
+                        }}
+                        className="portal-input font-mono text-[11px]"
+                      />
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="portal-field border-t border-[var(--portal-border)] pt-4 mt-2">
-            <label className="portal-field-label flex justify-between items-center">
-              <span>Downloadable Resource Files</span>
-              <button
-                type="button"
-                onClick={() => {
-                  const dw = [...getVal("downloads", [])];
-                  dw.push({ name: "New Brochure", size: "PDF · 2.5 MB", icon: "📋" });
-                  handleFieldChange("downloads", dw);
-                }}
-                className="portal-btn-secondary sm"
-                style={{ padding: "2px 8px", fontSize: "10.5px" }}
-              >
-                + Add Download
-              </button>
-            </label>
-
-            <div
-              style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}
-              className="mt-2"
-            >
-              {getVal("downloads", []).map((dw: any, i: number) => (
-                <div key={i} className="flex gap-2 items-center">
-                  <input
-                    type="text"
-                    placeholder="Document Name"
-                    value={dw.name || ""}
-                    onChange={(e) => {
-                      const next = [...payload.downloads];
-                      next[i] = { ...next[i], name: e.target.value };
-                      handleFieldChange("downloads", next);
-                    }}
-                    className="portal-input"
-                    style={{ flex: 3 }}
-                  />
-                  <input
-                    type="text"
-                    placeholder="e.g. PDF · 4.2 MB"
-                    value={dw.size || ""}
-                    onChange={(e) => {
-                      const next = [...payload.downloads];
-                      next[i] = { ...next[i], size: e.target.value };
-                      handleFieldChange("downloads", next);
-                    }}
-                    className="portal-input"
-                    style={{ flex: 2 }}
-                  />
-                  <input
-                    type="text"
-                    placeholder="Icon Emoji"
-                    value={dw.icon || "📋"}
-                    onChange={(e) => {
-                      const next = [...payload.downloads];
-                      next[i] = { ...next[i], icon: e.target.value };
-                      handleFieldChange("downloads", next);
-                    }}
-                    className="portal-input"
-                    style={{ flex: 1, textAlign: "center" }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const next = [...payload.downloads];
-                      next.splice(i, 1);
-                      handleFieldChange("downloads", next);
-                    }}
-                    className="portal-icon-btn hover:text-red-500"
-                  >
-                    <Trash2 size={13} />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       )}
 
@@ -4035,10 +4021,9 @@ function getEmptyPayloadFor(type: string) {
       return { eyebrow: "Decision Guide", headline: "Which unit is", headline_accent: "right?" };
     case "media-experience":
       return {
-        eyebrow: "Downloads",
+        eyebrow: "Media",
         photos: [],
         videos: [],
-        downloads: [{ name: "Brochure", size: "PDF · 4.2 MB", icon: "📋" }],
       };
     case "testimonials-slider":
       return {

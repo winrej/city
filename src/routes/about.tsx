@@ -184,34 +184,6 @@ function About() {
         </div>
       </section>
 
-      <section className="px-4 section-pad-sm">
-        <div className="container-prose">
-          <Reveal>
-            <p className="eyebrow mb-20">
-              <span className="gold-rule" />
-              Trust
-            </p>
-          </Reveal>
-          <div className="grid gap-20 md:grid-cols-3 md:gap-16">
-            {[
-              ["12+", "Years in property"],
-              ["350+", "Families advised"],
-              ["100%", "Transparent recommendations"],
-            ].map(([n, l], i) => (
-              <Reveal key={l} delay={i * 120}>
-                <div className="border-t border-hairline pt-10">
-                  <p className="text-[4rem] font-extrabold leading-[0.95] tracking-[-0.04em] md:text-[7.5rem]">
-                    {n}
-                  </p>
-                  <p className="mt-8 max-w-[16rem] text-[14px] leading-relaxed text-muted-foreground">
-                    {l}
-                  </p>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
 
       <ConsultationCTA />
     </>
