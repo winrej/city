@@ -19,13 +19,13 @@ export const Route = createFileRoute("/faq")({
   },
   head: () => ({
     meta: [
-      { title: "FAQ — CityQlo" },
+      { title: "DMCI Homes Condo Buying FAQ | CityQlo" },
       {
         name: "description",
         content:
-          "Frequently asked questions about buying, legalities, payments, and OFW property investments in Metro Manila.",
+          "Answers to common questions about buying DMCI Homes condos in Metro Manila — the buying process, legalities, payment terms, and OFW property investment.",
       },
-      { property: "og:title", content: "FAQ — CityQlo" },
+      { property: "og:title", content: "DMCI Homes Condo Buying FAQ | CityQlo" },
       {
         property: "og:description",
         content: "Find answers about buying process, legalities, and DMCI Homes investments in Metro Manila.",

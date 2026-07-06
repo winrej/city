@@ -58,21 +58,25 @@ export const Route = createFileRoute("/properties")({
   },
   head: () => ({
     meta: [
-      { title: "Residences — Cinematic Gallery · CityQlo" },
+      { title: "DMCI Homes Condos for Sale in Metro Manila | CityQlo" },
       {
         name: "description",
         content:
-          "A private, curated collection of premium property opportunities in Metro Manila. Aligning space and light with your long-term wealth goals.",
+          "Browse a curated collection of DMCI Homes condos for sale in Metro Manila. A DMCI Homes accredited property consultant helps you match the right unit to your budget and long-term goals.",
       },
       {
         name: "keywords",
         content:
-          "Metro Manila condos, property listings Philippines, DMCI Homes collection, real estate investment Manila, premium residences Manila",
+          "DMCI Homes condos for sale, DMCI condos Metro Manila, DMCI Homes property listings, condo for sale Metro Manila, DMCI accredited property consultant, real estate investment Manila",
       },
-      { property: "og:title", content: "Residences — Cinematic Gallery · CityQlo" },
+      {
+        property: "og:title",
+        content: "DMCI Homes Condos for Sale in Metro Manila | CityQlo",
+      },
       {
         property: "og:description",
-        content: "A private, curated collection of premium properties aligned with your goals.",
+        content:
+          "Browse DMCI Homes condos for sale in Metro Manila, curated by a DMCI Homes accredited property consultant.",
       },
       { property: "og:url", content: "https://cityqlo.com/properties" },
     ],

@@ -44,21 +44,28 @@ export const Route = createFileRoute("/")({
   },
   head: () => ({
     meta: [
-      { title: "CityQlo — Find the Right Property, Not Just Another Condo" },
+      {
+        title:
+          "DMCI Homes Accredited Property Consultant in Metro Manila | CityQlo",
+      },
       {
         name: "description",
         content:
-          "Premium property advisory for Filipino professionals, investors, and OFWs. Make smarter property decisions with CityQlo.",
+          "Work with a DMCI Homes accredited property consultant. CityQlo helps Filipino professionals, investors, and OFWs buy DMCI condos in Metro Manila with expert, unbiased advisory. Book a free consultation.",
       },
       {
         name: "keywords",
         content:
-          "Metro Manila real estate, property advisory, DMCI Homes, property investment Philippines, OFW real estate, Manila condos",
+          "DMCI accredited property consultant, DMCI Homes accredited agent, DMCI condos Metro Manila, DMCI Homes property consultant Philippines, buy DMCI condo, OFW real estate, Metro Manila condos, property advisory Philippines",
       },
-      { property: "og:title", content: "CityQlo — Find the Right Property" },
+      {
+        property: "og:title",
+        content: "DMCI Homes Accredited Property Consultant | CityQlo",
+      },
       {
         property: "og:description",
-        content: "Premium property advisory for Filipino professionals, investors, and OFWs.",
+        content:
+          "DMCI Homes accredited property consultant helping Filipino professionals, investors, and OFWs buy the right condo in Metro Manila.",
       },
       { property: "og:url", content: "https://cityqlo.com/" },
     ],

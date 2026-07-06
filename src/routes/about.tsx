@@ -8,13 +8,16 @@ import { BreadcrumbJsonLd } from "@/components/site/BreadcrumbJsonLd";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About — CityQlo" },
+      { title: "About CityQlo | DMCI Homes Accredited Property Consultant" },
       {
         name: "description",
         content:
-          "CityQlo is a property advisory built around guidance, transparency, and the long term.",
+          "CityQlo is a DMCI Homes accredited property consultant in Metro Manila — a property advisory built around guidance, transparency, and the long term.",
       },
-      { property: "og:title", content: "About — CityQlo" },
+      {
+        property: "og:title",
+        content: "About CityQlo | DMCI Homes Accredited Property Consultant",
+      },
       {
         property: "og:description",
         content: "A property advisory built around guidance, transparency, and the long term.",

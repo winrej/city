@@ -36,6 +36,10 @@ import {
   Award,
   Clock,
   Share2,
+  Camera,
+  Video,
+  Globe,
+  Sofa,
 } from "lucide-react";
 import { Reveal } from "@/components/site/Reveal";
 import { BreadcrumbJsonLd } from "@/components/site/BreadcrumbJsonLd";
@@ -782,6 +786,35 @@ function formatPrice(price: number) {
   return `₱${price.toLocaleString()}`;
 }
 
+// Gallery image with a skeleton shimmer that fades into a cinematic reveal once
+// the bitmap decodes. Module-scoped so it isn't re-created on every render.
+function MediaCardImage({
+  src,
+  alt,
+  className = "",
+}: {
+  src: string;
+  alt: string;
+  className?: string;
+}) {
+  const [loaded, setLoaded] = useState(false);
+  return (
+    <>
+      {!loaded && <div className="absolute inset-0 skeleton" aria-hidden />}
+      <img
+        src={src}
+        alt={alt}
+        loading="lazy"
+        decoding="async"
+        onLoad={() => setLoaded(true)}
+        className={`h-full w-full object-cover transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+          loaded ? "scale-100 opacity-100 blur-0" : "scale-[1.04] opacity-0 blur-sm"
+        } ${className}`}
+      />
+    </>
+  );
+}
+
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 function ProjectDetailPage() {
@@ -894,8 +927,9 @@ function ProjectDetailPage() {
   const [mediaTab, setMediaTab] = useState<
     "exterior" | "amenities" | "interiors" | "tour" | "videos" | "downloads"
   >("exterior");
-  const [lightboxImg, setLightboxImg] = useState<string | null>(null);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [videoModal, setVideoModal] = useState(false);
+  const touchStartX = useRef(0);
 
   // ── FAQ state
   const [openFaq, setOpenFaq] = useState<number | null>(0);
@@ -1008,6 +1042,39 @@ function ProjectDetailPage() {
   const visibleMedia = (media.photos || []).filter((m) =>
     mediaTab !== "videos" && mediaTab !== "downloads" ? m.tab === mediaTab : false,
   );
+
+  // ── Media browser metadata (real counts, so the row stays honest as the CMS grows)
+  const photoCount = (media.photos || []).length;
+  const videoCount = (media.videos || []).length;
+  const hasTour = tours.length > 0;
+
+  // ── Swipeable lightbox navigation (wraps within the active category's photos)
+  const showPrevPhoto = useCallback(
+    () =>
+      setLightboxIndex((i) =>
+        i === null || visibleMedia.length === 0
+          ? i
+          : (i - 1 + visibleMedia.length) % visibleMedia.length,
+      ),
+    [visibleMedia.length],
+  );
+  const showNextPhoto = useCallback(
+    () =>
+      setLightboxIndex((i) =>
+        i === null || visibleMedia.length === 0 ? i : (i + 1) % visibleMedia.length,
+      ),
+    [visibleMedia.length],
+  );
+  useEffect(() => {
+    if (lightboxIndex === null) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setLightboxIndex(null);
+      else if (e.key === "ArrowLeft") showPrevPhoto();
+      else if (e.key === "ArrowRight") showNextPhoto();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [lightboxIndex, showPrevPhoto, showNextPhoto]);
 
   // ── Related projects resolve: prefer live DB data, fall back to the demo map
   // for any slug not found among published projects (keeps local/demo working).
@@ -1389,23 +1456,68 @@ function ProjectDetailPage() {
       {/* ═══════════════════════════════════════════════════
           LIGHTBOX
       ═══════════════════════════════════════════════════ */}
-      {lightboxImg && (
+      {lightboxIndex !== null && visibleMedia[lightboxIndex] && (
         <div
-          className="fixed inset-0 z-50 bg-black/92 flex items-center justify-center p-4"
-          onClick={() => setLightboxImg(null)}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/92 p-4"
+          onClick={() => setLightboxIndex(null)}
+          onTouchStart={(e) => (touchStartX.current = e.touches[0].clientX)}
+          onTouchEnd={(e) => {
+            const dx = e.changedTouches[0].clientX - touchStartX.current;
+            if (dx > 50) showPrevPhoto();
+            else if (dx < -50) showNextPhoto();
+          }}
         >
           <button
-            onClick={() => setLightboxImg(null)}
-            className="absolute top-6 right-6 text-white/70 hover:text-white cursor-pointer"
+            onClick={() => setLightboxIndex(null)}
+            aria-label="Close gallery"
+            className="absolute right-6 top-6 cursor-pointer text-white/70 hover:text-white"
           >
             <X size={28} />
           </button>
-          <img
-            src={lightboxImg}
-            alt="Property photo"
-            className="max-h-[85vh] max-w-[90vw] object-contain rounded-2xl"
+
+          {visibleMedia.length > 1 && (
+            <>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  showPrevPhoto();
+                }}
+                aria-label="Previous photo"
+                className="absolute left-3 top-1/2 flex h-11 w-11 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-sm hover:bg-white/20 md:left-6"
+              >
+                <ChevronLeft size={22} />
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  showNextPhoto();
+                }}
+                aria-label="Next photo"
+                className="absolute right-3 top-1/2 flex h-11 w-11 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-sm hover:bg-white/20 md:right-6"
+              >
+                <ChevronRight size={22} />
+              </button>
+            </>
+          )}
+
+          <figure
+            className="flex flex-col items-center gap-4"
             onClick={(e) => e.stopPropagation()}
-          />
+          >
+            <img
+              key={visibleMedia[lightboxIndex].src}
+              src={visibleMedia[lightboxIndex].src}
+              alt={visibleMedia[lightboxIndex].title}
+              className="max-h-[82vh] max-w-[92vw] rounded-2xl object-contain"
+            />
+            <figcaption className="flex items-center gap-3 text-[13px] text-white/80">
+              <span className="font-semibold">{visibleMedia[lightboxIndex].title}</span>
+              <span className="text-white/40">·</span>
+              <span className="tabular-nums text-white/60">
+                {lightboxIndex + 1} / {visibleMedia.length}
+              </span>
+            </figcaption>
+          </figure>
         </div>
       )}
 
@@ -1487,9 +1599,10 @@ function ProjectDetailPage() {
       {/* ═══════════════════════════════════════════════════
           10. MEDIA EXPERIENCE
       ═══════════════════════════════════════════════════ */}
-      <section className="px-4 py-20 md:py-28">
+      <section className="py-12 md:px-4 md:py-28">
         <div className="container-prose">
-          <div className="text-center max-w-2xl mx-auto mb-12">
+          {/* Header — shared; tighter rhythm on mobile so it reads as a continuation */}
+          <div className="text-center max-w-2xl mx-auto mb-4 md:mb-12">
             <Reveal>
               <p className="eyebrow">
                 <span className="gold-rule" />
@@ -1497,15 +1610,164 @@ function ProjectDetailPage() {
               </p>
             </Reveal>
             <Reveal delay={100}>
-              <h2 className="display-2 mt-5">
+              <h2 className="display-2 mt-4 md:mt-5">
                 Experience the <span className="text-primary">Property</span>
               </h2>
             </Reveal>
             <Reveal delay={180}>
-              <p className="text-[15px] text-muted-foreground mt-3">Watch before you visit.</p>
+              <p className="text-[15px] text-muted-foreground mt-2 md:mt-3">
+                Watch before you visit.
+              </p>
             </Reveal>
           </div>
 
+          {/* ══════════════════════════════════════════════════════════
+              MOBILE (below md) — premium swipe-first media browser
+          ══════════════════════════════════════════════════════════ */}
+          <div className="md:hidden">
+            {/* Metadata row — muted, real counts */}
+            <div className="mb-4 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[12px] font-medium text-muted-foreground">
+              <span className="inline-flex items-center gap-1.5">📸 {photoCount} Photos</span>
+              <span className="text-border">•</span>
+              <span className="inline-flex items-center gap-1.5">🎥 {videoCount} Videos</span>
+              {hasTour && (
+                <>
+                  <span className="text-border">•</span>
+                  <span className="inline-flex items-center gap-1.5">🌐 360° Tour</span>
+                </>
+              )}
+            </div>
+
+            {/* Scrollable, snapping category tabs */}
+            <div className="-mx-5 mb-5 flex snap-x snap-mandatory gap-2 overflow-x-auto scroll-smooth px-5 pb-1 [-ms-overflow-style:none] [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {[
+                { key: "exterior", label: "Exterior", Icon: Building2 },
+                { key: "amenities", label: "Amenities", Icon: Waves },
+                { key: "interiors", label: "Interiors", Icon: Sofa },
+                { key: "videos", label: "Videos", Icon: Video },
+                ...(hasTour ? [{ key: "tour", label: "360° Tour", Icon: Globe }] : []),
+                { key: "downloads", label: "Downloads", Icon: Download },
+              ].map(({ key, label, Icon }) => {
+                const active = mediaTab === key;
+                return (
+                  <button
+                    key={key}
+                    onClick={() => setMediaTab(key as typeof mediaTab)}
+                    aria-pressed={active}
+                    className={`inline-flex min-h-[48px] shrink-0 snap-start items-center gap-2 rounded-full px-5 text-[13px] font-bold tracking-wide transition-all duration-300 ${
+                      active
+                        ? "bg-primary text-white shadow-[0_10px_28px_-10px_var(--primary)]"
+                        : "border border-border/70 bg-surface text-muted-foreground"
+                    }`}
+                  >
+                    <Icon size={16} className={active ? "text-white" : "text-muted-foreground"} />
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Tab content — subtle fade on switch (keyed remount) */}
+            <div key={mediaTab} className="animate-[cq-image-in_500ms_var(--ease-luxe)_both]">
+              {/* Photo categories → horizontal swipe gallery */}
+              {mediaTab !== "videos" && mediaTab !== "downloads" && mediaTab !== "tour" && (
+                <>
+                  <div className="-mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth px-5 pb-2 [-ms-overflow-style:none] [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                    {visibleMedia.map((item, i) => (
+                      <button
+                        key={item.src + i}
+                        onClick={() => setLightboxIndex(i)}
+                        aria-label={`Open ${item.title}`}
+                        className="group relative aspect-[4/5] w-[78%] shrink-0 snap-center overflow-hidden rounded-[20px] shadow-soft transition-shadow duration-300 active:shadow-lift"
+                      >
+                        <MediaCardImage
+                          src={item.thumb}
+                          alt={item.title}
+                          className="group-active:scale-[1.05]"
+                        />
+                        <span className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/55 to-transparent" />
+                        <span className="pointer-events-none absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-black/45 px-3 py-1 text-[11px] font-semibold text-white backdrop-blur-sm">
+                          <Camera size={12} /> {item.title}
+                        </span>
+                        <span className="pointer-events-none absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/85 opacity-0 shadow-lift transition-opacity duration-300 group-active:opacity-100">
+                          <ZoomIn size={15} className="text-ink" />
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+
+                  {visibleMedia.length > 0 && (
+                    <button
+                      onClick={() => setLightboxIndex(0)}
+                      className="mt-4 inline-flex items-center gap-1.5 text-[13px] font-bold text-primary"
+                    >
+                      View Full Gallery <ArrowRight size={15} />
+                    </button>
+                  )}
+                </>
+              )}
+
+              {/* Videos → horizontal swipe */}
+              {mediaTab === "videos" && (
+                <div className="-mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth px-5 pb-2 [-ms-overflow-style:none] [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                  {(media.videos || []).map((vid) => (
+                    <button
+                      key={vid.title}
+                      onClick={() => setVideoModal(true)}
+                      className="group relative aspect-[4/5] w-[78%] shrink-0 snap-center overflow-hidden rounded-[20px] shadow-soft transition-shadow duration-300 active:shadow-lift"
+                    >
+                      <MediaCardImage src={vid.thumb} alt={vid.title} />
+                      <span className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/35">
+                        <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white/90 shadow-lift">
+                          <Play size={22} className="ml-1 text-ink" />
+                        </span>
+                        <span className="text-[13px] font-bold text-white">{vid.title}</span>
+                        <span className="font-mono text-[11px] text-white/70">{vid.duration}</span>
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* 360° tour */}
+              {mediaTab === "tour" && (
+                <div>
+                  <TourViewer tours={tours} poster={poolImg} />
+                  <p className="mt-3 text-center text-[12.5px] text-muted-foreground">
+                    Drag to look around · tap the hotspots to move between rooms.
+                  </p>
+                </div>
+              )}
+
+              {/* Downloads → thumb-friendly stacked list */}
+              {mediaTab === "downloads" && (
+                <div className="flex flex-col gap-3">
+                  {(media.downloads || []).map((doc) => (
+                    <button
+                      key={doc.name}
+                      onClick={scrollToForm}
+                      className="group flex items-center gap-4 rounded-[20px] border border-border/50 bg-surface px-5 py-4 text-left shadow-soft transition-shadow duration-300 active:shadow-lift"
+                    >
+                      <span className="text-2xl">{doc.icon}</span>
+                      <div className="flex-1">
+                        <p className="text-[14px] font-bold text-ink">{doc.name}</p>
+                        <p className="mt-0.5 text-[12px] text-muted-foreground">{doc.size}</p>
+                      </div>
+                      <Download size={16} className="shrink-0 text-primary" />
+                    </button>
+                  ))}
+                  <p className="mt-1 text-center text-[12.5px] text-muted-foreground">
+                    Enter your contact details to unlock free downloads.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* ══════════════════════════════════════════════════════════
+              DESKTOP (md and up) — original layout, unchanged
+          ══════════════════════════════════════════════════════════ */}
+          <div className="hidden md:block">
           {/* Tabs */}
           <Reveal delay={200}>
             <div className="flex flex-wrap gap-2 mb-8">
@@ -1556,7 +1818,7 @@ function ProjectDetailPage() {
                 <Reveal key={item.src + i} delay={i * 60}>
                   <div
                     className={`group relative overflow-hidden rounded-2xl cursor-pointer shadow-soft hover:shadow-lift transition-all duration-500 ${i === 0 ? "md:col-span-2 aspect-[16/9]" : "aspect-[4/3]"}`}
-                    onClick={() => setLightboxImg(item.src)}
+                    onClick={() => setLightboxIndex(i)}
                   >
                     <img
                       src={item.thumb}
@@ -1649,8 +1911,9 @@ function ProjectDetailPage() {
               </div>
             </Reveal>
           )}
+          </div>
 
-          {/* Video modal */}
+          {/* Video modal — shared across breakpoints */}
           {videoModal && (
             <div
               className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"

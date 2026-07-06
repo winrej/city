@@ -186,16 +186,16 @@ export const SEO_FALLBACKS = {
     og_image_url: "",
   },
   seo_why_invest: {
-    meta_title: "Why Invest | CityQlo",
+    meta_title: "Why Invest in DMCI Homes Condos in Metro Manila | CityQlo",
     meta_description:
-      "Why real estate, why Metro Manila, why condo investments, and why DMCI - explained without the sales pitch.",
+      "Why real estate, why Metro Manila, why condo investments, and why DMCI Homes - explained by a DMCI Homes accredited property consultant, without the sales pitch.",
     canonical_path: "/why-invest",
     og_image_url: "",
   },
   seo_about: {
-    meta_title: "About | CityQlo",
+    meta_title: "About CityQlo | DMCI Homes Accredited Property Consultant",
     meta_description:
-      "CityQlo is a property advisory built around guidance, transparency, and the long term.",
+      "CityQlo is a DMCI Homes accredited property consultant in Metro Manila - a property advisory built around guidance, transparency, and the long term.",
     canonical_path: "/about",
     og_image_url: "",
   },

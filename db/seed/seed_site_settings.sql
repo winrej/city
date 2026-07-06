@@ -70,8 +70,8 @@ insert into public.site_settings (key, value) values
 
 -- SEO
 ('seo', '{
-  "meta_title": "CityQlo \u2014 Find the Right Property, Not Just Another Condo",
-  "meta_description": "Premium property advisory for Filipino professionals, investors, and OFWs. Make smarter property decisions with CityQlo.",
+  "meta_title": "DMCI Homes Accredited Property Consultant in Metro Manila | CityQlo",
+  "meta_description": "Work with a DMCI Homes accredited property consultant. CityQlo helps Filipino professionals, investors, and OFWs buy DMCI condos in Metro Manila with expert, unbiased advisory. Book a free consultation.",
   "og_image_url": "https://cityqlo.com/Logo.png",
   "og_title": "",
   "og_description": "",
