@@ -107,9 +107,9 @@ export const WHY_INVEST_PAGE_FALLBACK = {
     },
     {
       number: "02",
-      title: "Why Metro Manila",
+      title: "Why key Philippine cities",
       description:
-        "Metro Manila concentrates population, jobs, and infrastructure spend. New CBDs, transit lines, and lifestyle districts continue to expand the value envelope for the right submarkets.",
+        "DMCI Homes operates across major growth corridors — from Metro Manila to Laguna, Cavite, Cebu, and beyond. Population growth, infrastructure spend, and expanding CBDs continue to expand the value envelope for the right locations.",
     },
     {
       number: "03",
@@ -147,7 +147,7 @@ export const WHY_INVEST_PAGE_FALLBACK = {
   ],
   rental_strategies_heading: "Three ways your unit can earn.",
   rental_strategies_description:
-    "A DMCI property isn't just a home - it can also become a source of recurring income. Here's how different rental strategies compare.",
+    "A DMCI property isn't just a home - it can also become a source of recurring income. Here's how different rental strategies compare across Philippine locations.",
   rental_strategies_disclaimer:
     "Returns depend on location, occupancy, management, seasonality, and market conditions.",
   rental_strategies: [
@@ -170,7 +170,7 @@ export const WHY_INVEST_PAGE_FALLBACK = {
     {
       title: "Long-term rental",
       description:
-        "A 6-12 month lease trades peak yield for predictable, peso-resilient cash flow and minimal turnover - the classic passive hold.",
+        "A 6-12 month lease trades peak yield for predictable, peso-resilient cash flow and minimal turnover - the classic passive hold across any Philippine location.",
       effort: "Low",
       yield: "Steady",
       guide_slug: "long-term-rentals-metro-manila",
@@ -198,6 +198,16 @@ export const WHY_INVEST_PAGE_FALLBACK = {
       question: "Do you only recommend DMCI?",
       answer:
         "No. We recommend what fits your goals. DMCI is often a strong fit, but it is never the only option.",
+    },
+    {
+      question: "What if I buy and the market softens?",
+      answer:
+        "Property in Metro Manila has historically rewarded patience over timing. If your timeline is under 5 years and your liquidity is tight, that's exactly the conversation to have with us before you commit — not after.",
+    },
+    {
+      question: "How is CityQlo different from a developer's own sales team?",
+      answer:
+        "A developer's team is paid to move units. We earn through the same commission structure, but our incentive is your repeat business and referrals — which means we'll tell you when a unit isn't right for your situation, even if it's one we could sell you today.",
     },
   ],
 };

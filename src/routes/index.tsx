@@ -30,17 +30,17 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       {
-        title: "DMCI Homes Accredited Property Consultant in Metro Manila | CityQlo",
+        title: "DMCI Homes Accredited Property Consultant in the Philippines | CityQlo",
       },
       {
         name: "description",
         content:
-          "Work with a DMCI Homes accredited property consultant. CityQlo helps Filipino professionals, investors, and OFWs buy DMCI condos in Metro Manila with expert, unbiased advisory. Book a free consultation.",
+          "Work with a DMCI Homes accredited property consultant. CityQlo helps Filipino professionals, investors, and OFWs buy DMCI Homes properties across the Philippines with expert, unbiased advisory. Book a free consultation.",
       },
       {
         name: "keywords",
         content:
-          "DMCI accredited property consultant, DMCI Homes accredited agent, DMCI condos Metro Manila, DMCI Homes property consultant Philippines, buy DMCI condo, OFW real estate, Metro Manila condos, property advisory Philippines",
+          "DMCI accredited property consultant, DMCI Homes accredited agent, DMCI condos Philippines, DMCI Homes property consultant Philippines, buy DMCI condo, OFW real estate, property advisory Philippines",
       },
       {
         property: "og:title",
@@ -49,7 +49,7 @@ export const Route = createFileRoute("/")({
       {
         property: "og:description",
         content:
-          "DMCI Homes accredited property consultant helping Filipino professionals, investors, and OFWs buy the right condo in Metro Manila.",
+          "DMCI Homes accredited property consultant helping Filipino professionals, investors, and OFWs buy the right DMCI property across the Philippines.",
       },
       { property: "og:url", content: "https://cityqlo.com/" },
     ],
@@ -245,6 +245,7 @@ function Home() {
         beds: p.beds || null,
         area: p.area || null,
         unitTypes: p.unit_types || null,
+        highlights: Array.isArray(p.highlights) ? p.highlights : [],
         img: p.image_url || (idx === 0 ? towerImg : interiorImg),
         isDb: true,
       }));
@@ -1001,23 +1002,23 @@ function Home() {
       </section>
 
       {/* SECTION 2 — Selected Opportunities (post-hero secondary CTA) */}
-      <section className="px-4 section-pad">
+      <section className="px-4 pb-20 pt-16 md:pb-28 md:pt-20">
         <div className="container-prose">
           {/* Section header — CMS-controlled */}
-          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between mb-12 md:mb-16">
             <Reveal>
               <p className="eyebrow">
                 <span className="gold-rule" />
                 {homepageSettings.featured_eyebrow || "Start Here"}
               </p>
-              <h2 className="display-2 mt-6 max-w-xl">
+              <h2 className="display-2 mt-4 max-w-xl leading-tight">
                 {homepageSettings.featured_title || "Find the property that fits your goals."}
               </h2>
             </Reveal>
             <Reveal delay={120} className="hidden md:block shrink-0">
               <Link
                 to="/properties"
-                className="inline-flex items-center gap-2.5 rounded-full bg-[oklch(0.43_0.20_258)] px-7 py-3.5 text-[13px] font-semibold text-white tracking-[0.02em] transition-all duration-500 hover:-translate-y-[3px] hover:shadow-[0_8px_32px_oklch(0.43_0.20_258/0.35)] group"
+                className="inline-flex items-center gap-2.5 rounded-full bg-ink px-7 py-3.5 text-[13px] font-semibold text-white tracking-[0.02em] transition-all duration-500 hover:-translate-y-[3px] hover:shadow-[0_8px_32px_oklch(0.21_0.012_252/0.25)] group"
                 style={{ transitionTimingFunction: "var(--ease-luxe)" }}
               >
                 View All Properties
@@ -1032,135 +1033,162 @@ function Home() {
           </div>
 
           {/* Cards grid */}
-          <div className="mt-12 grid grid-cols-1 gap-8 md:mt-16 md:grid-cols-2 md:gap-10">
-            {featuredOpportunities.map((opp, idx) => (
-              <Reveal key={opp.slug} as="article" delay={idx * 140}>
-                <Link
-                  to="/projects/$slug"
-                  params={{ slug: opp.slug }}
-                  className="group block rounded-[1.75rem] border border-border bg-background transition-all duration-500 hover:-translate-y-[6px] hover:border-[oklch(0.43_0.20_258/0.35)] hover:shadow-[0_20px_60px_oklch(0_0_0/0.14)]"
-                  style={{ transitionTimingFunction: "var(--ease-luxe)" }}
+          <div className="grid grid-cols-1 gap-12 md:grid-cols-2 md:gap-10 md:pb-12">
+            {featuredOpportunities.map((opp, idx) => {
+              const hasFeaturedTags = opp.highlights && opp.highlights.length > 0;
+              const tags = hasFeaturedTags
+                ? opp.highlights.slice(0, 3)
+                : [
+                    /ready/i.test(opp.status ?? "") ? "Ready to Move In" : "Flexible Terms",
+                    "Prime Investment",
+                    "Resort Amenities",
+                  ];
+
+              return (
+                <Reveal
+                  key={opp.slug}
+                  as="article"
+                  delay={idx * 140}
+                  className={idx === 1 ? "md:translate-y-10" : ""}
                 >
-                  {/* Image */}
-                  <div className="overflow-hidden rounded-t-[1.75rem] relative">
-                    <img
-                      src={opp.img}
-                      alt={opp.name}
-                      className="aspect-[16/9] w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
-                      style={{ transitionTimingFunction: "var(--ease-luxe)" }}
-                      width={1280}
-                      height={720}
-                      loading="lazy"
-                    />
-                    {/* Single status badge */}
-                    {/ready/i.test(opp.status ?? "") ? (
+                  <Link
+                    to="/projects/$slug"
+                    params={{ slug: opp.slug }}
+                    className="group relative block rounded-[2rem] border border-black/[0.04] bg-white/60 backdrop-blur-md transition-all duration-500 hover:-translate-y-2 hover:border-[oklch(0.43_0.20_258/0.25)] hover:shadow-[0_30px_80px_rgba(0,0,0,0.06)] overflow-hidden"
+                    style={{ transitionTimingFunction: "var(--ease-luxe)" }}
+                  >
+                    {/* Image Container */}
+                    <div className="overflow-hidden relative aspect-[16/9] w-full bg-[#18181b]">
                       <img
-                        src="/rfo.png"
-                        alt="Ready for Occupancy"
-                        className="absolute top-3 left-3 z-10 w-14 h-14 rounded-xl shadow-lg select-none"
-                        draggable={false}
+                        src={opp.img}
+                        alt={opp.name}
+                        className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+                        style={{ transitionTimingFunction: "var(--ease-luxe)" }}
+                        width={1280}
+                        height={720}
+                        loading="lazy"
                       />
-                    ) : (
-                      <span className="absolute top-4 left-4 z-10 font-mono text-[9px] font-bold uppercase tracking-[0.15em] text-white bg-[#0c0c0e]/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 shadow-lg select-none">
-                        {opp.status}
-                      </span>
-                    )}
-                  </div>
+                      {/* Image Top Overlay Gradient */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
 
-                  {/* Card body */}
-                  <div className="p-7">
-                    {/* Location + Name */}
-                    <p className="eyebrow mb-2">{opp.location}</p>
-                    <h3 className="display-3 group-hover:text-primary transition-colors duration-300">
-                      {opp.name}
-                    </h3>
+                      {/* Single status badge — building Status images */}
+                      {(() => {
+                        const s = (opp.status ?? "").toLowerCase();
+                        const src = /ready|rfo/.test(s)
+                          ? "/building Status/rfo.png"
+                          : /pre-?sell|construction|under/.test(s)
+                            ? "/building Status/underconstruction.png"
+                            : "/building Status/comingsoon.png";
+                        const alt = /ready|rfo/.test(s)
+                          ? "Ready for Occupancy"
+                          : /pre-?sell|construction|under/.test(s)
+                            ? "Under Construction"
+                            : "Coming Soon";
+                        return (
+                          <img
+                            src={src}
+                            alt={alt}
+                            className="absolute top-4 left-4 z-10 w-14 h-14 object-contain select-none transition-transform duration-500 group-hover:scale-[1.05] drop-shadow-lg"
+                            draggable={false}
+                          />
+                        );
+                      })()}
+                    </div>
 
-                    {/* Stats block */}
-                    <div className="mt-6 space-y-4">
+                    {/* Card body */}
+                    <div className="p-8 relative">
+                      {/* Location + Developer */}
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="font-mono text-[10px] tracking-[0.14em] uppercase text-primary font-bold">
+                          {opp.location}
+                        </p>
+                        {/dmci/i.test(opp.developer ?? "") ? (
+                          <img
+                            src="/dmci-homes-seeklogo.png"
+                            alt="DMCI Homes"
+                            className="h-5 object-contain opacity-60"
+                            draggable={false}
+                          />
+                        ) : (
+                          <p className="font-mono text-[9px] tracking-wider text-muted-foreground">
+                            {opp.developer}
+                          </p>
+                        )}
+                      </div>
+
+                      <h3 className="display-3 group-hover:text-primary transition-colors duration-300 tracking-tight leading-tight">
+                        {opp.name}
+                      </h3>
+
                       {/* Price */}
-                      {opp.priceDisplay && (
-                        <>
-                          <div>
-                            <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground mb-1">
-                              Starts at
-                            </p>
-                            <p className="font-mono text-[22px] font-bold text-ink leading-none">
-                              {opp.priceDisplay}
-                            </p>
-                          </div>
-                          <hr className="border-border" />
-                        </>
-                      )}
+                      <div className="mt-8 pt-6 border-t border-black/[0.04]">
+                        <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-muted-foreground mb-1">
+                          Starting Price
+                        </p>
+                        <p className="font-mono text-[22px] font-extrabold text-ink leading-none tracking-tight">
+                          {opp.priceDisplay || "Inquire"}
+                        </p>
+                      </div>
 
-                      {/* Beds + Area */}
-                      {(opp.beds || opp.area || opp.unitTypes) && (
-                        <>
-                          <div className="space-y-2">
-                            {(opp.beds || opp.unitTypes) && (
-                              <p className="text-[13px] text-muted-foreground flex items-center gap-2">
-                                <span aria-hidden>🛏</span>
-                                {opp.unitTypes ||
-                                  `${opp.beds} Bedroom${opp.beds !== "1" ? "s" : ""}`}
-                              </p>
-                            )}
-                            {opp.area && (
-                              <p className="text-[13px] text-muted-foreground flex items-center gap-2">
-                                <span aria-hidden>📐</span>
-                                {opp.area}
-                              </p>
-                            )}
-                          </div>
-                          <hr className="border-border" />
-                        </>
-                      )}
+                      {/* Slide-Up Hover Content Area */}
+                      <div className="mt-6 pt-5 border-t border-black/[0.04] flex flex-wrap gap-2 transition-all duration-300">
+                        {tags.map((tag) => (
+                          <span
+                            key={tag}
+                            className="text-[9.5px] font-mono uppercase tracking-wider text-muted-foreground bg-black/[0.03] px-2.5 py-1 rounded"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
 
-                      {/* Status text */}
-                      <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
-                        {opp.status}
-                      </p>
+                      {/* Interactive Button */}
+                      <div className="mt-8 flex items-center justify-between">
+                        <div className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white px-5 py-2.5 text-[12px] font-bold tracking-[0.04em] text-ink transition-all duration-300 group-hover:border-primary/30 group-hover:bg-primary group-hover:text-white shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
+                          Explore Property
+                          <span
+                            aria-hidden
+                            className="inline-block transition-transform duration-300 group-hover:translate-x-1"
+                          >
+                            →
+                          </span>
+                        </div>
+                        <span className="font-mono text-[10px] text-muted-foreground font-semibold group-hover:text-primary transition-colors">
+                          View details
+                        </span>
+                      </div>
                     </div>
-
-                    {/* CTA */}
-                    <div className="mt-7 inline-flex items-center gap-2 rounded-full border border-border px-5 py-2.5 text-[12px] font-semibold tracking-[0.04em] text-ink transition-all duration-300 group-hover:border-[oklch(0.43_0.20_258/0.5)] group-hover:text-primary">
-                      Explore Property
-                      <span
-                        aria-hidden
-                        className="inline-block transition-transform duration-300 group-hover:translate-x-1"
-                      >
-                        →
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-              </Reveal>
-            ))}
+                  </Link>
+                </Reveal>
+              );
+            })}
           </div>
 
           {/* Trust strip */}
           <Reveal delay={200}>
-            <div className="mt-10 flex flex-col items-center gap-2.5 md:flex-row md:justify-center md:gap-8 text-[12px] text-muted-foreground">
+            <div className="mt-16 md:mt-24 flex flex-col items-center gap-3.5 md:flex-row md:justify-center md:gap-8 text-[12px] text-muted-foreground font-medium">
               <span className="flex items-center gap-2">
-                <span className="text-[oklch(0.74_0.137_79)] font-bold">✓</span>
+                <span className="text-[oklch(0.74_0.137_79)] font-bold text-[14px]">✓</span>
                 Licensed Real Estate Broker Supervision
               </span>
               <span className="hidden md:block text-border">·</span>
               <span className="flex items-center gap-2">
-                <span className="text-[oklch(0.74_0.137_79)] font-bold">✓</span>
+                <span className="text-[oklch(0.74_0.137_79)] font-bold text-[14px]">✓</span>
                 Official DMCI Homes Accredited Partner
               </span>
               <span className="hidden md:block text-border">·</span>
               <span className="flex items-center gap-2">
-                <span className="text-[oklch(0.74_0.137_79)] font-bold">✓</span>
+                <span className="text-[oklch(0.74_0.137_79)] font-bold text-[14px]">✓</span>
                 Free Consultation · No Buyer Fees
               </span>
             </div>
           </Reveal>
 
           {/* Mobile-only View All CTA */}
-          <Reveal delay={240} className="mt-10 flex justify-center md:hidden">
+          <Reveal delay={240} className="mt-12 flex justify-center md:hidden">
             <Link
               to="/properties"
-              className="inline-flex items-center gap-2.5 rounded-full bg-[oklch(0.43_0.20_258)] px-7 py-3.5 text-[13px] font-semibold text-white tracking-[0.02em] transition-all duration-500 hover:-translate-y-[3px] group"
+              className="inline-flex items-center gap-2.5 rounded-full bg-ink px-7 py-3.5 text-[13px] font-semibold text-white tracking-[0.02em] transition-all duration-500 hover:-translate-y-[3px] group"
               style={{ transitionTimingFunction: "var(--ease-luxe)" }}
             >
               View All Properties
@@ -1237,7 +1265,7 @@ function Home() {
               {
                 n: "01",
                 t: "Capital appreciation",
-                d: "Well-chosen Metro Manila locations have historically grown in value over decades — not quarters.",
+                d: "Well-chosen DMCI locations across the Philippines have historically grown in value over decades — not quarters.",
               },
               {
                 n: "02",
@@ -1267,46 +1295,6 @@ function Home() {
                     {b.d}
                   </p>
                 </div>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* SECTION 5 — Why CityQlo */}
-      <section className="surface px-4 section-pad">
-        <div className="container-prose">
-          <Reveal>
-            <p className="eyebrow">
-              <span className="gold-rule" />
-              Why CityQlo
-            </p>
-          </Reveal>
-          <Reveal delay={120}>
-            <h2 className="display-2 mt-6 max-w-3xl">Guidance you can build a decade on.</h2>
-          </Reveal>
-
-          <div className="mt-16 grid md:mt-24 gap-20 md:grid-cols-3 md:gap-12">
-            {[
-              {
-                t: "Goal-first approach",
-                d: "We start by understanding your timeline, liquidity, and family — not pushing a unit.",
-              },
-              {
-                t: "Transparent advice",
-                d: "We tell you when not to buy. We tell you when to wait. We tell you why.",
-              },
-              {
-                t: "Long-term perspective",
-                d: "Decisions designed to age well — across cycles, currencies, and life stages.",
-              },
-            ].map((p, i) => (
-              <Reveal key={p.t} delay={i * 100}>
-                <p className="text-[11px] font-semibold tracking-[0.28em] text-muted-foreground">
-                  {String(i + 1).padStart(2, "0")}
-                </p>
-                <h3 className="mt-6 text-[26px] font-bold tracking-[-0.025em]">{p.t}</h3>
-                <p className="mt-5 text-[16px] leading-relaxed text-muted-foreground">{p.d}</p>
               </Reveal>
             ))}
           </div>

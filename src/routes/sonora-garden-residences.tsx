@@ -22,10 +22,9 @@ import heroImg from "@/assets/tower-exterior.jpg";
 const CANONICAL = "https://cityqlo.com/sonora-garden-residences";
 const OG_IMAGE = "https://cityqlo.com/rfo.png";
 
-const META_TITLE =
-  "Sonora Garden Residences by DMCI Homes — Price, Floor Plans & Review (2026) | CityQlo";
+const META_TITLE = "Sonora Garden Residences Las Piñas | DMCI Homes Condo Price & Floor Plans";
 const META_DESCRIPTION =
-  "The complete guide to Sonora Garden Residences, the resort-inspired DMCI Homes & Robinsons Land condo in Las Piñas. RFO status, price list (₱4.55M–₱11.2M), unit sizes, amenities, location, and how to buy.";
+  "Get the official Sonora Garden Residences price list, floor plans, and promo updates (2026). Explore units (1BR–3BR), resort amenities, and payment options for this DMCI Homes condo in Las Piñas.";
 
 export const Route = createFileRoute("/sonora-garden-residences")({
   head: () => ({
@@ -287,7 +286,7 @@ const FAQS = [
 function StructuredData() {
   const realEstate = {
     "@context": "https://schema.org",
-    "@type": "Residence",
+    "@type": "ApartmentComplex",
     name: "Sonora Garden Residences",
     description: META_DESCRIPTION,
     url: CANONICAL,
@@ -534,7 +533,11 @@ function SonoraPillarPage() {
       <article className="px-4 py-16 md:py-24">
         <div className="container-prose space-y-20">
           {/* Overview */}
-          <Section id="overview" eyebrow="Overview" title="What is Sonora Garden Residences?">
+          <Section
+            id="overview"
+            eyebrow="Sonora Garden Residences Overview"
+            title="Sonora Garden Residences by DMCI Homes & Robinsons Land"
+          >
             <p>
               Sonora Garden Residences is a resort-inspired, high-rise condominium community
               developed as a joint venture between <strong>DMCI Homes</strong> — one of the
@@ -569,8 +572,8 @@ function SonoraPillarPage() {
           {/* Location */}
           <Section
             id="location"
-            eyebrow="Location"
-            title="Is the location of Sonora Garden Residences good?"
+            eyebrow="Las Piñas Location"
+            title="Location & Accessibility of Sonora Garden Residences along Alabang–Zapote Road"
           >
             <p>
               Yes — for South-Metro living, the location is one of Sonora's strongest selling
@@ -614,7 +617,11 @@ function SonoraPillarPage() {
           </Section>
 
           {/* Towers */}
-          <Section id="towers" eyebrow="The development" title="The three towers of Sonora">
+          <Section
+            id="towers"
+            eyebrow="Towers & Layout"
+            title="Towers of Sonora Garden Residences: Cadence, Stellan & Liran"
+          >
             <p>
               Sonora Garden Residences is composed of three distinct towers, each with its own
               character but sharing the same gated, amenity-rich grounds. Together they form a mix
@@ -641,7 +648,11 @@ function SonoraPillarPage() {
           </Section>
 
           {/* Units */}
-          <Section id="units" eyebrow="Floor plans" title="Unit types & floor areas">
+          <Section
+            id="units"
+            eyebrow="Sonora Floor Plans"
+            title="Sonora Garden Residences Unit Layouts & Floor Plans"
+          >
             <p>
               Sonora offers one-, two-, and three-bedroom configurations, and the cuts are notably
               generous for the price segment — every unit comes with a <strong>balcony</strong>, and
@@ -678,7 +689,11 @@ function SonoraPillarPage() {
           </Section>
 
           {/* Price */}
-          <Section id="price" eyebrow="Pricing" title="How much is Sonora Garden Residences?">
+          <Section
+            id="price"
+            eyebrow="DMCI Price Guide"
+            title="Sonora Garden Residences Price List & Computations (2026)"
+          >
             <p>
               As of <strong>June 2026</strong>, units at Sonora Garden Residences range from roughly{" "}
               <strong>₱4.55 million to ₱11.2 million</strong>, depending on unit type, floor level,
@@ -734,8 +749,8 @@ function SonoraPillarPage() {
           {/* Financing */}
           <Section
             id="financing"
-            eyebrow="Payment"
-            title="How to finance a Sonora Garden Residences unit"
+            eyebrow="Financing Guide"
+            title="Financing Options for Sonora Garden Residences: Bank, Pag-IBIG & In-House"
           >
             <p>
               Most buyers settle the <strong>down payment</strong> in monthly installments spread
@@ -776,7 +791,11 @@ function SonoraPillarPage() {
           </Section>
 
           {/* Amenities */}
-          <Section id="amenities" eyebrow="Lifestyle" title="Sonora Garden Residences amenities">
+          <Section
+            id="amenities"
+            eyebrow="Resort Living Amenities"
+            title="Resort-Style Amenities at Sonora Garden Residences Las Piñas"
+          >
             <p>
               Amenities are where Sonora earns its "resort living" name. Rather than a single token
               pool, the community offers a full cluster of leisure, fitness, family, and convenience
@@ -815,7 +834,11 @@ function SonoraPillarPage() {
           <VirtualTourSection />
 
           {/* Who */}
-          <Section id="who" eyebrow="Fit" title="Who is Sonora Garden Residences for?">
+          <Section
+            id="who"
+            eyebrow="Target Demographics"
+            title="Is Sonora Garden Residences the Right Las Piñas Condo for You?"
+          >
             <p>Sonora suits several distinct buyer profiles particularly well:</p>
             <ul className="my-4 space-y-3">
               <li>
@@ -847,8 +870,8 @@ function SonoraPillarPage() {
           {/* Investment */}
           <Section
             id="investment"
-            eyebrow="Returns"
-            title="Is Sonora Garden Residences a good investment?"
+            eyebrow="Investment Potential"
+            title="Sonora Garden Residences Investment Potential & Expected Rental Yields"
           >
             <p>
               On balance, Sonora has a credible investment case grounded in three forces: location
@@ -878,7 +901,11 @@ function SonoraPillarPage() {
           </Section>
 
           {/* Developer */}
-          <Section id="developer" eyebrow="Trust" title="Why DMCI Homes?">
+          <Section
+            id="developer"
+            eyebrow="Trusted Builders"
+            title="Why Invest in DMCI Homes & Robinsons Land Joint Ventures"
+          >
             <p>
               DMCI Homes is the residential arm of <strong>DMCI Holdings</strong>, a publicly listed
               engineering and construction conglomerate with decades of building experience. Unlike
@@ -902,7 +929,11 @@ function SonoraPillarPage() {
           </Section>
 
           {/* Pros & cons */}
-          <Section id="pros-cons" eyebrow="Balanced view" title="Pros and cons of Sonora">
+          <Section
+            id="pros-cons"
+            eyebrow="Honest Buying Review"
+            title="Pros & Cons of Buying a Unit in Sonora Garden Residences"
+          >
             <div className="my-6 grid gap-6 md:grid-cols-2">
               <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-5">
                 <h3 className="flex items-center gap-2 text-[15px] font-bold text-emerald-700">
@@ -934,7 +965,11 @@ function SonoraPillarPage() {
           </Section>
 
           {/* How to buy */}
-          <Section id="how-to-buy" eyebrow="Process" title="How to buy a unit at Sonora">
+          <Section
+            id="how-to-buy"
+            eyebrow="Buying Process"
+            title="Step-by-Step Buying Process for Sonora Garden Residences"
+          >
             <p>
               Buying at Sonora Garden Residences follows DMCI's standard, OFW-friendly process.
               Here's the path from shortlist to keys:
@@ -964,8 +999,8 @@ function SonoraPillarPage() {
           {/* Checklist */}
           <Section
             id="checklist"
-            eyebrow="Due diligence"
-            title="Before you buy: a Sonora checklist"
+            eyebrow="Due Diligence Checklist"
+            title="Buyer's Due Diligence Checklist for Sonora Garden Residences"
           >
             <p>
               A resort-grade unit is still a major financial commitment. Before you reserve, work
@@ -1010,7 +1045,11 @@ function SonoraPillarPage() {
           </Section>
 
           {/* Comparison */}
-          <Section id="comparison" eyebrow="Context" title="How Sonora compares to other condos">
+          <Section
+            id="comparison"
+            eyebrow="Property Comparison"
+            title="How Sonora Garden Residences Compares to Other South Metro Condos"
+          >
             <p>
               Generic listing sites show you a unit; they rarely tell you how it stacks up. Here's
               an honest comparison of Sonora against a typical Metro Manila condo offering:
@@ -1038,10 +1077,10 @@ function SonoraPillarPage() {
               </table>
             </div>
             <p>
-              For a deeper look at why Metro Manila condos can make sense as a long-term asset, read
+              For a deeper look at why Philippine condos can make sense as a long-term asset, read
               our{" "}
               <Link to="/why-invest" className="font-semibold text-primary underline">
-                guide to investing in Metro Manila property
+                guide to investing in Philippine property
               </Link>
               , or browse{" "}
               <Link
@@ -1056,7 +1095,11 @@ function SonoraPillarPage() {
           </Section>
 
           {/* FAQ */}
-          <Section id="faq" eyebrow="Questions" title="Sonora Garden Residences — FAQ">
+          <Section
+            id="faq"
+            eyebrow="Frequently Asked Questions"
+            title="Sonora Garden Residences Frequently Asked Questions (FAQ)"
+          >
             <div className="mt-6 divide-y divide-hairline border-y border-hairline">
               {FAQS.map((f, i) => {
                 const isOpen = openFaq === i;
@@ -1105,7 +1148,7 @@ function SonoraPillarPage() {
                   search={{} as never}
                   className="font-semibold text-primary underline"
                 >
-                  other Metro Manila condos
+                  other DMCI developments in the Philippines
                 </Link>
                 , or read more{" "}
                 <Link to="/guides" className="font-semibold text-primary underline">

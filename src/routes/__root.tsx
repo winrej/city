@@ -82,16 +82,16 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 const APP_LOCALE = "en";
 
 const DEFAULT_SEO = {
-  meta_title: "CityQlo — Smarter Property Decisions in Metro Manila",
+  meta_title: "CityQlo — Smarter Property Decisions in the Philippines",
   meta_description:
-    "CityQlo helps Filipino professionals, investors, and OFWs make smarter property decisions in Metro Manila.",
+    "CityQlo helps Filipino professionals, investors, and OFWs make smarter property decisions across the Philippines.",
   og_image_url: "https://cityqlo.com/Logo.png",
-  og_title: "CityQlo — Smarter Property Decisions in Metro Manila",
+  og_title: "CityQlo — Smarter Property Decisions in the Philippines",
   og_description:
-    "CityQlo helps Filipino professionals, investors, and OFWs make smarter property decisions in Metro Manila.",
-  twitter_title: "CityQlo — Smarter Property Decisions in Metro Manila",
+    "CityQlo helps Filipino professionals, investors, and OFWs make smarter property decisions across the Philippines.",
+  twitter_title: "CityQlo — Smarter Property Decisions in the Philippines",
   twitter_description:
-    "CityQlo helps Filipino professionals, investors, and OFWs make smarter property decisions in Metro Manila.",
+    "CityQlo helps Filipino professionals, investors, and OFWs make smarter property decisions across the Philippines.",
 };
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
@@ -126,7 +126,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         {
           name: "keywords",
           content:
-            "Metro Manila real estate, property advisory Philippines, DMCI Homes, condo investment Manila, OFW property investment, CityQlo",
+            "Philippine real estate, property advisory Philippines, DMCI Homes, DMCI condo investment, OFW property investment, CityQlo, property Philippines",
         },
         { name: "author", content: "CityQlo" },
         { property: "og:title", content: ogTitle },
@@ -181,10 +181,10 @@ function RootShell({ children }: { children: ReactNode }) {
           height: 60,
         },
         description:
-          "CityQlo helps Filipino professionals, investors, and OFWs make smarter property decisions in Metro Manila.",
+          "CityQlo helps Filipino professionals, investors, and OFWs make smarter property decisions across the Philippines.",
         address: {
           "@type": "PostalAddress",
-          addressLocality: "Metro Manila",
+          addressLocality: "Philippines",
           addressCountry: "PH",
         },
         contactPoint: {

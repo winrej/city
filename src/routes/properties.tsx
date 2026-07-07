@@ -58,25 +58,25 @@ export const Route = createFileRoute("/properties")({
   },
   head: () => ({
     meta: [
-      { title: "DMCI Homes Condos for Sale in Metro Manila | CityQlo" },
+      { title: "DMCI Homes Condos for Sale in the Philippines | CityQlo" },
       {
         name: "description",
         content:
-          "Browse a curated collection of DMCI Homes condos for sale in Metro Manila. A DMCI Homes accredited property consultant helps you match the right unit to your budget and long-term goals.",
+          "Browse a curated collection of DMCI Homes condos for sale across the Philippines. A DMCI Homes accredited property consultant helps you match the right unit to your budget and long-term goals.",
       },
       {
         name: "keywords",
         content:
-          "DMCI Homes condos for sale, DMCI condos Metro Manila, DMCI Homes property listings, condo for sale Metro Manila, DMCI accredited property consultant, real estate investment Manila",
+          "DMCI Homes condos for sale, DMCI condos Philippines, DMCI Homes property listings, condo for sale Philippines, DMCI accredited property consultant, real estate investment Philippines",
       },
       {
         property: "og:title",
-        content: "DMCI Homes Condos for Sale in Metro Manila | CityQlo",
+        content: "DMCI Homes Condos for Sale in the Philippines | CityQlo",
       },
       {
         property: "og:description",
         content:
-          "Browse DMCI Homes condos for sale in Metro Manila, curated by a DMCI Homes accredited property consultant.",
+          "Browse DMCI Homes condos for sale across the Philippines, curated by a DMCI Homes accredited property consultant.",
       },
       { property: "og:url", content: "https://cityqlo.com/properties" },
     ],
@@ -141,18 +141,27 @@ function PropertyCard({
           {/* Shimmer Skeleton */}
           {!imageLoaded && <Skeleton className="absolute inset-0 z-0 h-full w-full rounded-none" />}
 
-          {/* Status Badge */}
-          {property.status === "RFO" ? (
-            <img
-              src="/rfo.png"
-              alt="RFO — Ready for Occupancy"
-              className="absolute top-4 left-4 z-10 h-9 w-9 rounded-lg shadow-sm"
-            />
-          ) : (
-            <div className="absolute top-4 left-4 z-10 bg-white/90 backdrop-blur-md px-3.5 py-1 text-[10.5px] font-bold uppercase tracking-widest text-ink rounded-full shadow-sm">
-              {property.status}
-            </div>
-          )}
+          {/* Status Badge — building Status images */}
+          {(() => {
+            const s = (property.status ?? "").toLowerCase();
+            const src = /ready|rfo/.test(s)
+              ? "/building Status/rfo.png"
+              : /pre-?sell|construction|under/.test(s)
+                ? "/building Status/underconstruction.png"
+                : "/building Status/comingsoon.png";
+            const alt = /ready|rfo/.test(s)
+              ? "Ready for Occupancy"
+              : /pre-?sell|construction|under/.test(s)
+                ? "Under Construction"
+                : "Coming Soon";
+            return (
+              <img
+                src={src}
+                alt={alt}
+                className="absolute top-4 left-4 z-10 h-11 w-11 object-contain drop-shadow-md"
+              />
+            );
+          })()}
 
           {/* Share Button */}
           <button
@@ -185,9 +194,18 @@ function PropertyCard({
         <div className="mt-6 flex-1">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="font-mono tracking-widest uppercase text-[#3B82F6] text-[10px] font-bold">
-                {property.developer}
-              </p>
+              {/dmci/i.test(property.developer ?? "") ? (
+                <img
+                  src="/dmci-homes-seeklogo.png"
+                  alt="DMCI Homes"
+                  className="h-4 object-contain opacity-70 mb-0.5"
+                  draggable={false}
+                />
+              ) : (
+                <p className="font-mono tracking-widest uppercase text-[#3B82F6] text-[10px] font-bold">
+                  {property.developer}
+                </p>
+              )}
               <h3 className="text-[19px] font-bold tracking-tight text-ink mt-1.5 leading-snug group-hover:text-primary transition-colors">
                 {property.name}
               </h3>
@@ -269,8 +287,6 @@ function Properties() {
   });
 
   const propertiesData = useMemo(() => pageContent?.properties ?? [], [pageContent]);
-  const featuredDistrict = useMemo(() => pageContent?.featuredDistrict ?? {}, [pageContent]);
-  const showFeaturedDistrict = featuredDistrict?.enabled !== false;
 
   // Derive featured developments dynamically
   const featuredDevelopments = useMemo(() => {
@@ -888,110 +904,6 @@ function Properties() {
             </div>
           </div>
         </div>
-      )}
-
-      {/* "THE PASIG COLLECTION" — DARK INVERSION BLOCK */}
-      {showFeaturedDistrict && (
-        <section className="px-4 section-pad">
-          <div className="container-prose">
-            <div className="relative overflow-hidden rounded-[2.5rem] bg-ink px-8 py-16 text-white md:px-20 md:py-24 shadow-lift">
-              {/* Background elements */}
-              <div
-                aria-hidden
-                className="pointer-events-none absolute -right-32 -top-32 h-[32rem] w-[32rem] rounded-full opacity-30"
-                style={{
-                  background:
-                    "radial-gradient(closest-side, color-mix(in oklab, var(--primary) 40%, transparent), transparent 70%)",
-                }}
-              />
-              <div
-                aria-hidden
-                className="pointer-events-none absolute -bottom-48 -left-32 h-[28rem] w-[28rem] rounded-full opacity-20"
-                style={{
-                  background:
-                    "radial-gradient(closest-side, color-mix(in oklab, var(--gold) 25%, transparent), transparent 70%)",
-                }}
-              />
-
-              <div className="grid md:grid-cols-12 gap-12 md:gap-16 items-center relative z-10">
-                {/* Left Column: Asymmetric portrait image */}
-                <div className="md:col-span-5">
-                  <Reveal>
-                    <div className="img-luxe img-luxe-hover overflow-hidden rounded-3xl aspect-[3/4] max-w-sm mx-auto shadow-lift bg-[#18181b]">
-                      <img
-                        src={featuredDistrict?.image_url || towerImg}
-                        alt={`${featuredDistrict?.district_name || "Pasig"} architectural tower`}
-                        className="img-luxe h-full w-full object-cover"
-                        loading="lazy"
-                      />
-                    </div>
-                  </Reveal>
-                </div>
-
-                {/* Right Column: Collection details */}
-                <div className="md:col-span-7">
-                  <Reveal>
-                    <p className="font-mono tracking-[0.25em] text-[#60A5FA] text-[11px] uppercase font-bold">
-                      {featuredDistrict?.tagline || "Featured District"}
-                    </p>
-                    <h2 className="display-2 mt-6 text-white tracking-tighter leading-none">
-                      {featuredDistrict?.headline ? (
-                        renderHeadlineWithBreaks(featuredDistrict.headline)
-                      ) : (
-                        <>
-                          The Pasig
-                          <br />
-                          Collection.
-                        </>
-                      )}
-                    </h2>
-                    <p className="mt-8 text-[15px] leading-relaxed text-white/70 font-light max-w-xl">
-                      {featuredDistrict?.description ||
-                        "Pasig City stands as Metro Manila's residential sweet spot—blending central business accessibility to Ortigas, Bonifacio Global City, and Quezon City with expansive resort-inspired developments."}
-                    </p>
-                  </Reveal>
-
-                  {/* Stats Row */}
-                  <Reveal
-                    delay={140}
-                    className="mt-12 grid grid-cols-2 gap-8 border-t border-white/10 pt-10"
-                  >
-                    <div>
-                      <p className="text-[32px] md:text-[40px] font-extrabold tracking-tight text-white leading-none">
-                        {featuredDistrict?.projects_count ?? 12}
-                      </p>
-                      <p className="text-[10px] font-mono tracking-widest uppercase text-white/50 mt-3">
-                        Current Projects
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-[32px] md:text-[40px] font-extrabold tracking-tight text-white leading-none">
-                        {featuredDistrict?.entry_price || "₱4.8M+"}
-                      </p>
-                      <p className="text-[10px] font-mono tracking-widest uppercase text-white/50 mt-3">
-                        Entry Price
-                      </p>
-                    </div>
-                  </Reveal>
-
-                  {/* CTA Link */}
-                  <Reveal delay={240} className="mt-10">
-                    <button
-                      onClick={() => {
-                        setSelectedLocation(featuredDistrict?.district_name || "Pasig");
-                        scrollToResidences();
-                      }}
-                      className="inline-flex items-center gap-2 text-[12.5px] font-semibold tracking-wider uppercase text-white hover:text-[#60A5FA] transition-colors border-b border-white/20 pb-1 hover:border-[#60A5FA]/40"
-                    >
-                      View {featuredDistrict?.district_name || "Pasig"} listings{" "}
-                      <ArrowRight className="h-4.5 w-4.5" />
-                    </button>
-                  </Reveal>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
       )}
 
       {/* PROPERTY GRID (AVAILABLE RESIDENCES) */}

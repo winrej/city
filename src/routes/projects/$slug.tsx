@@ -931,6 +931,29 @@ function formatPrice(price: number) {
   return `₱${price.toLocaleString()}`;
 }
 
+// Build a Facebook Messenger deep link for the Page from whatever the portal
+// "Messenger URL" setting holds — a full m.me/facebook link, a bare "m.me/handle",
+// or just a Page username — falling back to the FloatingMessenger handle.
+// An optional `ref` (project slug + intent, e.g. "sonora-garden_pricelist") is
+// delivered to the Page inbox / webhook so you can see what the visitor clicked.
+// Note: Messenger no longer pre-fills visible message text; ref is metadata only.
+function buildMessengerUrl(handle: string | undefined, ref?: string) {
+  const raw = (handle || "").trim();
+  let base: string;
+  if (!raw) {
+    base = "https://m.me/cityqlo";
+  } else if (/^https?:\/\//i.test(raw)) {
+    base = raw;
+  } else if (raw.includes("/")) {
+    base = `https://${raw.replace(/^\/+/, "")}`;
+  } else {
+    base = `https://m.me/${raw}`;
+  }
+  const cleanRef = (ref || "").replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 60);
+  if (cleanRef) base += `${base.includes("?") ? "&" : "?"}ref=${cleanRef}`;
+  return base;
+}
+
 // Gallery image with a skeleton shimmer that fades into a cinematic reveal once
 // the bitmap decodes. Module-scoped so it isn't re-created on every render.
 function MediaCardImage({
@@ -988,6 +1011,18 @@ function ProjectDetailPage() {
   const viberUrl = isViberLink
     ? rawViber
     : `viber://chat?number=%2B${rawViber.replace(/[^0-9]/g, "")}`;
+
+  // Facebook Messenger — the #1 channel for PH real-estate inquiries. The three
+  // primary CTAs (Get Price List / Free Computation / Schedule Viewing) open the
+  // Page chat directly. `ref` carries the project slug + intent into the inbox.
+  const messengerHandle = contactSettings.messenger;
+  const messengerUrl = (intent: string) =>
+    buildMessengerUrl(messengerHandle, `${meta.id}_${intent}`);
+  const openMessenger = (intent: string) => {
+    if (typeof window !== "undefined") {
+      window.open(messengerUrl(intent), "_blank", "noopener,noreferrer");
+    }
+  };
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -1302,7 +1337,7 @@ function ProjectDetailPage() {
           {/* Primary CTA */}
           <button
             id="widget-get-price-list"
-            onClick={() => setPriceListOpen(true)}
+            onClick={() => openMessenger("pricelist")}
             className={`w-full flex items-center justify-center gap-2 px-4 py-3.5 text-[12.5px] font-bold tracking-wide transition-all duration-300 cursor-pointer ${
               idlePulse
                 ? "bg-primary text-white animate-pulse"
@@ -1318,7 +1353,7 @@ function ProjectDetailPage() {
           <div className="p-3 flex flex-col gap-2">
             <button
               id="widget-free-computation"
-              onClick={() => setPriceListOpen(true)}
+              onClick={() => openMessenger("computation")}
               className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl bg-surface text-ink text-[12px] font-semibold hover:bg-border/40 transition-colors cursor-pointer"
             >
               <Zap size={13} className="text-primary" />
@@ -1326,7 +1361,7 @@ function ProjectDetailPage() {
             </button>
             <button
               id="widget-schedule-viewing"
-              onClick={scrollToForm}
+              onClick={() => openMessenger("viewing")}
               className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl bg-surface text-ink text-[12px] font-semibold hover:bg-border/40 transition-colors cursor-pointer"
             >
               <Eye size={13} className="text-primary" />
@@ -1405,7 +1440,7 @@ function ProjectDetailPage() {
           </button>
           <button
             id="mobile-bar-price-list"
-            onClick={() => setPriceListOpen(true)}
+            onClick={() => openMessenger("pricelist")}
             className="flex-[2] flex items-center justify-center gap-2 bg-primary text-white text-[12.5px] font-bold tracking-wide cursor-pointer hover:bg-primary/90 transition-colors"
           >
             <FileText size={15} />
@@ -2240,7 +2275,7 @@ function ProjectDetailPage() {
                     </table>
                     <div className="px-5 py-3 bg-primary/5 border-t border-border/50">
                       <button
-                        onClick={() => setPriceListOpen(true)}
+                        onClick={() => openMessenger("pricelist")}
                         className="w-full flex items-center justify-center gap-2 py-3 bg-primary text-white font-bold rounded-xl text-[13.5px] hover:bg-primary/90 transition-colors cursor-pointer"
                       >
                         <FileText size={15} />
@@ -2747,7 +2782,7 @@ function ProjectDetailPage() {
                       {unit.description}
                     </p>
                     <button
-                      onClick={scrollToForm}
+                      onClick={() => openMessenger(`unit-${unit.name.replace(/\s+/g, "")}`)}
                       className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border-2 border-primary/20 text-primary text-[12.5px] font-bold hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 cursor-pointer"
                     >
                       Get Details <ArrowRight size={13} />
@@ -2810,7 +2845,7 @@ function ProjectDetailPage() {
                   Not sure which unit fits your budget and goals?
                 </p>
                 <button
-                  onClick={scrollToForm}
+                  onClick={() => openMessenger("computation")}
                   className="inline-flex items-center gap-2 bg-ink text-white px-7 py-3.5 rounded-full text-[13px] font-bold tracking-wide hover:-translate-y-0.5 hover:shadow-lift transition-all duration-500 cursor-pointer"
                 >
                   Get a Free Personalized Computation <ArrowRight size={15} />

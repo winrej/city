@@ -54,118 +54,159 @@ export function BottomNav() {
     }
   };
 
-  // Shared classes
-  const tabBase =
-    "flex flex-1 flex-col items-center justify-center gap-0.5 py-1 rounded-2xl transition-all duration-300 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary";
-
-  const labelBase = "text-[9px] font-sans font-semibold tracking-[0.08em] uppercase leading-none";
+  const visible = hasScrolledPastHero && !isScrolling;
 
   return (
     <nav
       aria-label="Mobile Navigation"
-      className="fixed inset-x-3 z-40 md:hidden transition-transform duration-500 max-w-sm mx-auto"
+      className="fixed inset-x-4 z-40 md:hidden max-w-[380px] mx-auto"
       style={{
-        bottom: "calc(0.85rem + env(safe-area-inset-bottom))",
-        transform:
-          isScrolling || !hasScrolledPastHero ? "translateY(calc(100% + 32px))" : "translateY(0)",
-        transitionTimingFunction: "var(--ease-luxe)",
+        bottom: "calc(1rem + env(safe-area-inset-bottom))",
+        transform: visible ? "translateY(0) scale(1)" : "translateY(calc(100% + 40px)) scale(0.96)",
+        opacity: visible ? 1 : 0,
+        transition: "transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease",
       }}
     >
+      {/* Bar */}
       <div
-        className="flex items-center justify-between rounded-[22px] border border-black/[0.07] bg-white/90 px-1 py-1 shadow-[0_12px_40px_-8px_rgba(0,0,0,0.16),0_2px_8px_-2px_rgba(0,0,0,0.06)]"
+        className="relative flex items-center justify-between px-2 py-1.5"
         style={{
-          backdropFilter: "blur(20px) saturate(180%)",
-          WebkitBackdropFilter: "blur(20px) saturate(180%)",
+          background: "oklch(0.21 0.012 252 / 0.96)",
+          borderRadius: "22px",
+          border: "1px solid oklch(1 0 0 / 0.08)",
+          backdropFilter: "blur(24px) saturate(180%)",
+          WebkitBackdropFilter: "blur(24px) saturate(180%)",
+          boxShadow:
+            "0 20px 60px -8px oklch(0.21 0.012 252 / 0.55), 0 4px 16px -4px oklch(0 0 0 / 0.3), inset 0 1px 0 oklch(1 0 0 / 0.06)",
         }}
       >
-        {/* Tab 1: Home */}
-        <Link
+        {/* Gold hairline top rule */}
+        <div
+          aria-hidden
+          className="absolute top-0 left-8 right-8 h-px rounded-full"
+          style={{
+            background:
+              "linear-gradient(to right, transparent, oklch(0.74 0.137 79 / 0.35), transparent)",
+          }}
+        />
+
+        {/* Tab: Home */}
+        <NavTab
           to="/"
-          aria-current={isHomeActive ? "page" : undefined}
-          className={`${tabBase} ${isHomeActive ? "text-[#1A56DB]" : "text-ink/45 hover:text-ink/70"}`}
-        >
-          <span
-            className={`flex items-center justify-center rounded-xl transition-all duration-300 ${
-              isHomeActive ? "bg-[#1A56DB]/10 px-3 py-1.5" : "px-3 py-1.5"
-            }`}
-          >
-            <Compass size={19} strokeWidth={isHomeActive ? 2.25 : 1.75} />
-          </span>
-          <span className={`${labelBase} ${isHomeActive ? "text-[#1A56DB]" : "text-ink/40"}`}>
-            Home
-          </span>
-        </Link>
+          label="Home"
+          icon={<Compass size={18} strokeWidth={isHomeActive ? 2.2 : 1.6} />}
+          active={isHomeActive}
+        />
 
-        {/* Tab 2: Properties */}
-        <Link
+        {/* Tab: Browse */}
+        <NavTab
           to="/properties"
+          label="Browse"
+          icon={<LayoutGrid size={18} strokeWidth={isPropertiesActive ? 2.2 : 1.6} />}
+          active={isPropertiesActive}
           search={{} as any}
-          aria-current={isPropertiesActive ? "page" : undefined}
-          className={`${tabBase} ${isPropertiesActive ? "text-[#1A56DB]" : "text-ink/45 hover:text-ink/70"}`}
-        >
-          <span
-            className={`flex items-center justify-center rounded-xl transition-all duration-300 ${
-              isPropertiesActive ? "bg-[#1A56DB]/10 px-3 py-1.5" : "px-3 py-1.5"
-            }`}
-          >
-            <LayoutGrid size={19} strokeWidth={isPropertiesActive ? 2.25 : 1.75} />
-          </span>
-          <span className={`${labelBase} ${isPropertiesActive ? "text-[#1A56DB]" : "text-ink/40"}`}>
-            Browse
-          </span>
-        </Link>
+        />
 
-        {/* Tab 3: Center Search FAB */}
-        <div className="flex flex-1 justify-center items-center relative h-12">
+        {/* Center FAB */}
+        <div className="flex flex-1 justify-center items-center relative" style={{ height: 56 }}>
           <button
             onClick={handleSearchClick}
             aria-label="Search Properties"
-            className="absolute -top-5 w-14 h-14 rounded-full bg-[#1A56DB] text-white active:scale-95 transition-all duration-300 flex items-center justify-center cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A56DB] focus-visible:ring-offset-2"
+            className="absolute flex items-center justify-center cursor-pointer active:scale-90 focus-visible:outline-none"
             style={{
-              boxShadow: "0 6px 24px rgba(26, 86, 219, 0.45), 0 2px 8px rgba(0,0,0,0.12)",
-              border: "3px solid white",
+              top: "-22px",
+              width: 52,
+              height: 52,
+              borderRadius: "50%",
+              background: "oklch(0.43 0.2 258)",
+              border: "2.5px solid oklch(0.21 0.012 252)",
+              boxShadow:
+                "0 0 0 1px oklch(0.43 0.2 258 / 0.4), 0 8px 28px oklch(0.43 0.2 258 / 0.55), 0 2px 8px oklch(0 0 0 / 0.3)",
+              color: "white",
+              transition: "transform 0.2s cubic-bezier(0.22,1,0.36,1), box-shadow 0.2s ease",
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLElement).style.transform = "scale(1.08)";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLElement).style.transform = "scale(1)";
             }}
           >
-            <SlidersHorizontal size={20} strokeWidth={2.25} />
+            <SlidersHorizontal size={19} strokeWidth={2.2} />
           </button>
         </div>
 
-        {/* Tab 4: Guides */}
-        <Link
+        {/* Tab: Guides */}
+        <NavTab
           to="/guides"
-          aria-current={isGuidesActive ? "page" : undefined}
-          className={`${tabBase} ${isGuidesActive ? "text-[#1A56DB]" : "text-ink/45 hover:text-ink/70"}`}
-        >
-          <span
-            className={`flex items-center justify-center rounded-xl transition-all duration-300 ${
-              isGuidesActive ? "bg-[#1A56DB]/10 px-3 py-1.5" : "px-3 py-1.5"
-            }`}
-          >
-            <Newspaper size={19} strokeWidth={isGuidesActive ? 2.25 : 1.75} />
-          </span>
-          <span className={`${labelBase} ${isGuidesActive ? "text-[#1A56DB]" : "text-ink/40"}`}>
-            Guides
-          </span>
-        </Link>
+          label="Guides"
+          icon={<Newspaper size={18} strokeWidth={isGuidesActive ? 2.2 : 1.6} />}
+          active={isGuidesActive}
+        />
 
-        {/* Tab 5: Contact */}
-        <Link
+        {/* Tab: Inquire */}
+        <NavTab
           to="/contact"
-          aria-current={isContactActive ? "page" : undefined}
-          className={`${tabBase} ${isContactActive ? "text-[#1A56DB]" : "text-ink/45 hover:text-ink/70"}`}
-        >
-          <span
-            className={`flex items-center justify-center rounded-xl transition-all duration-300 ${
-              isContactActive ? "bg-[#1A56DB]/10 px-3 py-1.5" : "px-3 py-1.5"
-            }`}
-          >
-            <Phone size={19} strokeWidth={isContactActive ? 2.25 : 1.75} />
-          </span>
-          <span className={`${labelBase} ${isContactActive ? "text-[#1A56DB]" : "text-ink/40"}`}>
-            Inquire
-          </span>
-        </Link>
+          label="Inquire"
+          icon={<Phone size={18} strokeWidth={isContactActive ? 2.2 : 1.6} />}
+          active={isContactActive}
+        />
       </div>
     </nav>
+  );
+}
+
+function NavTab({
+  to,
+  label,
+  icon,
+  active,
+  search,
+}: {
+  to: string;
+  label: string;
+  icon: React.ReactNode;
+  active: boolean;
+  search?: any;
+}) {
+  return (
+    <Link
+      to={to}
+      search={search}
+      aria-current={active ? "page" : undefined}
+      className="flex flex-1 flex-col items-center justify-center gap-1 py-1.5 rounded-2xl focus-visible:outline-none group"
+      style={{
+        transition: "color 0.2s ease",
+        color: active ? "oklch(0.74 0.137 79)" : "oklch(1 0 0 / 0.38)",
+        minHeight: 44,
+      }}
+    >
+      {/* Icon pill — gold glow when active */}
+      <span
+        className="flex items-center justify-center rounded-xl transition-all duration-300"
+        style={{
+          padding: "4px 10px",
+          background: active ? "oklch(0.74 0.137 79 / 0.12)" : "transparent",
+        }}
+      >
+        {icon}
+      </span>
+
+      {/* Label */}
+      <span
+        style={{
+          fontSize: "8.5px",
+          fontFamily: "var(--font-sans)",
+          fontWeight: 700,
+          letterSpacing: "0.1em",
+          textTransform: "uppercase",
+          lineHeight: 1,
+          color: active ? "oklch(0.74 0.137 79)" : "oklch(1 0 0 / 0.3)",
+          transition: "color 0.2s ease",
+        }}
+      >
+        {label}
+      </span>
+    </Link>
   );
 }
