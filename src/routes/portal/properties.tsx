@@ -143,15 +143,33 @@ function CloudinaryImageInput({
 
   return (
     <div className="portal-field">
-      <label className="portal-field-label" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <label
+        className="portal-field-label"
+        style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
+      >
         <span>
-          {label} {optional && <span style={{ color: "var(--zinc-500)", fontWeight: 400, fontSize: "11px" }}>(Optional)</span>}
+          {label}{" "}
+          {optional && (
+            <span style={{ color: "var(--zinc-500)", fontWeight: 400, fontSize: "11px" }}>
+              (Optional)
+            </span>
+          )}
         </span>
-        <span style={{ fontSize: "11px", padding: "2px 6px", borderRadius: "4px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "var(--zinc-400)", fontFamily: "monospace" }}>
+        <span
+          style={{
+            fontSize: "11px",
+            padding: "2px 6px",
+            borderRadius: "4px",
+            background: "rgba(255,255,255,0.05)",
+            border: "1px solid rgba(255,255,255,0.1)",
+            color: "var(--zinc-400)",
+            fontFamily: "monospace",
+          }}
+        >
           {aspectRatioLabel}
         </span>
       </label>
-      
+
       <div style={{ position: "relative" }}>
         <input
           type="url"
@@ -165,24 +183,102 @@ function CloudinaryImageInput({
           }}
         />
         {value && (
-          <div style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", display: "flex", alignItems: "center" }}>
+          <div
+            style={{
+              position: "absolute",
+              right: "12px",
+              top: "50%",
+              transform: "translateY(-50%)",
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
             {isCloudinary ? (
-              <span style={{ fontSize: "10px", color: "oklch(0.65 0.18 145)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" }}>Cloudinary ✓</span>
+              <span
+                style={{
+                  fontSize: "10px",
+                  color: "oklch(0.65 0.18 145)",
+                  fontWeight: 700,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.05em",
+                }}
+              >
+                Cloudinary ✓
+              </span>
             ) : (
-              <span style={{ fontSize: "10px", color: "oklch(0.74 0.137 79)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" }}>External Link</span>
+              <span
+                style={{
+                  fontSize: "10px",
+                  color: "oklch(0.74 0.137 79)",
+                  fontWeight: 700,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.05em",
+                }}
+              >
+                External Link
+              </span>
             )}
           </div>
         )}
       </div>
 
-      <p style={{ fontSize: "11.5px", color: "var(--zinc-400)", marginTop: "0.25rem", marginBottom: 0, display: "flex", alignItems: "center", gap: "0.25rem" }}>
+      <p
+        style={{
+          fontSize: "11.5px",
+          color: "var(--zinc-400)",
+          marginTop: "0.25rem",
+          marginBottom: 0,
+          display: "flex",
+          alignItems: "center",
+          gap: "0.25rem",
+        }}
+      >
         <span>💡</span> {description || "Please paste a direct Cloudinary image URL link."}
       </p>
 
       {value && (
-        <div style={{ marginTop: "0.75rem", padding: "0.5rem", background: "rgba(255,255,255,0.01)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "10px", display: "flex", alignItems: "center", gap: "0.75rem" }}>
-          <div style={{ width: "64px", height: "48px", background: "rgba(0,0,0,0.2)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "6px", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", flexShrink: 0 }}>
-            {loading && <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.6)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "10px" }}>...</div>}
+        <div
+          style={{
+            marginTop: "0.75rem",
+            padding: "0.5rem",
+            background: "rgba(255,255,255,0.01)",
+            border: "1px solid rgba(255,255,255,0.05)",
+            borderRadius: "10px",
+            display: "flex",
+            alignItems: "center",
+            gap: "0.75rem",
+          }}
+        >
+          <div
+            style={{
+              width: "64px",
+              height: "48px",
+              background: "rgba(0,0,0,0.2)",
+              border: "1px solid rgba(255,255,255,0.1)",
+              borderRadius: "6px",
+              overflow: "hidden",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              position: "relative",
+              flexShrink: 0,
+            }}
+          >
+            {loading && (
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  background: "rgba(0,0,0,0.6)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "10px",
+                }}
+              >
+                ...
+              </div>
+            )}
             <img
               src={value}
               alt="Preview"
@@ -200,11 +296,31 @@ function CloudinaryImageInput({
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
             {imageError ? (
-              <p style={{ fontSize: "12px", color: "#f87171", fontWeight: 600, margin: 0, display: "flex", alignItems: "center", gap: "0.35rem" }}>
+              <p
+                style={{
+                  fontSize: "12px",
+                  color: "#f87171",
+                  fontWeight: 600,
+                  margin: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.35rem",
+                }}
+              >
                 ⚠️ Could not load image. Make sure the URL is valid.
               </p>
             ) : (
-              <p style={{ fontSize: "11.5px", color: "oklch(0.65 0.18 145)", fontWeight: 600, margin: 0, display: "flex", alignItems: "center", gap: "0.35rem" }}>
+              <p
+                style={{
+                  fontSize: "11.5px",
+                  color: "oklch(0.65 0.18 145)",
+                  fontWeight: 600,
+                  margin: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.35rem",
+                }}
+              >
                 ✓ Image loaded successfully
               </p>
             )}
@@ -319,7 +435,9 @@ function PropertyFormModal({
     );
   };
 
-  const [activeTab, setActiveTab] = useState<"general" | "gallery" | "units" | "amenities" | "seo" | "publish">("general");
+  const [activeTab, setActiveTab] = useState<
+    "general" | "gallery" | "units" | "amenities" | "seo" | "publish"
+  >("general");
 
   return (
     <div className="portal-detail-overlay" onClick={onClose}>
@@ -335,7 +453,7 @@ function PropertyFormModal({
           borderRadius: "16px",
           border: "1px solid var(--portal-border)",
           boxShadow: "0 24px 64px rgba(0, 0, 0, 0.4)",
-          overflow: "hidden"
+          overflow: "hidden",
         }}
       >
         {/* Header */}
@@ -344,8 +462,16 @@ function PropertyFormModal({
             <h2 className="portal-detail-name" style={{ fontSize: "1.25rem", fontWeight: 800 }}>
               {mode === "create" ? "Add New Property Listing" : "Edit Property Listing"}
             </h2>
-            <p style={{ margin: "0.25rem 0 0 0", fontSize: "12px", color: "var(--portal-text-muted)" }}>
-              {mode === "create" ? "Create a new public card layout and link it to projects." : `Editing: ${form.name}`}
+            <p
+              style={{
+                margin: "0.25rem 0 0 0",
+                fontSize: "12px",
+                color: "var(--portal-text-muted)",
+              }}
+            >
+              {mode === "create"
+                ? "Create a new public card layout and link it to projects."
+                : `Editing: ${form.name}`}
             </p>
           </div>
           <button className="portal-detail-close" onClick={onClose} style={{ fontSize: "1.5rem" }}>
@@ -354,7 +480,9 @@ function PropertyFormModal({
         </div>
 
         {/* Main Panel Content with Sidebar */}
-        <div style={{ display: "flex", flex: 1, overflow: "hidden", background: "var(--portal-bg)" }}>
+        <div
+          style={{ display: "flex", flex: 1, overflow: "hidden", background: "var(--portal-bg)" }}
+        >
           {/* Sidebar Navigation */}
           <div
             style={{
@@ -366,7 +494,7 @@ function PropertyFormModal({
               gap: "0.35rem",
               padding: "1.25rem 0.75rem",
               overflowY: "auto",
-              flexShrink: 0
+              flexShrink: 0,
             }}
           >
             {[
@@ -375,7 +503,7 @@ function PropertyFormModal({
               { id: "units", label: "Units & Pricing", icon: "🏢" },
               { id: "amenities", label: "Details & Tags", icon: "✨" },
               { id: "seo", label: "Web Link Address", icon: "🌐" },
-              { id: "publish", label: "Publish Settings", icon: "🚀" }
+              { id: "publish", label: "Publish Settings", icon: "🚀" },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -394,7 +522,7 @@ function PropertyFormModal({
                   border: "none",
                   cursor: "pointer",
                   textAlign: "left",
-                  transition: "all 0.2s"
+                  transition: "all 0.2s",
                 }}
               >
                 <span style={{ fontSize: "15px" }}>{tab.icon}</span>
@@ -411,7 +539,7 @@ function PropertyFormModal({
               overflowY: "auto",
               display: "flex",
               flexDirection: "column",
-              gap: "1.5rem"
+              gap: "1.5rem",
             }}
           >
             {/* GENERAL TAB */}
@@ -425,8 +553,16 @@ function PropertyFormModal({
                     value={form.name}
                     onChange={(e) => set("name", e.target.value)}
                   />
-                  <p style={{ fontSize: "11px", color: "var(--zinc-500)", marginTop: "0.25rem", marginBottom: 0 }}>
-                    The public name of the project. A web link address will be generated automatically.
+                  <p
+                    style={{
+                      fontSize: "11px",
+                      color: "var(--zinc-500)",
+                      marginTop: "0.25rem",
+                      marginBottom: 0,
+                    }}
+                  >
+                    The public name of the project. A web link address will be generated
+                    automatically.
                   </p>
                   {duplicateWarning && (
                     <div
@@ -440,12 +576,14 @@ function PropertyFormModal({
                         alignItems: "center",
                         gap: "0.5rem",
                         fontSize: "12px",
-                        color: "oklch(0.74 0.137 79)"
+                        color: "oklch(0.74 0.137 79)",
                       }}
                     >
                       <AlertTriangle size={15} style={{ flexShrink: 0 }} />
                       <span>
-                        <strong>Warning:</strong> Similar active property detected ({duplicateWarning.count} match(es) on {duplicateWarning.reasons}: <em>{duplicateWarning.names}</em>).
+                        <strong>Warning:</strong> Similar active property detected (
+                        {duplicateWarning.count} match(es) on {duplicateWarning.reasons}:{" "}
+                        <em>{duplicateWarning.names}</em>).
                       </span>
                     </div>
                   )}
@@ -460,7 +598,14 @@ function PropertyFormModal({
                       value={form.developer}
                       onChange={(e) => set("developer", e.target.value)}
                     />
-                    <p style={{ fontSize: "11px", color: "var(--zinc-500)", marginTop: "0.25rem", marginBottom: 0 }}>
+                    <p
+                      style={{
+                        fontSize: "11px",
+                        color: "var(--zinc-500)",
+                        marginTop: "0.25rem",
+                        marginBottom: 0,
+                      }}
+                    >
                       The developer building the project. Default is <strong>DMCI Homes</strong>.
                     </p>
                   </div>
@@ -472,7 +617,14 @@ function PropertyFormModal({
                       value={form.city}
                       onChange={(e) => set("city", e.target.value)}
                     />
-                    <p style={{ fontSize: "11px", color: "var(--zinc-500)", marginTop: "0.25rem", marginBottom: 0 }}>
+                    <p
+                      style={{
+                        fontSize: "11px",
+                        color: "var(--zinc-500)",
+                        marginTop: "0.25rem",
+                        marginBottom: 0,
+                      }}
+                    >
                       Full location address displayed on public pages.
                     </p>
                   </div>
@@ -486,8 +638,16 @@ function PropertyFormModal({
                     value={form.location}
                     onChange={(e) => set("location", e.target.value)}
                   />
-                  <p style={{ fontSize: "11px", color: "var(--zinc-500)", marginTop: "0.25rem", marginBottom: 0 }}>
-                    The target district/city name used for search filters (e.g. <strong>Las Piñas</strong>).
+                  <p
+                    style={{
+                      fontSize: "11px",
+                      color: "var(--zinc-500)",
+                      marginTop: "0.25rem",
+                      marginBottom: 0,
+                    }}
+                  >
+                    The target district/city name used for search filters (e.g.{" "}
+                    <strong>Las Piñas</strong>).
                   </p>
                 </div>
               </>
@@ -518,7 +678,14 @@ function PropertyFormModal({
                       value={form.price_display}
                       onChange={(e) => set("price_display", e.target.value)}
                     />
-                    <p style={{ fontSize: "11px", color: "var(--zinc-500)", marginTop: "0.25rem", marginBottom: 0 }}>
+                    <p
+                      style={{
+                        fontSize: "11px",
+                        color: "var(--zinc-500)",
+                        marginTop: "0.25rem",
+                        marginBottom: 0,
+                      }}
+                    >
                       Starting price label shown on cards (e.g. <strong>₱5.6M</strong>).
                     </p>
                   </div>
@@ -533,8 +700,18 @@ function PropertyFormModal({
                       value={form.price_min || ""}
                       onChange={(e) => set("price_min", parseFloat(e.target.value) || 0)}
                     />
-                    <p style={{ fontSize: "11px", color: form.price_min ? "oklch(0.65 0.18 145)" : "var(--zinc-500)", marginTop: "0.25rem", marginBottom: 0, fontWeight: form.price_min ? 600 : 400 }}>
-                      {form.price_min ? `✓ Entering ${form.price_min} = ₱${(form.price_min * 1_000_000).toLocaleString()} PHP` : "Minimum numeric price value used for sorting."}
+                    <p
+                      style={{
+                        fontSize: "11px",
+                        color: form.price_min ? "oklch(0.65 0.18 145)" : "var(--zinc-500)",
+                        marginTop: "0.25rem",
+                        marginBottom: 0,
+                        fontWeight: form.price_min ? 600 : 400,
+                      }}
+                    >
+                      {form.price_min
+                        ? `✓ Entering ${form.price_min} = ₱${(form.price_min * 1_000_000).toLocaleString()} PHP`
+                        : "Minimum numeric price value used for sorting."}
                     </p>
                   </div>
                 </div>
@@ -548,7 +725,14 @@ function PropertyFormModal({
                       value={form.price_max_display}
                       onChange={(e) => set("price_max_display", e.target.value)}
                     />
-                    <p style={{ fontSize: "11px", color: "var(--zinc-500)", marginTop: "0.25rem", marginBottom: 0 }}>
+                    <p
+                      style={{
+                        fontSize: "11px",
+                        color: "var(--zinc-500)",
+                        marginTop: "0.25rem",
+                        marginBottom: 0,
+                      }}
+                    >
                       Optional maximum price label (e.g. <strong>₱11.2M</strong>).
                     </p>
                   </div>
@@ -563,13 +747,29 @@ function PropertyFormModal({
                       value={form.price_max || ""}
                       onChange={(e) => set("price_max", parseFloat(e.target.value) || 0)}
                     />
-                    <p style={{ fontSize: "11px", color: form.price_max ? "oklch(0.65 0.18 145)" : "var(--zinc-500)", marginTop: "0.25rem", marginBottom: 0, fontWeight: form.price_max ? 600 : 400 }}>
-                      {form.price_max ? `✓ Entering ${form.price_max} = ₱${(form.price_max * 1_000_000).toLocaleString()} PHP` : "Optional maximum numeric price value for range filter."}
+                    <p
+                      style={{
+                        fontSize: "11px",
+                        color: form.price_max ? "oklch(0.65 0.18 145)" : "var(--zinc-500)",
+                        marginTop: "0.25rem",
+                        marginBottom: 0,
+                        fontWeight: form.price_max ? 600 : 400,
+                      }}
+                    >
+                      {form.price_max
+                        ? `✓ Entering ${form.price_max} = ₱${(form.price_max * 1_000_000).toLocaleString()} PHP`
+                        : "Optional maximum numeric price value for range filter."}
                     </p>
                   </div>
                 </div>
 
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 2fr 1.5fr", gap: "0.75rem" }}>
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr 2fr 1.5fr",
+                    gap: "0.75rem",
+                  }}
+                >
                   <div className="portal-field">
                     <label className="portal-field-label">Beds</label>
                     <input
@@ -641,7 +841,14 @@ function PropertyFormModal({
                       <Plus size={14} />
                     </button>
                   </div>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem", marginTop: "0.5rem" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      gap: "0.4rem",
+                      marginTop: "0.5rem",
+                    }}
+                  >
                     {["Studio", "1BR", "2BR", "3BR", "Penthouse"]
                       .filter((t) => !form.unit_types.includes(t))
                       .map((t) => (
@@ -656,7 +863,7 @@ function PropertyFormModal({
                             padding: "0.2rem 0.65rem",
                             fontSize: "11px",
                             color: "var(--zinc-400)",
-                            cursor: "pointer"
+                            cursor: "pointer",
                           }}
                         >
                           + {t}
@@ -664,7 +871,14 @@ function PropertyFormModal({
                       ))}
                   </div>
                   {form.unit_types.length > 0 && (
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem", marginTop: "0.5rem" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexWrap: "wrap",
+                        gap: "0.4rem",
+                        marginTop: "0.5rem",
+                      }}
+                    >
                       {form.unit_types.map((u, i) => (
                         <span
                           key={i}
@@ -677,7 +891,7 @@ function PropertyFormModal({
                             borderRadius: "999px",
                             padding: "0.2rem 0.65rem",
                             fontSize: "11px",
-                            color: "var(--zinc-200)"
+                            color: "var(--zinc-200)",
                           }}
                         >
                           {u}
@@ -690,7 +904,7 @@ function PropertyFormModal({
                               cursor: "pointer",
                               color: "var(--zinc-400)",
                               lineHeight: 1,
-                              padding: 0
+                              padding: 0,
                             }}
                           >
                             ✕
@@ -744,7 +958,14 @@ function PropertyFormModal({
                     </button>
                   </div>
                   {form.highlights.length > 0 && (
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem", marginTop: "0.5rem" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexWrap: "wrap",
+                        gap: "0.4rem",
+                        marginTop: "0.5rem",
+                      }}
+                    >
                       {form.highlights.map((h, i) => (
                         <span
                           key={i}
@@ -757,7 +978,7 @@ function PropertyFormModal({
                             borderRadius: "999px",
                             padding: "0.2rem 0.65rem",
                             fontSize: "11px",
-                            color: "var(--zinc-200)"
+                            color: "var(--zinc-200)",
                           }}
                         >
                           {h}
@@ -770,7 +991,7 @@ function PropertyFormModal({
                               cursor: "pointer",
                               color: "var(--zinc-400)",
                               lineHeight: 1,
-                              padding: 0
+                              padding: 0,
                             }}
                           >
                             ✕
@@ -789,12 +1010,19 @@ function PropertyFormModal({
                     value={form.promo_badge || ""}
                     onChange={(e) => set("promo_badge", e.target.value)}
                   />
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem", marginTop: "0.5rem" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      gap: "0.4rem",
+                      marginTop: "0.5rem",
+                    }}
+                  >
                     {[
                       "Featured Development",
                       "Spotlight Residence",
                       "Premium Luxury",
-                      "Limited Offer"
+                      "Limited Offer",
                     ].map((badge) => (
                       <button
                         type="button"
@@ -808,7 +1036,7 @@ function PropertyFormModal({
                           padding: "3px 8px",
                           color: "var(--zinc-350)",
                           cursor: "pointer",
-                          transition: "all 0.2s"
+                          transition: "all 0.2s",
                         }}
                       >
                         {badge}
@@ -825,7 +1053,7 @@ function PropertyFormModal({
                           borderRadius: "6px",
                           padding: "3px 8px",
                           color: "#f87171",
-                          cursor: "pointer"
+                          cursor: "pointer",
                         }}
                       >
                         Clear Tag
@@ -849,7 +1077,7 @@ function PropertyFormModal({
                       borderRadius: "8px",
                       fontSize: "12px",
                       fontFamily: "monospace",
-                      color: "var(--zinc-400)"
+                      color: "var(--zinc-400)",
                     }}
                   >
                     <span>https://cityqlo.com/projects/</span>
@@ -863,8 +1091,18 @@ function PropertyFormModal({
                         : "[property-name]"}
                     </span>
                   </div>
-                  <p style={{ fontSize: "11.5px", color: "var(--zinc-500)", marginTop: "0.5rem", marginBottom: 0, lineHeight: "1.4" }}>
-                    The webpage link address is generated automatically from the property name. It is clean, lowercase, and contains no special characters to ensure search engines (Google) index it correctly.
+                  <p
+                    style={{
+                      fontSize: "11.5px",
+                      color: "var(--zinc-500)",
+                      marginTop: "0.5rem",
+                      marginBottom: 0,
+                      lineHeight: "1.4",
+                    }}
+                  >
+                    The webpage link address is generated automatically from the property name. It
+                    is clean, lowercase, and contains no special characters to ensure search engines
+                    (Google) index it correctly.
                   </p>
                 </div>
               </>
@@ -882,7 +1120,14 @@ function PropertyFormModal({
                       value={form.display_order}
                       onChange={(e) => set("display_order", parseInt(e.target.value) || 0)}
                     />
-                    <p style={{ fontSize: "11px", color: "var(--zinc-500)", marginTop: "0.25rem", marginBottom: 0 }}>
+                    <p
+                      style={{
+                        fontSize: "11px",
+                        color: "var(--zinc-500)",
+                        marginTop: "0.25rem",
+                        marginBottom: 0,
+                      }}
+                    >
                       Used for sorting. Higher numbers are listed first.
                     </p>
                   </div>
@@ -895,7 +1140,14 @@ function PropertyFormModal({
                       value={form.featured_rank}
                       onChange={(e) => set("featured_rank", parseInt(e.target.value) || 0)}
                     />
-                    <p style={{ fontSize: "11px", color: "var(--zinc-500)", marginTop: "0.25rem", marginBottom: 0 }}>
+                    <p
+                      style={{
+                        fontSize: "11px",
+                        color: "var(--zinc-500)",
+                        marginTop: "0.25rem",
+                        marginBottom: 0,
+                      }}
+                    >
                       Determines display sequence in the homepage showcase block.
                     </p>
                   </div>
@@ -903,26 +1155,62 @@ function PropertyFormModal({
 
                 <div className="portal-field">
                   <label className="portal-field-label">Visibility Status &amp; Flags</label>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", paddingTop: "0.25rem" }}>
-                    <label style={{ display: "flex", alignItems: "center", gap: "0.6rem", cursor: "pointer", fontSize: "13px" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "0.75rem",
+                      paddingTop: "0.25rem",
+                    }}
+                  >
+                    <label
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.6rem",
+                        cursor: "pointer",
+                        fontSize: "13px",
+                      }}
+                    >
                       <input
                         type="checkbox"
                         checked={form.is_active}
                         onChange={(e) => set("is_active", e.target.checked)}
                       />
-                      <span><strong>Active Visibility</strong> (visible publicly to visitors on the website)</span>
+                      <span>
+                        <strong>Active Visibility</strong> (visible publicly to visitors on the
+                        website)
+                      </span>
                     </label>
 
-                    <label style={{ display: "flex", alignItems: "center", gap: "0.6rem", cursor: "pointer", fontSize: "13px" }}>
+                    <label
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.6rem",
+                        cursor: "pointer",
+                        fontSize: "13px",
+                      }}
+                    >
                       <input
                         type="checkbox"
                         checked={form.is_featured}
                         onChange={(e) => set("is_featured", e.target.checked)}
                       />
-                      <span><strong>Featured Status</strong> (list inside the primary showcase rows)</span>
+                      <span>
+                        <strong>Featured Status</strong> (list inside the primary showcase rows)
+                      </span>
                     </label>
 
-                    <label style={{ display: "flex", alignItems: "center", gap: "0.6rem", cursor: "pointer", fontSize: "13px" }}>
+                    <label
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.6rem",
+                        cursor: "pointer",
+                        fontSize: "13px",
+                      }}
+                    >
                       <input
                         type="checkbox"
                         checked={form.is_spotlight}
@@ -934,7 +1222,17 @@ function PropertyFormModal({
                     </label>
 
                     {mode === "create" && (
-                      <label style={{ display: "flex", alignItems: "center", gap: "0.6rem", cursor: "pointer", fontSize: "13px", color: "oklch(0.74 0.137 79)", fontWeight: 700 }}>
+                      <label
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "0.6rem",
+                          cursor: "pointer",
+                          fontSize: "13px",
+                          color: "oklch(0.74 0.137 79)",
+                          fontWeight: 700,
+                        }}
+                      >
                         <input
                           type="checkbox"
                           checked={form.autoCreateProject}
@@ -959,7 +1257,7 @@ function PropertyFormModal({
             display: "flex",
             justifyContent: "flex-end",
             gap: "0.75rem",
-            background: "rgba(0, 0, 0, 0.2)"
+            background: "rgba(0, 0, 0, 0.2)",
           }}
         >
           <button className="portal-btn-ghost" onClick={onClose} disabled={isSubmitting}>
@@ -997,7 +1295,6 @@ function PropertiesPage() {
   const [showCreate, setShowCreate] = useState(false);
   const [editingProp, setEditingProp] = useState<Property | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Property | null>(null);
-
 
   const { data: properties, isLoading } = useQuery({
     queryKey: ["admin-properties"],
@@ -1264,8 +1561,14 @@ function PropertiesPage() {
           <div className="portal-item-grid">
             {Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="portal-item-card" style={{ minHeight: "160px" }}>
-                <div className="skeleton" style={{ height: "14px", width: "60%", borderRadius: "6px" }} />
-                <div className="skeleton" style={{ height: "12px", width: "40%", borderRadius: "6px" }} />
+                <div
+                  className="skeleton"
+                  style={{ height: "14px", width: "60%", borderRadius: "6px" }}
+                />
+                <div
+                  className="skeleton"
+                  style={{ height: "12px", width: "40%", borderRadius: "6px" }}
+                />
                 <div className="skeleton" style={{ height: "48px", borderRadius: "6px" }} />
               </div>
             ))}
@@ -1356,7 +1659,11 @@ function PropertiesPage() {
                     <span className="portal-item-card-meta-label">Price</span>
                     <span
                       className="portal-item-card-meta-value"
-                      style={{ fontFamily: "var(--font-mono)", fontSize: "0.8rem", color: "oklch(0.8 0.16 145)" }}
+                      style={{
+                        fontFamily: "var(--font-mono)",
+                        fontSize: "0.8rem",
+                        color: "oklch(0.8 0.16 145)",
+                      }}
                     >
                       {prop.price_display}
                     </span>
@@ -1452,55 +1759,121 @@ function PropertiesPage() {
                       <div style={{ display: "flex", flexDirection: "column", gap: "0.2rem" }}>
                         <span
                           className="font-bold text-zinc-100"
-                          style={{ display: "flex", alignItems: "center", gap: "0.4rem", flexWrap: "wrap" }}
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "0.4rem",
+                            flexWrap: "wrap",
+                          }}
                         >
                           {prop.name}
                           {prop.is_spotlight && (
-                            <span style={{ fontSize: "10px", color: "oklch(0.78 0.18 75)", background: "rgba(234,179,8,0.12)", border: "1px solid rgba(234,179,8,0.25)", borderRadius: "4px", padding: "1px 6px", fontWeight: "bold" }}>
+                            <span
+                              style={{
+                                fontSize: "10px",
+                                color: "oklch(0.78 0.18 75)",
+                                background: "rgba(234,179,8,0.12)",
+                                border: "1px solid rgba(234,179,8,0.25)",
+                                borderRadius: "4px",
+                                padding: "1px 6px",
+                                fontWeight: "bold",
+                              }}
+                            >
                               ★
                             </span>
                           )}
                           {duplicateIds.has(prop.id) && !prop.is_deleted && (
-                            <span title="Duplicate detected" style={{ fontSize: "10px", color: "oklch(0.74 0.137 79)", background: "rgba(212,163,89,0.12)", border: "1px solid rgba(212,163,89,0.25)", borderRadius: "4px", padding: "1px 6px", fontWeight: "bold" }}>
+                            <span
+                              title="Duplicate detected"
+                              style={{
+                                fontSize: "10px",
+                                color: "oklch(0.74 0.137 79)",
+                                background: "rgba(212,163,89,0.12)",
+                                border: "1px solid rgba(212,163,89,0.25)",
+                                borderRadius: "4px",
+                                padding: "1px 6px",
+                                fontWeight: "bold",
+                              }}
+                            >
                               ⚠️ Dup
                             </span>
                           )}
                           {prop.is_deleted && (
-                            <span style={{ fontSize: "10px", color: "#f87171", background: "rgba(248,113,113,0.12)", border: "1px solid rgba(248,113,113,0.25)", borderRadius: "4px", padding: "1px 6px" }}>
+                            <span
+                              style={{
+                                fontSize: "10px",
+                                color: "#f87171",
+                                background: "rgba(248,113,113,0.12)",
+                                border: "1px solid rgba(248,113,113,0.25)",
+                                borderRadius: "4px",
+                                padding: "1px 6px",
+                              }}
+                            >
                               DEL
                             </span>
                           )}
                         </span>
-                        <span style={{ fontSize: "11px", color: "var(--zinc-400)", fontFamily: "var(--font-mono)" }}>
+                        <span
+                          style={{
+                            fontSize: "11px",
+                            color: "var(--zinc-400)",
+                            fontFamily: "var(--font-mono)",
+                          }}
+                        >
                           /{prop.slug}
                         </span>
                       </div>
                     </td>
                     <td className="hide-mobile">
                       <div style={{ display: "flex", flexDirection: "column", gap: "0.1rem" }}>
-                        <span style={{ fontSize: "13px", color: "var(--zinc-200)" }}>{prop.location}</span>
-                        <span style={{ fontSize: "11px", color: "var(--zinc-500)" }}>{prop.city}</span>
+                        <span style={{ fontSize: "13px", color: "var(--zinc-200)" }}>
+                          {prop.location}
+                        </span>
+                        <span style={{ fontSize: "11px", color: "var(--zinc-500)" }}>
+                          {prop.city}
+                        </span>
                       </div>
                     </td>
                     <td>
                       <div style={{ display: "flex", flexDirection: "column", gap: "0.1rem" }}>
-                        <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--zinc-100)", fontFamily: "var(--font-mono)" }}>
+                        <span
+                          style={{
+                            fontSize: "13px",
+                            fontWeight: 600,
+                            color: "var(--zinc-100)",
+                            fontFamily: "var(--font-mono)",
+                          }}
+                        >
                           {prop.price_display}
                         </span>
-                        <span className={`portal-status-badge status-${prop.status === "RFO" ? "closed" : "new"}`} style={{ alignSelf: "flex-start" }}>
+                        <span
+                          className={`portal-status-badge status-${prop.status === "RFO" ? "closed" : "new"}`}
+                          style={{ alignSelf: "flex-start" }}
+                        >
                           {prop.status}
                         </span>
                       </div>
                     </td>
-                    <td className="hide-mobile" style={{ color: "var(--zinc-400)", fontSize: "13px" }}>
+                    <td
+                      className="hide-mobile"
+                      style={{ color: "var(--zinc-400)", fontSize: "13px" }}
+                    >
                       {prop.beds}b · {prop.baths}ba
                     </td>
                     <td style={{ textAlign: "center" }}>
                       <button
                         disabled={prop.is_deleted || toggleActiveMut.isPending}
-                        onClick={() => toggleActiveMut.mutate({ id: prop.id, is_active: !prop.is_active })}
+                        onClick={() =>
+                          toggleActiveMut.mutate({ id: prop.id, is_active: !prop.is_active })
+                        }
                         title={prop.is_active ? "Click to hide" : "Click to show"}
-                        style={{ background: "none", border: "none", cursor: prop.is_deleted ? "default" : "pointer", color: prop.is_active ? "oklch(0.72 0.20 145)" : "var(--zinc-600)", transition: "color 0.2s" }}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          cursor: prop.is_deleted ? "default" : "pointer",
+                          color: prop.is_active ? "oklch(0.72 0.20 145)" : "var(--zinc-600)",
+                          transition: "color 0.2s",
+                        }}
                       >
                         {prop.is_active ? <Eye size={16} /> : <EyeOff size={16} />}
                       </button>
@@ -1508,9 +1881,17 @@ function PropertiesPage() {
                     <td style={{ textAlign: "center" }}>
                       <button
                         disabled={prop.is_deleted || toggleFeaturedMut.isPending}
-                        onClick={() => toggleFeaturedMut.mutate({ id: prop.id, is_featured: !prop.is_featured })}
+                        onClick={() =>
+                          toggleFeaturedMut.mutate({ id: prop.id, is_featured: !prop.is_featured })
+                        }
                         title={prop.is_featured ? "Remove from featured" : "Mark as featured"}
-                        style={{ background: "none", border: "none", cursor: prop.is_deleted ? "default" : "pointer", color: prop.is_featured ? "oklch(0.78 0.18 75)" : "var(--zinc-600)", transition: "color 0.2s" }}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          cursor: prop.is_deleted ? "default" : "pointer",
+                          color: prop.is_featured ? "oklch(0.78 0.18 75)" : "var(--zinc-600)",
+                          transition: "color 0.2s",
+                        }}
                       >
                         {prop.is_featured ? <Star size={16} /> : <StarOff size={16} />}
                       </button>
@@ -1519,10 +1900,19 @@ function PropertiesPage() {
                       <div style={{ display: "flex", gap: "0.4rem", justifyContent: "flex-end" }}>
                         {!prop.is_deleted && (
                           <>
-                            <button className="portal-icon-btn" title="Edit property" onClick={() => setEditingProp(prop)}>
+                            <button
+                              className="portal-icon-btn"
+                              title="Edit property"
+                              onClick={() => setEditingProp(prop)}
+                            >
                               <Edit3 size={14} />
                             </button>
-                            <button className="portal-icon-btn" title="Delete property" style={{ color: "oklch(0.7 0.2 25)" }} onClick={() => setDeleteTarget(prop)}>
+                            <button
+                              className="portal-icon-btn"
+                              title="Delete property"
+                              style={{ color: "oklch(0.7 0.2 25)" }}
+                              onClick={() => setDeleteTarget(prop)}
+                            >
                               <Trash2 size={14} />
                             </button>
                           </>
@@ -1652,4 +2042,3 @@ function PropertiesPage() {
     </div>
   );
 }
-

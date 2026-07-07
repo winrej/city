@@ -28,7 +28,8 @@ export const Route = createFileRoute("/faq")({
       { property: "og:title", content: "DMCI Homes Condo Buying FAQ | CityQlo" },
       {
         property: "og:description",
-        content: "Find answers about buying process, legalities, and DMCI Homes investments in Metro Manila.",
+        content:
+          "Find answers about buying process, legalities, and DMCI Homes investments in Metro Manila.",
       },
       { property: "og:url", content: "https://cityqlo.com/faq" },
     ],
@@ -61,14 +62,14 @@ function FaqPage() {
     return {
       "@context": "https://schema.org",
       "@type": "FAQPage",
-      "mainEntity": faqs.map(f => ({
+      mainEntity: faqs.map((f) => ({
         "@type": "Question",
-        "name": f.question,
-        "acceptedAnswer": {
+        name: f.question,
+        acceptedAnswer: {
           "@type": "Answer",
-          "text": f.answer
-        }
-      }))
+          text: f.answer,
+        },
+      })),
     };
   }, [faqs]);
 
@@ -165,7 +166,6 @@ function FaqPage() {
             <h1 className="display-1 mt-10 max-w-5xl text-white text-shadow-hero relative">
               Frequently Asked
               <span className="block text-primary text-shadow-sub">Questions.</span>
-              
               <span
                 className="absolute hidden lg:inline-block pointer-events-none opacity-80 text-[26px] tracking-wide rotate-[-3deg] select-none text-gold font-normal"
                 style={{
@@ -180,8 +180,8 @@ function FaqPage() {
           </Reveal>
           <Reveal delay={240}>
             <p className="lede mt-12 max-w-3xl text-zinc-300 text-shadow-sm">
-              We believe in guidance, not pressure. Explore detailed information regarding the buying
-              cycle, downpayment methods, foreign ownership rules, and developer highlights.
+              We believe in guidance, not pressure. Explore detailed information regarding the
+              buying cycle, downpayment methods, foreign ownership rules, and developer highlights.
             </p>
           </Reveal>
         </div>

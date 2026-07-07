@@ -440,9 +440,9 @@ function SonoraPillarPage() {
           </Reveal>
           <Reveal delay={200}>
             <p className="lede mt-8 max-w-2xl text-white/70">
-              The complete, independent guide to DMCI Homes &amp; Robinsons Land's
-              resort-inspired condominium — pricing, floor plans, amenities, location, and
-              everything you need to decide with confidence.
+              The complete, independent guide to DMCI Homes &amp; Robinsons Land's resort-inspired
+              condominium — pricing, floor plans, amenities, location, and everything you need to
+              decide with confidence.
             </p>
           </Reveal>
 
@@ -495,9 +495,9 @@ function SonoraPillarPage() {
                 <strong>Ready-for-Occupancy</strong> condominium by{" "}
                 <strong>DMCI Homes and Robinsons Land</strong> on Alabang–Zapote Road in{" "}
                 <strong>Las Piñas</strong>, directly connected to Robinsons Place Las Piñas. It
-                offers <strong>1BR–3BR units</strong> across three towers (Cadence, Stellan,
-                Liran), priced from about <strong>₱4.55M to ₱11.2M</strong>, with lap pools, a
-                sky lounge, and a roof garden — built for South-Metro end-users and investors.
+                offers <strong>1BR–3BR units</strong> across three towers (Cadence, Stellan, Liran),
+                priced from about <strong>₱4.55M to ₱11.2M</strong>, with lap pools, a sky lounge,
+                and a roof garden — built for South-Metro end-users and investors.
               </p>
             </div>
           </Reveal>
@@ -539,17 +539,17 @@ function SonoraPillarPage() {
               Sonora Garden Residences is a resort-inspired, high-rise condominium community
               developed as a joint venture between <strong>DMCI Homes</strong> — one of the
               Philippines' most trusted developers and builders — and{" "}
-              <strong>Robinsons Land Corporation</strong>, the property arm of the Gokongwei
-              group. The collaboration pairs DMCI's signature lush, low-density "Lumiventt"
-              design philosophy with Robinsons Land's retail ecosystem, anchored by the adjacent
-              Robinsons Place Las Piñas mall.
+              <strong>Robinsons Land Corporation</strong>, the property arm of the Gokongwei group.
+              The collaboration pairs DMCI's signature lush, low-density "Lumiventt" design
+              philosophy with Robinsons Land's retail ecosystem, anchored by the adjacent Robinsons
+              Place Las Piñas mall.
             </p>
             <p>
               Set on roughly <strong>14,492 square meters</strong> along the busy Alabang–Zapote
               corridor, the masterplan is organized around landscaped garden atriums and
-              resort-style common areas rather than a single dense slab. The result is a
-              community that feels like a vacation property you can live in year-round — pools,
-              a roof garden, and breathable shared spaces woven between the towers.
+              resort-style common areas rather than a single dense slab. The result is a community
+              that feels like a vacation property you can live in year-round — pools, a roof garden,
+              and breathable shared spaces woven between the towers.
             </p>
             <p>
               The development comprises three towers — <strong>Cadence</strong>,{" "}
@@ -559,10 +559,10 @@ function SonoraPillarPage() {
               earning rental income without the multi-year wait typical of pre-selling projects.
             </p>
             <p>
-              For Filipino professionals, growing families, and overseas Filipino workers (OFWs)
-              who want a quality home in the South of Metro Manila — close to malls, schools, and
-              the Cavite gateway — Sonora positions itself as a rare blend of resort lifestyle,
-              ready inventory, and accessible pricing.
+              For Filipino professionals, growing families, and overseas Filipino workers (OFWs) who
+              want a quality home in the South of Metro Manila — close to malls, schools, and the
+              Cavite gateway — Sonora positions itself as a rare blend of resort lifestyle, ready
+              inventory, and accessible pricing.
             </p>
           </Section>
 
@@ -580,17 +580,15 @@ function SonoraPillarPage() {
               cinemas, restaurants, banks, and clinics — is effectively part of your address,
               reachable on foot and under cover.
             </p>
-            <p>
-              The address places residents within a short drive of several key destinations:
-            </p>
+            <p>The address places residents within a short drive of several key destinations:</p>
             <ul className="my-4 space-y-2">
               <li>
-                <strong>NAIA (airport):</strong> roughly 15–20 minutes by car, traffic
-                permitting — a major plus for OFWs and frequent travelers.
+                <strong>NAIA (airport):</strong> roughly 15–20 minutes by car, traffic permitting —
+                a major plus for OFWs and frequent travelers.
               </li>
               <li>
-                <strong>Alabang &amp; Filinvest City:</strong> a quick hop along Alabang–Zapote
-                for offices, hospitals (Asian Hospital), and Festival Mall.
+                <strong>Alabang &amp; Filinvest City:</strong> a quick hop along Alabang–Zapote for
+                offices, hospitals (Asian Hospital), and Festival Mall.
               </li>
               <li>
                 <strong>Parañaque &amp; the Bay Area:</strong> accessible via the Manila–Cavite
@@ -601,18 +599,17 @@ function SonoraPillarPage() {
                 Metro Manila but rooted in the south.
               </li>
               <li>
-                <strong>Schools:</strong> proximity to established Las Piñas and Parañaque
-                campuses makes it practical for families.
+                <strong>Schools:</strong> proximity to established Las Piñas and Parañaque campuses
+                makes it practical for families.
               </li>
             </ul>
             <p>
-              Crucially, the area is on the upswing. The{" "}
-              <strong>LRT-1 Cavite Extension</strong> — which extends the light rail line from
-              Pasay through Parañaque and Las Piñas toward Cavite — is set to dramatically
-              improve public-transport access along this corridor, a structural tailwind for
-              both convenience and long-term property values. The one honest caveat: like much
-              of Metro Manila, Alabang–Zapote Road carries real rush-hour traffic, so commuters
-              to Makati or BGC should test the drive before committing.
+              Crucially, the area is on the upswing. The <strong>LRT-1 Cavite Extension</strong> —
+              which extends the light rail line from Pasay through Parañaque and Las Piñas toward
+              Cavite — is set to dramatically improve public-transport access along this corridor, a
+              structural tailwind for both convenience and long-term property values. The one honest
+              caveat: like much of Metro Manila, Alabang–Zapote Road carries real rush-hour traffic,
+              so commuters to Makati or BGC should test the drive before committing.
             </p>
           </Section>
 
@@ -620,8 +617,8 @@ function SonoraPillarPage() {
           <Section id="towers" eyebrow="The development" title="The three towers of Sonora">
             <p>
               Sonora Garden Residences is composed of three distinct towers, each with its own
-              character but sharing the same gated, amenity-rich grounds. Together they form a
-              mix of high-rise and mid-rise living on a single resort masterplan.
+              character but sharing the same gated, amenity-rich grounds. Together they form a mix
+              of high-rise and mid-rise living on a single resort masterplan.
             </p>
             <div className="my-6 space-y-4">
               {TOWERS.map((t) => (
@@ -631,16 +628,14 @@ function SonoraPillarPage() {
                     <span className="text-[12px] font-semibold text-primary">{t.storeys}</span>
                   </div>
                   <p className="mt-1 text-[13px] font-medium text-emerald-600">{t.status}</p>
-                  <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">
-                    {t.note}
-                  </p>
+                  <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">{t.note}</p>
                 </div>
               ))}
             </div>
             <p>
-              Because <strong>Cadence is already RFO</strong>, it is the focus for buyers who
-              want to move in or lease out immediately. Stellan and Liran extend the community in
-              later phases — useful to know if you are choosing between a ready unit today and a
+              Because <strong>Cadence is already RFO</strong>, it is the focus for buyers who want
+              to move in or lease out immediately. Stellan and Liran extend the community in later
+              phases — useful to know if you are choosing between a ready unit today and a
               future-phase unit.
             </p>
           </Section>
@@ -648,10 +643,10 @@ function SonoraPillarPage() {
           {/* Units */}
           <Section id="units" eyebrow="Floor plans" title="Unit types & floor areas">
             <p>
-              Sonora offers one-, two-, and three-bedroom configurations, and the cuts are
-              notably generous for the price segment — every unit comes with a{" "}
-              <strong>balcony</strong>, and the development is marketed around larger doors,
-              windows, and living areas than the typical mass-market condo.
+              Sonora offers one-, two-, and three-bedroom configurations, and the cuts are notably
+              generous for the price segment — every unit comes with a <strong>balcony</strong>, and
+              the development is marketed around larger doors, windows, and living areas than the
+              typical mass-market condo.
             </p>
             <div className="my-6 overflow-x-auto">
               <table className="w-full border-collapse text-left text-[14px]">
@@ -676,20 +671,20 @@ function SonoraPillarPage() {
               </table>
             </div>
             <p className="text-[13px] italic text-muted-foreground">
-              Floor areas and prices are indicative as of June 2026 and vary by tower, floor
-              level, and view. Exact unit dimensions and the official price list are confirmed
-              per release — request the current sheet for the unit you have in mind.
+              Floor areas and prices are indicative as of June 2026 and vary by tower, floor level,
+              and view. Exact unit dimensions and the official price list are confirmed per release
+              — request the current sheet for the unit you have in mind.
             </p>
           </Section>
 
           {/* Price */}
           <Section id="price" eyebrow="Pricing" title="How much is Sonora Garden Residences?">
             <p>
-              As of <strong>June 2026</strong>, units at Sonora Garden Residences range from
-              roughly <strong>₱4.55 million to ₱11.2 million</strong>, depending on unit type,
-              floor level, and tower. Entry-level one-bedroom units begin around{" "}
-              <strong>₱4.55M</strong>, with sample monthly plans starting near{" "}
-              <strong>₱22,000+ per month</strong> under DMCI's spread-out payment scheme.
+              As of <strong>June 2026</strong>, units at Sonora Garden Residences range from roughly{" "}
+              <strong>₱4.55 million to ₱11.2 million</strong>, depending on unit type, floor level,
+              and tower. Entry-level one-bedroom units begin around <strong>₱4.55M</strong>, with
+              sample monthly plans starting near <strong>₱22,000+ per month</strong> under DMCI's
+              spread-out payment scheme.
             </p>
             <div className="my-6 overflow-x-auto">
               <table className="w-full border-collapse text-left text-[14px]">
@@ -717,11 +712,11 @@ function SonoraPillarPage() {
               </table>
             </div>
             <p>
-              The headline advantage of DMCI's terms is the{" "}
-              <strong>spread-out down payment</strong>: instead of producing a large lump sum
-              upfront, the down payment is amortized across the term, making a resort-grade unit
-              attainable on a professional's or OFW's monthly budget. The remaining balance can
-              then be settled through bank financing, in-house financing, Pag-IBIG, or spot cash.
+              The headline advantage of DMCI's terms is the <strong>spread-out down payment</strong>
+              : instead of producing a large lump sum upfront, the down payment is amortized across
+              the term, making a resort-grade unit attainable on a professional's or OFW's monthly
+              budget. The remaining balance can then be settled through bank financing, in-house
+              financing, Pag-IBIG, or spot cash.
             </p>
             <div className="my-6 rounded-xl border border-primary/30 bg-primary/5 p-5">
               <p className="text-[14px] text-ink">
@@ -743,50 +738,49 @@ function SonoraPillarPage() {
             title="How to finance a Sonora Garden Residences unit"
           >
             <p>
-              Most buyers settle the <strong>down payment</strong> in monthly installments
-              spread across the payment term, then choose how to cover the remaining{" "}
+              Most buyers settle the <strong>down payment</strong> in monthly installments spread
+              across the payment term, then choose how to cover the remaining{" "}
               <strong>balance</strong>. There are four common routes, each with different
               trade-offs:
             </p>
             <ul className="my-4 space-y-3">
               <li>
                 <strong>Bank financing:</strong> the most common option for the balance. Banks
-                typically finance up to 80% of the unit value over 5–20 years. Rates are fixed
-                for an initial period, then repriced. Best for buyers with documented, stable
-                income who want the longest amortization and lowest monthly outlay.
+                typically finance up to 80% of the unit value over 5–20 years. Rates are fixed for
+                an initial period, then repriced. Best for buyers with documented, stable income who
+                want the longest amortization and lowest monthly outlay.
               </li>
               <li>
-                <strong>In-house financing:</strong> arranged directly with the developer. Easier
-                to qualify for and faster to approve, but usually carries higher interest and a
-                shorter term than a bank. A practical bridge for self-employed buyers or those
-                still building bank-ready documents.
+                <strong>In-house financing:</strong> arranged directly with the developer. Easier to
+                qualify for and faster to approve, but usually carries higher interest and a shorter
+                term than a bank. A practical bridge for self-employed buyers or those still
+                building bank-ready documents.
               </li>
               <li>
                 <strong>Pag-IBIG (HDMF):</strong> for eligible members, the Pag-IBIG housing loan
-                can offer competitive, socialized rates over terms up to 30 years. Loan ceilings
-                and qualification depend on your contributions and income.
+                can offer competitive, socialized rates over terms up to 30 years. Loan ceilings and
+                qualification depend on your contributions and income.
               </li>
               <li>
                 <strong>Spot / deferred cash:</strong> paying in full (or over a short deferred
-                period) typically unlocks the largest discounts. Ideal for cash-rich buyers and
-                OFWs consolidating savings.
+                period) typically unlocks the largest discounts. Ideal for cash-rich buyers and OFWs
+                consolidating savings.
               </li>
             </ul>
             <p>
-              The right structure depends on your income documentation, how long you plan to
-              hold the unit, and your appetite for interest cost versus monthly cash flow. We can
-              model each option side by side against your target Sonora unit so you can see the
-              true monthly cost before you commit.
+              The right structure depends on your income documentation, how long you plan to hold
+              the unit, and your appetite for interest cost versus monthly cash flow. We can model
+              each option side by side against your target Sonora unit so you can see the true
+              monthly cost before you commit.
             </p>
           </Section>
 
           {/* Amenities */}
           <Section id="amenities" eyebrow="Lifestyle" title="Sonora Garden Residences amenities">
             <p>
-              Amenities are where Sonora earns its "resort living" name. Rather than a single
-              token pool, the community offers a full cluster of leisure, fitness, family, and
-              convenience facilities spread across landscaped grounds and an elevated roof
-              garden.
+              Amenities are where Sonora earns its "resort living" name. Rather than a single token
+              pool, the community offers a full cluster of leisure, fitness, family, and convenience
+              facilities spread across landscaped grounds and an elevated roof garden.
             </p>
             <div className="my-6 grid gap-5 sm:grid-cols-2">
               {AMENITY_GROUPS.map((g) => (
@@ -800,10 +794,7 @@ function SonoraPillarPage() {
                         key={item}
                         className="flex items-start gap-2 text-[14px] text-muted-foreground"
                       >
-                        <CheckCircle2
-                          size={15}
-                          className="mt-0.5 shrink-0 text-emerald-500"
-                        />
+                        <CheckCircle2 size={15} className="mt-0.5 shrink-0 text-emerald-500" />
                         {item}
                       </li>
                     ))}
@@ -815,8 +806,8 @@ function SonoraPillarPage() {
               Behind the leisure facilities sit the practical systems DMCI is known for:{" "}
               <strong>12 dual-core high-speed elevators</strong>, integrated WiFi and fiber-optic
               readiness, standby power for both units and common areas, a card-operated laundry
-              station, an on-site convenience store and water station, and round-the-clock
-              security with CCTV — all maintained by DMCI Homes Property Management Corporation.
+              station, an on-site convenience store and water station, and round-the-clock security
+              with CCTV — all maintained by DMCI Homes Property Management Corporation.
             </p>
           </Section>
 
@@ -847,8 +838,8 @@ function SonoraPillarPage() {
               </li>
             </ul>
             <p>
-              It is a weaker fit for buyers who need to be inside the Makati/BGC/Ortigas CBDs
-              daily and are unwilling to commute along Alabang–Zapote — for them, a CBD-adjacent
+              It is a weaker fit for buyers who need to be inside the Makati/BGC/Ortigas CBDs daily
+              and are unwilling to commute along Alabang–Zapote — for them, a CBD-adjacent
               development may justify its premium.
             </p>
           </Section>
@@ -860,20 +851,19 @@ function SonoraPillarPage() {
             title="Is Sonora Garden Residences a good investment?"
           >
             <p>
-              On balance, Sonora has a credible investment case grounded in three forces:
-              location demand, ready inventory, and infrastructure momentum.
+              On balance, Sonora has a credible investment case grounded in three forces: location
+              demand, ready inventory, and infrastructure momentum.
             </p>
             <p>
               <strong>Demand:</strong> Las Piñas sits at the heart of a dense, growing South-Metro
-              population and serves as a gateway for Cavite-based workers. A unit directly linked
-              to a major mall, in an RFO building, addresses the most rentable segment of the
-              market — tenants who want convenience now, not in three years.
+              population and serves as a gateway for Cavite-based workers. A unit directly linked to
+              a major mall, in an RFO building, addresses the most rentable segment of the market —
+              tenants who want convenience now, not in three years.
             </p>
             <p>
-              <strong>Developer scale:</strong> DMCI Homes has publicly framed Sonora as a
-              flagship project for the south, with reported revenue targets in the ₱13-billion
-              range — a signal of the developer's confidence in sustained absorption along this
-              corridor.
+              <strong>Developer scale:</strong> DMCI Homes has publicly framed Sonora as a flagship
+              project for the south, with reported revenue targets in the ₱13-billion range — a
+              signal of the developer's confidence in sustained absorption along this corridor.
             </p>
             <p>
               <strong>Infrastructure:</strong> the LRT-1 Cavite Extension and broader road and
@@ -882,27 +872,27 @@ function SonoraPillarPage() {
             </p>
             <p>
               As always, treat projections with discipline: confirm the current price, association
-              dues, and realistic rental comparables for your specific unit before assuming a
-              yield. We're happy to share live rental data for the area.
+              dues, and realistic rental comparables for your specific unit before assuming a yield.
+              We're happy to share live rental data for the area.
             </p>
           </Section>
 
           {/* Developer */}
           <Section id="developer" eyebrow="Trust" title="Why DMCI Homes?">
             <p>
-              DMCI Homes is the residential arm of <strong>DMCI Holdings</strong>, a publicly
-              listed engineering and construction conglomerate with decades of building
-              experience. Unlike many developers that outsource construction, DMCI builds its own
-              projects — a vertical integration that underpins its reputation for solid,
-              well-finished structures.
+              DMCI Homes is the residential arm of <strong>DMCI Holdings</strong>, a publicly listed
+              engineering and construction conglomerate with decades of building experience. Unlike
+              many developers that outsource construction, DMCI builds its own projects — a vertical
+              integration that underpins its reputation for solid, well-finished structures.
             </p>
             <p>
-              The brand is best known for its <strong>resort-inspired, low-density communities</strong>{" "}
-              and its <strong>Lumiventt design technology</strong>, which channels natural light
-              and cross-ventilation through garden atriums and breezeways — the same DNA visible
-              in Sonora's roof garden and landscaped commons. After turnover, units are maintained
-              by <strong>DMCI Homes Property Management Corporation</strong>, giving owners a
-              single accountable party for security, upkeep, and common-area service.
+              The brand is best known for its{" "}
+              <strong>resort-inspired, low-density communities</strong> and its{" "}
+              <strong>Lumiventt design technology</strong>, which channels natural light and
+              cross-ventilation through garden atriums and breezeways — the same DNA visible in
+              Sonora's roof garden and landscaped commons. After turnover, units are maintained by{" "}
+              <strong>DMCI Homes Property Management Corporation</strong>, giving owners a single
+              accountable party for security, upkeep, and common-area service.
             </p>
             <p>
               For a buyer, that track record translates into lower execution risk: a higher
@@ -965,9 +955,9 @@ function SonoraPillarPage() {
               ))}
             </ol>
             <p>
-              A CityQlo advisor can handle the legwork on your behalf — sending the live price
-              list, reserving your unit, and preparing the document checklist — including fully
-              remote transactions for OFWs.
+              A CityQlo advisor can handle the legwork on your behalf — sending the live price list,
+              reserving your unit, and preparing the document checklist — including fully remote
+              transactions for OFWs.
             </p>
           </Section>
 
@@ -984,9 +974,9 @@ function SonoraPillarPage() {
             </p>
             <ul className="my-4 space-y-3">
               <li>
-                <strong>Confirm the live price &amp; promo.</strong> Developer pricing and
-                discounts change per release. Get the current official price list for your exact
-                unit, floor, and tower in writing.
+                <strong>Confirm the live price &amp; promo.</strong> Developer pricing and discounts
+                change per release. Get the current official price list for your exact unit, floor,
+                and tower in writing.
               </li>
               <li>
                 <strong>Ask about association dues.</strong> Monthly condo dues fund security,
@@ -1005,26 +995,22 @@ function SonoraPillarPage() {
                 realistic rents and vacancy for similar Las Piñas units before assuming a yield.
               </li>
               <li>
-                <strong>Review the contract carefully.</strong> Read the Contract to Sell,
-                payment schedule, and penalties; for OFWs, prepare your SPA early.
+                <strong>Review the contract carefully.</strong> Read the Contract to Sell, payment
+                schedule, and penalties; for OFWs, prepare your SPA early.
               </li>
               <li>
-                <strong>Prepare your financing path.</strong> Pre-qualify with a bank or Pag-IBIG
-                so the balance option is settled before the down-payment term ends.
+                <strong>Prepare your financing path.</strong> Pre-qualify with a bank or Pag-IBIG so
+                the balance option is settled before the down-payment term ends.
               </li>
             </ul>
             <p>
-              If any of these are unclear, ask before you pay the reservation fee — a good
-              advisor will welcome the questions and give you straight answers.
+              If any of these are unclear, ask before you pay the reservation fee — a good advisor
+              will welcome the questions and give you straight answers.
             </p>
           </Section>
 
           {/* Comparison */}
-          <Section
-            id="comparison"
-            eyebrow="Context"
-            title="How Sonora compares to other condos"
-          >
+          <Section id="comparison" eyebrow="Context" title="How Sonora compares to other condos">
             <p>
               Generic listing sites show you a unit; they rarely tell you how it stacks up. Here's
               an honest comparison of Sonora against a typical Metro Manila condo offering:
@@ -1052,13 +1038,17 @@ function SonoraPillarPage() {
               </table>
             </div>
             <p>
-              For a deeper look at why Metro Manila condos can make sense as a long-term asset,
-              read our{" "}
+              For a deeper look at why Metro Manila condos can make sense as a long-term asset, read
+              our{" "}
               <Link to="/why-invest" className="font-semibold text-primary underline">
                 guide to investing in Metro Manila property
               </Link>
               , or browse{" "}
-              <Link to="/properties" search={{} as never} className="font-semibold text-primary underline">
+              <Link
+                to="/properties"
+                search={{} as never}
+                className="font-semibold text-primary underline"
+              >
                 other DMCI developments
               </Link>{" "}
               we cover.
@@ -1110,7 +1100,11 @@ function SonoraPillarPage() {
                   Sonora Garden Residences project page
                 </Link>
                 , compare{" "}
-                <Link to="/properties" search={{} as never} className="font-semibold text-primary underline">
+                <Link
+                  to="/properties"
+                  search={{} as never}
+                  className="font-semibold text-primary underline"
+                >
                   other Metro Manila condos
                 </Link>
                 , or read more{" "}

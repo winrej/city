@@ -115,9 +115,24 @@ function WhyInvest() {
 
   // Consistent outlined icon set per rental strategy, indexed by position (kept in code — not CMS)
   const rentalStrategyIcons = [
-    <BedDouble key="short-term" className="h-6 w-6 text-primary" strokeWidth={1.75} aria-hidden="true" />,
-    <Umbrella key="staycation" className="h-6 w-6 text-primary" strokeWidth={1.75} aria-hidden="true" />,
-    <KeyRound key="long-term" className="h-6 w-6 text-primary" strokeWidth={1.75} aria-hidden="true" />,
+    <BedDouble
+      key="short-term"
+      className="h-6 w-6 text-primary"
+      strokeWidth={1.75}
+      aria-hidden="true"
+    />,
+    <Umbrella
+      key="staycation"
+      className="h-6 w-6 text-primary"
+      strokeWidth={1.75}
+      aria-hidden="true"
+    />,
+    <KeyRound
+      key="long-term"
+      className="h-6 w-6 text-primary"
+      strokeWidth={1.75}
+      aria-hidden="true"
+    />,
   ];
 
   // Hardcoded premium structural labels matching the pillars index
@@ -205,9 +220,7 @@ function WhyInvest() {
             </h1>
           </Reveal>
           <Reveal delay={240}>
-            <p className="lede mt-12 max-w-3xl text-zinc-300 text-shadow-sm">
-              {heroDescription}
-            </p>
+            <p className="lede mt-12 max-w-3xl text-zinc-300 text-shadow-sm">{heroDescription}</p>
           </Reveal>
         </div>
       </section>
@@ -250,8 +263,8 @@ function WhyInvest() {
               </p>
               <h2 className="display-2 mt-6">A disciplined path to real estate.</h2>
               <p className="mt-6 text-muted-foreground text-[16px] leading-relaxed">
-                Four distinct strategic layers designed to guide your investment decisions without the
-                sales noise.
+                Four distinct strategic layers designed to guide your investment decisions without
+                the sales noise.
               </p>
             </Reveal>
           </div>
@@ -434,9 +447,13 @@ function WhyInvest() {
 
                   {/* Effort / Yield comparison labels */}
                   <div className="mt-8 flex items-center gap-2 border-t border-hairline pt-5 font-mono text-[10px] uppercase tracking-widest text-muted-foreground/70">
-                    <span>Effort: <span className="text-ink/70">{s.effort}</span></span>
+                    <span>
+                      Effort: <span className="text-ink/70">{s.effort}</span>
+                    </span>
                     <span className="text-gold/60">·</span>
-                    <span>Yield: <span className="text-ink/70">{s.yield}</span></span>
+                    <span>
+                      Yield: <span className="text-ink/70">{s.yield}</span>
+                    </span>
                   </div>
 
                   {/* Deep-dive guide link */}

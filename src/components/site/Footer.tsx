@@ -104,6 +104,9 @@ export function Footer() {
   });
 
   const socialSettings = siteSettings?.find((r: any) => r.key === "social")?.value ?? {};
+  const contactSettings = siteSettings?.find((r: any) => r.key === "contact")?.value ?? {};
+  const officeAddress = contactSettings.address || "Metro Manila, Philippines";
+  const contactEmail = contactSettings.email || "hello@cityqlo.com";
 
   if (isContactPage) {
     return (
@@ -154,7 +157,9 @@ export function Footer() {
                 className="h-7.5 object-contain brightness-0 invert opacity-80"
               />
               <span className="text-[10px] font-mono tracking-widest uppercase text-white/50 leading-tight">
-                Accredited<br />Partner
+                Accredited
+                <br />
+                Partner
               </span>
             </div>
           </div>
@@ -291,10 +296,13 @@ export function Footer() {
                   </li>
                 ))}
               </ul>
-              <div className="mt-5 space-y-3.5 text-[14px]" style={{ color: "rgba(255,255,255,0.6)" }}>
-                <p>Metro Manila, Philippines</p>
+              <div
+                className="mt-5 space-y-3.5 text-[14px]"
+                style={{ color: "rgba(255,255,255,0.6)" }}
+              >
+                <p>{officeAddress}</p>
                 <a
-                  href="mailto:hello@cityqlo.com"
+                  href={`mailto:${contactEmail}`}
                   className="block transition-colors duration-200"
                   style={{ color: "rgba(255,255,255,0.6)" }}
                   onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = "#fff")}
@@ -302,7 +310,7 @@ export function Footer() {
                     ((e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.6)")
                   }
                 >
-                  hello@cityqlo.com
+                  {contactEmail}
                 </a>
               </div>
             </div>
@@ -326,9 +334,28 @@ export function Footer() {
             </div>
           </div>
 
+          {/* Broker compliance line */}
+          <div
+            className="border-t border-white/8 pt-8 pb-5 text-[10.5px] leading-relaxed"
+            style={{ color: "rgba(255,255,255,0.25)" }}
+          >
+            <p>
+              <span
+                className="font-semibold tracking-wide"
+                style={{ color: "rgba(255,255,255,0.4)" }}
+              >
+                Licensed Broker Oversight —
+              </span>{" "}
+              CityQlo works under the supervision of licensed real estate broker Joy Lachica (PRC
+              Lic. No. 10101 · DHSUD NCR-B-6055). Property reservations and transactions are
+              processed in coordination with our supervising broker to help ensure compliance with
+              applicable Philippine real estate regulations.
+            </p>
+          </div>
+
           {/* Copyright bar */}
           <div
-            className="flex flex-col gap-2 pt-8 text-[11px] tracking-[0.06em] md:flex-row md:justify-between"
+            className="flex flex-col gap-2 pt-5 text-[11px] tracking-[0.06em] md:flex-row md:justify-between"
             style={{ color: "rgba(255,255,255,0.3)" }}
           >
             <p>© {new Date().getFullYear()} CityQlo. All rights reserved.</p>

@@ -1,15 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import {
-  Plus,
-  Edit3,
-  Trash2,
-  Eye,
-  FileText,
-  Search,
-  Tag,
-} from "lucide-react";
+import { Plus, Edit3, Trash2, Eye, FileText, Search, Tag } from "lucide-react";
 import { getAdminBlogs, deleteBlog, deleteBlogs } from "../../../lib/api/admin.functions";
 import { toast } from "sonner";
 
@@ -96,9 +88,7 @@ function BlogsDashboard() {
   };
 
   const toggleSelect = (id: string) => {
-    setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
-    );
+    setSelectedIds((prev) => (prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]));
   };
 
   const publishedCount = posts.filter((p) => p.status === "published").length;
@@ -115,8 +105,8 @@ function BlogsDashboard() {
           </p>
         </div>
         <div style={{ display: "flex", gap: "0.75rem" }}>
-          {selectedIds.length > 0 && (
-            bulkDeleteConfirm ? (
+          {selectedIds.length > 0 &&
+            (bulkDeleteConfirm ? (
               <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
                 <span style={{ fontSize: "0.8125rem", color: "oklch(0.6 0.18 25)" }}>
                   Delete {selectedIds.length} items?
@@ -129,7 +119,7 @@ function BlogsDashboard() {
                     background: "oklch(0.6 0.18 25)",
                     borderColor: "oklch(0.6 0.18 25)",
                     padding: "0.4rem 0.8rem",
-                    fontSize: "0.75rem"
+                    fontSize: "0.75rem",
                   }}
                 >
                   {bulkDeleteMutation.isPending ? "Deleting..." : "Confirm"}
@@ -149,14 +139,13 @@ function BlogsDashboard() {
                 style={{
                   color: "oklch(0.6 0.18 25)",
                   borderColor: "oklch(0.6 0.18 25 / 0.2)",
-                  background: "oklch(0.6 0.18 25 / 0.05)"
+                  background: "oklch(0.6 0.18 25 / 0.05)",
                 }}
               >
                 <Trash2 size={16} />
                 Delete Selected ({selectedIds.length})
               </button>
-            )
-          )}
+            ))}
           <Link
             to="/portal/blogs/$id"
             params={{ id: "new" }}
@@ -277,7 +266,10 @@ function BlogsDashboard() {
           </div>
         ) : filtered.length === 0 ? (
           <div style={{ padding: "3rem", textAlign: "center" }}>
-            <FileText size={32} style={{ color: "var(--portal-text-muted)", margin: "0 auto 1rem" }} />
+            <FileText
+              size={32}
+              style={{ color: "var(--portal-text-muted)", margin: "0 auto 1rem" }}
+            />
             <p style={{ color: "var(--portal-text-muted)", fontSize: "0.875rem" }}>
               {posts.length === 0
                 ? "No articles yet. Create your first one."
@@ -306,11 +298,16 @@ function BlogsDashboard() {
                       style={{ cursor: "pointer" }}
                     />
                   </th>
-                  {["Title", "Status", "Tags", "Read time", "Published", "Updated", "Actions"].map((h) => (
-                    <th key={h} style={{ padding: "0.75rem 1rem", textAlign: "left", whiteSpace: "nowrap" }}>
-                      {h}
-                    </th>
-                  ))}
+                  {["Title", "Status", "Tags", "Read time", "Published", "Updated", "Actions"].map(
+                    (h) => (
+                      <th
+                        key={h}
+                        style={{ padding: "0.75rem 1rem", textAlign: "left", whiteSpace: "nowrap" }}
+                      >
+                        {h}
+                      </th>
+                    ),
+                  )}
                 </tr>
               </thead>
               <tbody>
@@ -320,7 +317,9 @@ function BlogsDashboard() {
                     style={{
                       borderBottom: "1px solid var(--portal-border)",
                       transition: "background 150ms ease",
-                      background: selectedIds.includes(post.id) ? "var(--portal-accent-dim)" : "transparent",
+                      background: selectedIds.includes(post.id)
+                        ? "var(--portal-accent-dim)"
+                        : "transparent",
                     }}
                     onMouseEnter={(e) => {
                       if (!selectedIds.includes(post.id)) {
@@ -410,17 +409,37 @@ function BlogsDashboard() {
                     </td>
 
                     {/* Read time */}
-                    <td style={{ padding: "0.9rem 1rem", color: "var(--portal-text-muted)", fontSize: "0.8rem" }}>
+                    <td
+                      style={{
+                        padding: "0.9rem 1rem",
+                        color: "var(--portal-text-muted)",
+                        fontSize: "0.8rem",
+                      }}
+                    >
                       {post.read_time ? `${post.read_time} min` : "—"}
                     </td>
 
                     {/* Published */}
-                    <td style={{ padding: "0.9rem 1rem", color: "var(--portal-text-muted)", fontSize: "0.75rem", whiteSpace: "nowrap" }}>
+                    <td
+                      style={{
+                        padding: "0.9rem 1rem",
+                        color: "var(--portal-text-muted)",
+                        fontSize: "0.75rem",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
                       {post.published_at ? formatDate(post.published_at) : "—"}
                     </td>
 
                     {/* Updated */}
-                    <td style={{ padding: "0.9rem 1rem", color: "var(--portal-text-muted)", fontSize: "0.75rem", whiteSpace: "nowrap" }}>
+                    <td
+                      style={{
+                        padding: "0.9rem 1rem",
+                        color: "var(--portal-text-muted)",
+                        fontSize: "0.75rem",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
                       {formatDate(post.updated_at)}
                     </td>
 
@@ -445,8 +464,14 @@ function BlogsDashboard() {
                             cursor: "pointer",
                             transition: "all 150ms ease",
                           }}
-                          onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = "oklch(0.6 0.18 258 / 0.25)")}
-                          onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = "var(--portal-accent-dim)")}
+                          onMouseEnter={(e) =>
+                            ((e.currentTarget as HTMLElement).style.background =
+                              "oklch(0.6 0.18 258 / 0.25)")
+                          }
+                          onMouseLeave={(e) =>
+                            ((e.currentTarget as HTMLElement).style.background =
+                              "var(--portal-accent-dim)")
+                          }
                         >
                           <Edit3 size={13} />
                         </Link>
@@ -526,8 +551,14 @@ function BlogsDashboard() {
                               cursor: "pointer",
                               transition: "all 150ms ease",
                             }}
-                            onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = "oklch(0.6 0.18 25 / 0.2)")}
-                            onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = "oklch(0.6 0.18 25 / 0.1)")}
+                            onMouseEnter={(e) =>
+                              ((e.currentTarget as HTMLElement).style.background =
+                                "oklch(0.6 0.18 25 / 0.2)")
+                            }
+                            onMouseLeave={(e) =>
+                              ((e.currentTarget as HTMLElement).style.background =
+                                "oklch(0.6 0.18 25 / 0.1)")
+                            }
                           >
                             <Trash2 size={13} />
                           </button>

@@ -95,7 +95,10 @@ function DetailPanel({
           </button>
         </div>
 
-        <div className="portal-detail-body" style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+        <div
+          className="portal-detail-body"
+          style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}
+        >
           {/* Contact info */}
           <div
             style={{
@@ -270,7 +273,13 @@ function DetailPanel({
           >
             <button
               className="portal-action-btn delete"
-              style={{ padding: "0.5rem 0.875rem", fontSize: "12px", display: "flex", alignItems: "center", gap: "0.4rem" }}
+              style={{
+                padding: "0.5rem 0.875rem",
+                fontSize: "12px",
+                display: "flex",
+                alignItems: "center",
+                gap: "0.4rem",
+              }}
               onClick={onDelete}
               disabled={isDeleting}
             >
@@ -326,12 +335,15 @@ function ApplicationsAdminPage() {
     });
   }, [apps, search, filterRole, filterStatus]);
 
-  const stats = useMemo(() => ({
-    total: apps.length,
-    new: apps.filter((a) => a.status === "new").length,
-    shortlisted: apps.filter((a) => a.status === "shortlisted").length,
-    hired: apps.filter((a) => a.status === "hired").length,
-  }), [apps]);
+  const stats = useMemo(
+    () => ({
+      total: apps.length,
+      new: apps.filter((a) => a.status === "new").length,
+      shortlisted: apps.filter((a) => a.status === "shortlisted").length,
+      hired: apps.filter((a) => a.status === "hired").length,
+    }),
+    [apps],
+  );
 
   const updateMut = useMutation({
     mutationFn: (data: { id: string; status?: Application["status"]; notes?: string }) =>
@@ -340,7 +352,7 @@ function ApplicationsAdminPage() {
       qc.invalidateQueries({ queryKey: ["admin-applications"] });
       // Update selected in-place so panel reflects change immediately
       if (selected) {
-        setSelected((prev) => prev ? { ...prev, ...updateMut.variables } : prev);
+        setSelected((prev) => (prev ? { ...prev, ...updateMut.variables } : prev));
       }
       toast.success("Application updated");
     },
@@ -363,9 +375,7 @@ function ApplicationsAdminPage() {
       <div className="portal-page-header">
         <div>
           <h1 className="portal-page-title">Job Applications</h1>
-          <p className="portal-page-desc">
-            Review and manage applicants from the careers page.
-          </p>
+          <p className="portal-page-desc">Review and manage applicants from the careers page.</p>
         </div>
       </div>
 
@@ -430,7 +440,9 @@ function ApplicationsAdminPage() {
           >
             <option value="all">All Roles</option>
             {ROLES.map((r) => (
-              <option key={r} value={r}>{r}</option>
+              <option key={r} value={r}>
+                {r}
+              </option>
             ))}
           </select>
           <ChevronDown size={14} className="portal-select-icon" />
@@ -444,7 +456,9 @@ function ApplicationsAdminPage() {
           >
             <option value="all">All Statuses</option>
             {Object.entries(STATUS_CONFIG).map(([k, v]) => (
-              <option key={k} value={k}>{v.label}</option>
+              <option key={k} value={k}>
+                {v.label}
+              </option>
             ))}
           </select>
           <ChevronDown size={14} className="portal-select-icon" />
@@ -496,7 +510,9 @@ function ApplicationsAdminPage() {
                       <div>{app.email}</div>
                       {app.phone && <div>{app.phone}</div>}
                     </td>
-                    <td style={{ fontSize: "12px", color: "var(--zinc-500)", whiteSpace: "nowrap" }}>
+                    <td
+                      style={{ fontSize: "12px", color: "var(--zinc-500)", whiteSpace: "nowrap" }}
+                    >
                       {new Date(app.created_at).toLocaleDateString("en-PH")}
                     </td>
                     <td>

@@ -172,7 +172,9 @@ function CloudinaryImageField({
           marginBottom: 0,
         }}
       >
-        💡 {description || "Paste a direct Cloudinary image URL (starts with https://res.cloudinary.com/…)"}
+        💡{" "}
+        {description ||
+          "Paste a direct Cloudinary image URL (starts with https://res.cloudinary.com/…)"}
       </p>
 
       {value && (
@@ -230,8 +232,6 @@ function CloudinaryImageField({
     </div>
   );
 }
-
-
 
 function ProjectsPage() {
   const qc = useQueryClient();
@@ -322,7 +322,8 @@ function ProjectsPage() {
 
     if (matches.length > 0) {
       const reasons = [];
-      if (matches.some((m: any) => m.title.trim().toLowerCase() === titleLower)) reasons.push("title");
+      if (matches.some((m: any) => m.title.trim().toLowerCase() === titleLower))
+        reasons.push("title");
       if (matches.some((m: any) => m.slug.trim().toLowerCase() === slugLower)) reasons.push("slug");
       if (reasons.length === 0) reasons.push("specifications");
       return {
@@ -336,9 +337,7 @@ function ProjectsPage() {
 
   const unlinkedProperties = useMemo(() => {
     if (!properties) return [];
-    return (properties as any[]).filter(
-      (p) => !p.is_deleted && !existingProjectSlugs.has(p.slug)
-    );
+    return (properties as any[]).filter((p) => !p.is_deleted && !existingProjectSlugs.has(p.slug));
   }, [properties, existingProjectSlugs]);
 
   const createMutation = useMutation({
@@ -399,7 +398,7 @@ function ProjectsPage() {
   const filteredProjects = useMemo(() => {
     return projects.filter((p: any) => {
       if (filterStatus !== "all" && p.status !== filterStatus) return false;
-      
+
       if (search) {
         const q = search.toLowerCase();
         if (
@@ -423,9 +422,7 @@ function ProjectsPage() {
   };
 
   const toggleSelect = (id: string) => {
-    setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
-    );
+    setSelectedIds((prev) => (prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]));
   };
 
   if (activeProjectId && activeProjectSlug) {
@@ -455,8 +452,8 @@ function ProjectsPage() {
           </p>
         </div>
         <div className="portal-page-header-actions">
-          {selectedIds.length > 0 && (
-            bulkDeleteConfirm ? (
+          {selectedIds.length > 0 &&
+            (bulkDeleteConfirm ? (
               <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
                 <span style={{ fontSize: "0.8125rem", color: "oklch(0.6 0.18 25)" }}>
                   Delete {selectedIds.length} items?
@@ -481,13 +478,16 @@ function ProjectsPage() {
               <button
                 onClick={() => setBulkDeleteConfirm(true)}
                 className="portal-btn-ghost"
-                style={{ color: "oklch(0.6 0.18 25)", borderColor: "oklch(0.6 0.18 25 / 0.3)", background: "oklch(0.6 0.18 25 / 0.06)" }}
+                style={{
+                  color: "oklch(0.6 0.18 25)",
+                  borderColor: "oklch(0.6 0.18 25 / 0.3)",
+                  background: "oklch(0.6 0.18 25 / 0.06)",
+                }}
               >
                 <Trash2 size={15} />
                 Delete ({selectedIds.length})
               </button>
-            )
-          )}
+            ))}
           <button onClick={() => setShowCreateModal(true)} className="portal-btn-primary">
             <Plus size={16} />
             New Project
@@ -499,8 +499,16 @@ function ProjectsPage() {
       <div className="portal-stats-row">
         {[
           { label: "Total", value: filteredProjects.length, color: "stat-blue" },
-          { label: "Published", value: (projects as any[]).filter((p) => p.status === "published").length, color: "stat-green" },
-          { label: "Drafts", value: (projects as any[]).filter((p) => p.status === "draft").length, color: "stat-amber" },
+          {
+            label: "Published",
+            value: (projects as any[]).filter((p) => p.status === "published").length,
+            color: "stat-green",
+          },
+          {
+            label: "Drafts",
+            value: (projects as any[]).filter((p) => p.status === "draft").length,
+            color: "stat-amber",
+          },
           { label: "Selected", value: selectedIds.length, color: "stat-violet" },
         ].map((s) => (
           <div key={s.label} className={`portal-stat-card ${s.color}`}>
@@ -520,7 +528,10 @@ function ProjectsPage() {
             className="portal-input"
             placeholder="Search title, city, developer…"
             value={search}
-            onChange={(e) => { setSearch(e.target.value); setSelectedIds([]); }}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setSelectedIds([]);
+            }}
           />
         </div>
 
@@ -529,7 +540,10 @@ function ProjectsPage() {
             <select
               className="portal-select"
               value={filterStatus}
-              onChange={(e) => { setFilterStatus(e.target.value); setSelectedIds([]); }}
+              onChange={(e) => {
+                setFilterStatus(e.target.value);
+                setSelectedIds([]);
+              }}
             >
               <option value="all">All Status</option>
               <option value="draft">Draft</option>
@@ -563,8 +577,14 @@ function ProjectsPage() {
           <div className="portal-item-grid">
             {Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="portal-item-card" style={{ minHeight: "160px" }}>
-                <div className="skeleton" style={{ height: "14px", width: "65%", borderRadius: "6px" }} />
-                <div className="skeleton" style={{ height: "12px", width: "40%", borderRadius: "6px" }} />
+                <div
+                  className="skeleton"
+                  style={{ height: "14px", width: "65%", borderRadius: "6px" }}
+                />
+                <div
+                  className="skeleton"
+                  style={{ height: "12px", width: "40%", borderRadius: "6px" }}
+                />
                 <div className="skeleton" style={{ height: "56px", borderRadius: "6px" }} />
               </div>
             ))}
@@ -586,7 +606,9 @@ function ProjectsPage() {
                 key={proj.id}
                 className={`portal-item-card ${selectedIds.includes(proj.id) ? "is-selected" : ""}`}
                 style={{
-                  outline: selectedIds.includes(proj.id) ? "2px solid var(--portal-accent)" : undefined,
+                  outline: selectedIds.includes(proj.id)
+                    ? "2px solid var(--portal-accent)"
+                    : undefined,
                   outlineOffset: "-2px",
                 }}
               >
@@ -602,11 +624,21 @@ function ProjectsPage() {
                     <div className="portal-item-card-title">{proj.title}</div>
                     <div className="portal-item-card-slug">/{proj.slug}</div>
                     <div className="portal-item-card-badges" style={{ marginTop: "0.4rem" }}>
-                      <span className={`portal-status-badge status-${proj.status}`}>{proj.status}</span>
+                      <span className={`portal-status-badge status-${proj.status}`}>
+                        {proj.status}
+                      </span>
                       {duplicateIds.has(proj.id) && (
                         <span
                           title="Duplicate detected"
-                          style={{ fontSize: "10px", color: "oklch(0.74 0.137 79)", background: "rgba(212,163,89,0.12)", border: "1px solid rgba(212,163,89,0.25)", borderRadius: "4px", padding: "1px 6px", fontWeight: "bold" }}
+                          style={{
+                            fontSize: "10px",
+                            color: "oklch(0.74 0.137 79)",
+                            background: "rgba(212,163,89,0.12)",
+                            border: "1px solid rgba(212,163,89,0.25)",
+                            borderRadius: "4px",
+                            padding: "1px 6px",
+                            fontWeight: "bold",
+                          }}
                         >
                           ⚠️ Duplicate
                         </span>
@@ -619,21 +651,35 @@ function ProjectsPage() {
                 <div className="portal-item-card-meta">
                   <div className="portal-item-card-meta-item">
                     <span className="portal-item-card-meta-label">Developer</span>
-                    <span className="portal-item-card-meta-value" style={{ fontSize: "0.75rem" }}>{proj.developer}</span>
+                    <span className="portal-item-card-meta-value" style={{ fontSize: "0.75rem" }}>
+                      {proj.developer}
+                    </span>
                   </div>
                   <div className="portal-item-card-meta-item">
                     <span className="portal-item-card-meta-label">City</span>
-                    <span className="portal-item-card-meta-value" style={{ fontSize: "0.75rem" }}>{proj.city}</span>
+                    <span className="portal-item-card-meta-value" style={{ fontSize: "0.75rem" }}>
+                      {proj.city}
+                    </span>
                   </div>
                   <div className="portal-item-card-meta-item">
                     <span className="portal-item-card-meta-label">Min Price</span>
-                    <span className="portal-item-card-meta-value" style={{ fontFamily: "var(--font-mono)", fontSize: "0.78rem", color: "oklch(0.8 0.16 145)" }}>
+                    <span
+                      className="portal-item-card-meta-value"
+                      style={{
+                        fontFamily: "var(--font-mono)",
+                        fontSize: "0.78rem",
+                        color: "oklch(0.8 0.16 145)",
+                      }}
+                    >
                       ₱{(proj.min_price / 1_000_000).toFixed(1)}M
                     </span>
                   </div>
                   <div className="portal-item-card-meta-item">
                     <span className="portal-item-card-meta-label">Max Price</span>
-                    <span className="portal-item-card-meta-value" style={{ fontFamily: "var(--font-mono)", fontSize: "0.78rem" }}>
+                    <span
+                      className="portal-item-card-meta-value"
+                      style={{ fontFamily: "var(--font-mono)", fontSize: "0.78rem" }}
+                    >
                       ₱{(proj.max_price / 1_000_000).toFixed(1)}M
                     </span>
                   </div>
@@ -666,7 +712,11 @@ function ProjectsPage() {
                     </button>
                     <button
                       onClick={() => {
-                        if (confirm(`Delete "${proj.title}"? This will permanently remove all layouts and revisions.`)) {
+                        if (
+                          confirm(
+                            `Delete "${proj.title}"? This will permanently remove all layouts and revisions.`,
+                          )
+                        ) {
                           deleteMutation.mutate(proj.id);
                         }
                       }}
@@ -690,7 +740,10 @@ function ProjectsPage() {
                   <th style={{ width: "40px", textAlign: "center" }}>
                     <input
                       type="checkbox"
-                      checked={filteredProjects.length > 0 && selectedIds.length === filteredProjects.length}
+                      checked={
+                        filteredProjects.length > 0 &&
+                        selectedIds.length === filteredProjects.length
+                      }
                       onChange={toggleSelectAll}
                       style={{ cursor: "pointer" }}
                     />
@@ -708,7 +761,11 @@ function ProjectsPage() {
                   <tr
                     key={proj.id}
                     className="portal-table-row"
-                    style={{ background: selectedIds.includes(proj.id) ? "var(--portal-accent-dim)" : "transparent" }}
+                    style={{
+                      background: selectedIds.includes(proj.id)
+                        ? "var(--portal-accent-dim)"
+                        : "transparent",
+                    }}
                   >
                     <td style={{ textAlign: "center" }}>
                       <input
@@ -720,32 +777,89 @@ function ProjectsPage() {
                     </td>
                     <td>
                       <div style={{ display: "flex", flexDirection: "column", gap: "0.2rem" }}>
-                        <span style={{ fontWeight: 700, display: "flex", alignItems: "center", gap: "0.4rem", flexWrap: "wrap" }}>
+                        <span
+                          style={{
+                            fontWeight: 700,
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "0.4rem",
+                            flexWrap: "wrap",
+                          }}
+                        >
                           {proj.title}
                           {duplicateIds.has(proj.id) && (
-                            <span title="Duplicate detected" style={{ fontSize: "10px", color: "oklch(0.74 0.137 79)", background: "rgba(212,163,89,0.12)", border: "1px solid rgba(212,163,89,0.25)", borderRadius: "4px", padding: "1px 6px", fontWeight: "bold" }}>
+                            <span
+                              title="Duplicate detected"
+                              style={{
+                                fontSize: "10px",
+                                color: "oklch(0.74 0.137 79)",
+                                background: "rgba(212,163,89,0.12)",
+                                border: "1px solid rgba(212,163,89,0.25)",
+                                borderRadius: "4px",
+                                padding: "1px 6px",
+                                fontWeight: "bold",
+                              }}
+                            >
                               ⚠️ Dup
                             </span>
                           )}
                         </span>
-                        <span style={{ fontSize: "11px", fontFamily: "var(--font-mono)", color: "var(--portal-text-muted)" }}>/{proj.slug}</span>
+                        <span
+                          style={{
+                            fontSize: "11px",
+                            fontFamily: "var(--font-mono)",
+                            color: "var(--portal-text-muted)",
+                          }}
+                        >
+                          /{proj.slug}
+                        </span>
                       </div>
                     </td>
-                    <td className="hide-mobile" style={{ fontSize: "13px", color: "var(--portal-text)" }}>{proj.developer}</td>
-                    <td className="hide-mobile" style={{ fontSize: "13px", color: "var(--portal-text-muted)" }}>{proj.city}</td>
-                    <td>
-                      <span className={`portal-status-badge status-${proj.status}`}>{proj.status}</span>
+                    <td
+                      className="hide-mobile"
+                      style={{ fontSize: "13px", color: "var(--portal-text)" }}
+                    >
+                      {proj.developer}
                     </td>
-                    <td className="hide-mobile" style={{ fontFamily: "var(--font-mono)", fontSize: "12px", color: "var(--portal-text)" }}>
-                      ₱{(proj.min_price / 1_000_000).toFixed(1)}M–₱{(proj.max_price / 1_000_000).toFixed(1)}M
+                    <td
+                      className="hide-mobile"
+                      style={{ fontSize: "13px", color: "var(--portal-text-muted)" }}
+                    >
+                      {proj.city}
+                    </td>
+                    <td>
+                      <span className={`portal-status-badge status-${proj.status}`}>
+                        {proj.status}
+                      </span>
+                    </td>
+                    <td
+                      className="hide-mobile"
+                      style={{
+                        fontFamily: "var(--font-mono)",
+                        fontSize: "12px",
+                        color: "var(--portal-text)",
+                      }}
+                    >
+                      ₱{(proj.min_price / 1_000_000).toFixed(1)}M–₱
+                      {(proj.max_price / 1_000_000).toFixed(1)}M
                     </td>
                     <td>
                       <div style={{ display: "flex", gap: "0.4rem", justifyContent: "flex-end" }}>
-                        <a href={`/projects/${proj.slug}`} target="_blank" rel="noreferrer" className="portal-icon-btn" title="View public page">
+                        <a
+                          href={`/projects/${proj.slug}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="portal-icon-btn"
+                          title="View public page"
+                        >
                           <Eye size={14} />
                         </a>
                         <button
-                          onClick={() => { setActiveProjectId(proj.id); setActiveProjectSlug(proj.slug); setActiveProjectTitle(proj.title); }}
+                          onClick={() => {
+                            setActiveProjectId(proj.id);
+                            setActiveProjectSlug(proj.slug);
+                            setActiveProjectTitle(proj.title);
+                          }}
                           className="portal-icon-btn"
                           title="Edit page layout"
                         >
@@ -753,7 +867,11 @@ function ProjectsPage() {
                         </button>
                         <button
                           onClick={() => {
-                            if (confirm(`Delete "${proj.title}"? This will permanently remove all layouts and revisions.`)) {
+                            if (
+                              confirm(
+                                `Delete "${proj.title}"? This will permanently remove all layouts and revisions.`,
+                              )
+                            ) {
                               deleteMutation.mutate(proj.id);
                             }
                           }}
@@ -774,9 +892,20 @@ function ProjectsPage() {
 
         {/* Footer count */}
         {!listLoading && filteredProjects.length > 0 && (
-          <div style={{ padding: "0.6rem 1.25rem", borderTop: "1px solid oklch(0.25 0.015 258)", fontSize: "12px", color: "var(--portal-text-muted)" }}>
+          <div
+            style={{
+              padding: "0.6rem 1.25rem",
+              borderTop: "1px solid oklch(0.25 0.015 258)",
+              fontSize: "12px",
+              color: "var(--portal-text-muted)",
+            }}
+          >
             Showing {filteredProjects.length} of {projects.length} projects
-            {selectedIds.length > 0 && <span style={{ marginLeft: "0.75rem", color: "var(--portal-accent)" }}>· {selectedIds.length} selected</span>}
+            {selectedIds.length > 0 && (
+              <span style={{ marginLeft: "0.75rem", color: "var(--portal-accent)" }}>
+                · {selectedIds.length} selected
+              </span>
+            )}
           </div>
         )}
       </div>
@@ -791,12 +920,28 @@ function ProjectsPage() {
           >
             <div className="portal-detail-header">
               <h2 className="portal-detail-name">Create New Project</h2>
-              <button className="portal-detail-close" onClick={() => setShowCreateModal(false)}>✕</button>
+              <button className="portal-detail-close" onClick={() => setShowCreateModal(false)}>
+                ✕
+              </button>
             </div>
-            <div className="portal-detail-body" style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+            <div
+              className="portal-detail-body"
+              style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+            >
               {unlinkedProperties.length > 0 && (
-                <div className="portal-field" style={{ background: "rgba(255,255,255,0.03)", padding: "0.75rem", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.06)" }}>
-                  <label className="portal-field-label" style={{ color: "oklch(0.74 0.137 79)", fontWeight: "bold" }}>
+                <div
+                  className="portal-field"
+                  style={{
+                    background: "rgba(255,255,255,0.03)",
+                    padding: "0.75rem",
+                    borderRadius: "8px",
+                    border: "1px solid rgba(255,255,255,0.06)",
+                  }}
+                >
+                  <label
+                    className="portal-field-label"
+                    style={{ color: "oklch(0.74 0.137 79)", fontWeight: "bold" }}
+                  >
                     Link & Import from Existing Property (Optional)
                   </label>
                   <div className="portal-select-wrap">
@@ -823,64 +968,143 @@ function ProjectsPage() {
                     >
                       <option value="">-- Or select property to auto-fill --</option>
                       {unlinkedProperties.map((p: any) => (
-                        <option key={p.id} value={p.id}>{p.name} ({p.location})</option>
+                        <option key={p.id} value={p.id}>
+                          {p.name} ({p.location})
+                        </option>
                       ))}
                     </select>
                     <ChevronDown size={14} className="portal-select-icon" />
                   </div>
-                  <span style={{ fontSize: "11px", color: "var(--zinc-500)", marginTop: "0.25rem", display: "block" }}>
-                    Selecting a property auto-populates the form and ensures the slugs match perfectly.
+                  <span
+                    style={{
+                      fontSize: "11px",
+                      color: "var(--zinc-500)",
+                      marginTop: "0.25rem",
+                      display: "block",
+                    }}
+                  >
+                    Selecting a property auto-populates the form and ensures the slugs match
+                    perfectly.
                   </span>
                 </div>
               )}
 
               <div className="portal-field">
                 <label className="portal-field-label">Project Title</label>
-                <input type="text" placeholder="e.g., Sonora Garden Residences" value={newProj.title} onChange={(e) => setNewProj((prev) => ({ ...prev, title: e.target.value }))} className="portal-input" />
+                <input
+                  type="text"
+                  placeholder="e.g., Sonora Garden Residences"
+                  value={newProj.title}
+                  onChange={(e) => setNewProj((prev) => ({ ...prev, title: e.target.value }))}
+                  className="portal-input"
+                />
               </div>
 
               <div className="portal-field">
                 <label className="portal-field-label">Slug (URL path)</label>
-                <input type="text" placeholder="e.g., sonora-garden" value={newProj.slug} onChange={(e) => setNewProj((prev) => ({ ...prev, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "") }))} className="portal-input" />
+                <input
+                  type="text"
+                  placeholder="e.g., sonora-garden"
+                  value={newProj.slug}
+                  onChange={(e) =>
+                    setNewProj((prev) => ({
+                      ...prev,
+                      slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""),
+                    }))
+                  }
+                  className="portal-input"
+                />
                 {newProjDuplicateWarning && (
-                  <div style={{ marginTop: "0.5rem", padding: "0.6rem 0.8rem", background: "rgba(212,163,89,0.08)", border: "1px solid rgba(212,163,89,0.25)", borderRadius: "6px", display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "12px", color: "oklch(0.74 0.137 79)" }}>
+                  <div
+                    style={{
+                      marginTop: "0.5rem",
+                      padding: "0.6rem 0.8rem",
+                      background: "rgba(212,163,89,0.08)",
+                      border: "1px solid rgba(212,163,89,0.25)",
+                      borderRadius: "6px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.5rem",
+                      fontSize: "12px",
+                      color: "oklch(0.74 0.137 79)",
+                    }}
+                  >
                     <AlertCircle size={14} style={{ flexShrink: 0 }} />
-                    <span><strong>Warning:</strong> Similar active project detected ({newProjDuplicateWarning.count} match(es) on {newProjDuplicateWarning.reasons}: <em>{newProjDuplicateWarning.names}</em>).</span>
+                    <span>
+                      <strong>Warning:</strong> Similar active project detected (
+                      {newProjDuplicateWarning.count} match(es) on {newProjDuplicateWarning.reasons}
+                      : <em>{newProjDuplicateWarning.names}</em>).
+                    </span>
                   </div>
                 )}
               </div>
 
               <div className="portal-field">
                 <label className="portal-field-label">Developer</label>
-                <input type="text" value={newProj.developer} onChange={(e) => setNewProj((prev) => ({ ...prev, developer: e.target.value }))} className="portal-input" />
+                <input
+                  type="text"
+                  value={newProj.developer}
+                  onChange={(e) => setNewProj((prev) => ({ ...prev, developer: e.target.value }))}
+                  className="portal-input"
+                />
               </div>
 
               <div className="portal-grid-2col">
                 <div className="portal-field">
                   <label className="portal-field-label">City</label>
-                  <input type="text" placeholder="e.g., Las Piñas" value={newProj.city} onChange={(e) => setNewProj((prev) => ({ ...prev, city: e.target.value }))} className="portal-input" />
+                  <input
+                    type="text"
+                    placeholder="e.g., Las Piñas"
+                    value={newProj.city}
+                    onChange={(e) => setNewProj((prev) => ({ ...prev, city: e.target.value }))}
+                    className="portal-input"
+                  />
                 </div>
                 <div className="portal-field">
                   <label className="portal-field-label">Full Address</label>
-                  <input type="text" placeholder="e.g., Alabang-Zapote Road" value={newProj.full_address} onChange={(e) => setNewProj((prev) => ({ ...prev, full_address: e.target.value }))} className="portal-input" />
+                  <input
+                    type="text"
+                    placeholder="e.g., Alabang-Zapote Road"
+                    value={newProj.full_address}
+                    onChange={(e) =>
+                      setNewProj((prev) => ({ ...prev, full_address: e.target.value }))
+                    }
+                    className="portal-input"
+                  />
                 </div>
               </div>
 
               <div className="portal-grid-2col">
                 <div className="portal-field">
                   <label className="portal-field-label">Minimum Price (₱)</label>
-                  <input type="number" value={newProj.min_price} onChange={(e) => setNewProj((prev) => ({ ...prev, min_price: parseInt(e.target.value) || 0 }))} className="portal-input" />
+                  <input
+                    type="number"
+                    value={newProj.min_price}
+                    onChange={(e) =>
+                      setNewProj((prev) => ({ ...prev, min_price: parseInt(e.target.value) || 0 }))
+                    }
+                    className="portal-input"
+                  />
                 </div>
                 <div className="portal-field">
                   <label className="portal-field-label">Maximum Price (₱)</label>
-                  <input type="number" value={newProj.max_price} onChange={(e) => setNewProj((prev) => ({ ...prev, max_price: parseInt(e.target.value) || 0 }))} className="portal-input" />
+                  <input
+                    type="number"
+                    value={newProj.max_price}
+                    onChange={(e) =>
+                      setNewProj((prev) => ({ ...prev, max_price: parseInt(e.target.value) || 0 }))
+                    }
+                    className="portal-input"
+                  />
                 </div>
               </div>
 
               <div className="portal-detail-footer" style={{ marginTop: "1rem" }}>
                 <button
                   onClick={() => createMutation.mutate({ data: newProj })}
-                  disabled={createMutation.isPending || !newProj.title || !newProj.slug || !newProj.city}
+                  disabled={
+                    createMutation.isPending || !newProj.title || !newProj.slug || !newProj.city
+                  }
                   className="portal-btn-primary"
                   style={{ width: "100%" }}
                 >
@@ -1000,7 +1224,7 @@ function ProjectEditor({ projectId, slug, projectTitle, onBack }: EditorProps) {
   const updateSectionField = (sectionType: string, key: string, value: any) => {
     if (!draft?.layout_flow) return;
     const nextFlow = (draft.layout_flow as any[]).map((s) =>
-      s.type === sectionType ? { ...s, payload: { ...s.payload, [key]: value } } : s
+      s.type === sectionType ? { ...s, payload: { ...s.payload, [key]: value } } : s,
     );
     setDraft({ ...draft, layout_flow: nextFlow });
     setDirty(true);
@@ -1239,15 +1463,36 @@ function ProjectEditor({ projectId, slug, projectTitle, onBack }: EditorProps) {
             marginBottom: "1rem",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
+          <div
+            style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}
+          >
             <AlertCircle size={16} style={{ color: "oklch(0.7 0.18 25)", flexShrink: 0 }} />
-            <p style={{ fontSize: "0.8125rem", fontWeight: 700, color: "oklch(0.7 0.18 25)", margin: 0 }}>
-              Resolve {validationIssues.length} issue{validationIssues.length > 1 ? "s" : ""} before publishing
+            <p
+              style={{
+                fontSize: "0.8125rem",
+                fontWeight: 700,
+                color: "oklch(0.7 0.18 25)",
+                margin: 0,
+              }}
+            >
+              Resolve {validationIssues.length} issue{validationIssues.length > 1 ? "s" : ""} before
+              publishing
             </p>
           </div>
-          <ul style={{ margin: 0, paddingLeft: "1.5rem", display: "flex", flexDirection: "column", gap: "0.2rem" }}>
+          <ul
+            style={{
+              margin: 0,
+              paddingLeft: "1.5rem",
+              display: "flex",
+              flexDirection: "column",
+              gap: "0.2rem",
+            }}
+          >
             {validationIssues.map((issue, i) => (
-              <li key={i} style={{ fontSize: "0.78rem", color: "var(--portal-text-muted, #a1a1aa)" }}>
+              <li
+                key={i}
+                style={{ fontSize: "0.78rem", color: "var(--portal-text-muted, #a1a1aa)" }}
+              >
                 {issue}
               </li>
             ))}
@@ -1315,7 +1560,20 @@ function ProjectEditor({ projectId, slug, projectTitle, onBack }: EditorProps) {
         {/* Sub tabs */}
         <aside className="portal-settings-nav">
           {/* ── GROUP: Content ─────────────────── */}
-          <p style={{ fontSize: "9px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--portal-text-muted, #71717a)", padding: "0.25rem 0.75rem", marginBottom: "0.15rem", marginTop: "0.25rem" }}>Content</p>
+          <p
+            style={{
+              fontSize: "9px",
+              fontWeight: 700,
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              color: "var(--portal-text-muted, #71717a)",
+              padding: "0.25rem 0.75rem",
+              marginBottom: "0.15rem",
+              marginTop: "0.25rem",
+            }}
+          >
+            Content
+          </p>
           <button
             onClick={() => setActiveTab("general")}
             className={`portal-settings-nav-item ${activeTab === "general" ? "active" : ""}`}
@@ -1346,7 +1604,20 @@ function ProjectEditor({ projectId, slug, projectTitle, onBack }: EditorProps) {
           </button>
 
           {/* ── GROUP: Page Layout ──────────────── */}
-          <p style={{ fontSize: "9px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--portal-text-muted, #71717a)", padding: "0.25rem 0.75rem", marginBottom: "0.15rem", marginTop: "0.75rem" }}>Page Layout</p>
+          <p
+            style={{
+              fontSize: "9px",
+              fontWeight: 700,
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              color: "var(--portal-text-muted, #71717a)",
+              padding: "0.25rem 0.75rem",
+              marginBottom: "0.15rem",
+              marginTop: "0.75rem",
+            }}
+          >
+            Page Layout
+          </p>
           <button
             onClick={() => setActiveTab("sections")}
             className={`portal-settings-nav-item ${activeTab === "sections" ? "active" : ""}`}
@@ -1356,7 +1627,20 @@ function ProjectEditor({ projectId, slug, projectTitle, onBack }: EditorProps) {
           </button>
 
           {/* ── GROUP: Publishing ───────────────── */}
-          <p style={{ fontSize: "9px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--portal-text-muted, #71717a)", padding: "0.25rem 0.75rem", marginBottom: "0.15rem", marginTop: "0.75rem" }}>Publishing</p>
+          <p
+            style={{
+              fontSize: "9px",
+              fontWeight: 700,
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              color: "var(--portal-text-muted, #71717a)",
+              padding: "0.25rem 0.75rem",
+              marginBottom: "0.15rem",
+              marginTop: "0.75rem",
+            }}
+          >
+            Publishing
+          </p>
           <button
             onClick={() => setActiveTab("seo")}
             className={`portal-settings-nav-item ${activeTab === "seo" ? "active" : ""}`}
@@ -1371,7 +1655,18 @@ function ProjectEditor({ projectId, slug, projectTitle, onBack }: EditorProps) {
             <Rocket size={15} />
             Publish
             {validationIssues.length > 0 && (
-              <span style={{ marginLeft: "auto", background: "oklch(0.65 0.2 25 / 0.8)", color: "#fff", borderRadius: "99px", fontSize: "9px", fontWeight: 700, padding: "1px 6px", lineHeight: 1.5 }}>
+              <span
+                style={{
+                  marginLeft: "auto",
+                  background: "oklch(0.65 0.2 25 / 0.8)",
+                  color: "#fff",
+                  borderRadius: "99px",
+                  fontSize: "9px",
+                  fontWeight: 700,
+                  padding: "1px 6px",
+                  lineHeight: 1.5,
+                }}
+              >
                 {validationIssues.length}
               </span>
             )}
@@ -1385,7 +1680,20 @@ function ProjectEditor({ projectId, slug, projectTitle, onBack }: EditorProps) {
           </button>
 
           {/* ── GROUP: Advanced ─────────────────── */}
-          <p style={{ fontSize: "9px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--portal-text-muted, #71717a)", padding: "0.25rem 0.75rem", marginBottom: "0.15rem", marginTop: "0.75rem" }}>Advanced</p>
+          <p
+            style={{
+              fontSize: "9px",
+              fontWeight: 700,
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              color: "var(--portal-text-muted, #71717a)",
+              padding: "0.25rem 0.75rem",
+              marginBottom: "0.15rem",
+              marginTop: "0.75rem",
+            }}
+          >
+            Advanced
+          </p>
           <button
             onClick={() => setActiveTab("raw")}
             className={`portal-settings-nav-item ${activeTab === "raw" ? "active" : ""}`}
@@ -1493,8 +1801,20 @@ function ProjectEditor({ projectId, slug, projectTitle, onBack }: EditorProps) {
                     onChange={(e) => updateMeta("min_price", parseInt(e.target.value) || 0)}
                     className="portal-input"
                   />
-                  <p style={{ fontSize: "11px", color: draft.project_meta.min_price ? "oklch(0.65 0.18 145)" : "var(--zinc-500)", marginTop: "0.25rem", marginBottom: 0, fontWeight: draft.project_meta.min_price ? 600 : 400 }}>
-                    {draft.project_meta.min_price ? `✓ ₱${(draft.project_meta.min_price).toLocaleString()} PHP` : "Enter the minimum price in full Pesos (e.g. 4500000 = ₱4.5M)."}
+                  <p
+                    style={{
+                      fontSize: "11px",
+                      color: draft.project_meta.min_price
+                        ? "oklch(0.65 0.18 145)"
+                        : "var(--zinc-500)",
+                      marginTop: "0.25rem",
+                      marginBottom: 0,
+                      fontWeight: draft.project_meta.min_price ? 600 : 400,
+                    }}
+                  >
+                    {draft.project_meta.min_price
+                      ? `✓ ₱${draft.project_meta.min_price.toLocaleString()} PHP`
+                      : "Enter the minimum price in full Pesos (e.g. 4500000 = ₱4.5M)."}
                   </p>
                 </div>
                 <div className="portal-field">
@@ -1505,8 +1825,20 @@ function ProjectEditor({ projectId, slug, projectTitle, onBack }: EditorProps) {
                     onChange={(e) => updateMeta("max_price", parseInt(e.target.value) || 0)}
                     className="portal-input"
                   />
-                  <p style={{ fontSize: "11px", color: draft.project_meta.max_price ? "oklch(0.65 0.18 145)" : "var(--zinc-500)", marginTop: "0.25rem", marginBottom: 0, fontWeight: draft.project_meta.max_price ? 600 : 400 }}>
-                    {draft.project_meta.max_price ? `✓ ₱${(draft.project_meta.max_price).toLocaleString()} PHP` : "Enter the maximum price in full Pesos (e.g. 13500000 = ₱13.5M)."}
+                  <p
+                    style={{
+                      fontSize: "11px",
+                      color: draft.project_meta.max_price
+                        ? "oklch(0.65 0.18 145)"
+                        : "var(--zinc-500)",
+                      marginTop: "0.25rem",
+                      marginBottom: 0,
+                      fontWeight: draft.project_meta.max_price ? 600 : 400,
+                    }}
+                  >
+                    {draft.project_meta.max_price
+                      ? `✓ ₱${draft.project_meta.max_price.toLocaleString()} PHP`
+                      : "Enter the maximum price in full Pesos (e.g. 13500000 = ₱13.5M)."}
                   </p>
                 </div>
               </div>
@@ -1572,13 +1904,31 @@ function ProjectEditor({ projectId, slug, projectTitle, onBack }: EditorProps) {
                 className="border-t border-[var(--portal-border)] pt-4 mt-4"
                 style={{ display: "flex", alignItems: "flex-start", gap: "0.5rem" }}
               >
-                <Globe size={15} style={{ color: "var(--portal-text-muted)", flexShrink: 0, marginTop: "2px" }} />
-                <p style={{ fontSize: "12px", color: "var(--portal-text-muted)", margin: 0, lineHeight: 1.5 }}>
+                <Globe
+                  size={15}
+                  style={{ color: "var(--portal-text-muted)", flexShrink: 0, marginTop: "2px" }}
+                />
+                <p
+                  style={{
+                    fontSize: "12px",
+                    color: "var(--portal-text-muted)",
+                    margin: 0,
+                    lineHeight: 1.5,
+                  }}
+                >
                   Page title, meta description, and the public URL slug now live in the{" "}
                   <button
                     type="button"
                     onClick={() => setActiveTab("seo")}
-                    style={{ background: "none", border: "none", color: "var(--portal-accent)", cursor: "pointer", padding: 0, font: "inherit", textDecoration: "underline" }}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      color: "var(--portal-accent)",
+                      cursor: "pointer",
+                      padding: 0,
+                      font: "inherit",
+                      textDecoration: "underline",
+                    }}
                   >
                     SEO &amp; URL
                   </button>{" "}
@@ -1595,7 +1945,8 @@ function ProjectEditor({ projectId, slug, projectTitle, onBack }: EditorProps) {
                 <div className="portal-card-title">Gallery &amp; Images</div>
               </div>
               <p className="text-[11px] text-zinc-400 mt-1 mb-4 leading-relaxed">
-                Manage the hero carousel here, and review every image used across this project in one place.
+                Manage the hero carousel here, and review every image used across this project in
+                one place.
               </p>
 
               {/* Hero carousel images */}
@@ -1610,7 +1961,15 @@ function ProjectEditor({ projectId, slug, projectTitle, onBack }: EditorProps) {
                         <button
                           type="button"
                           onClick={() => setActiveTab("sections")}
-                          style={{ background: "none", border: "none", color: "var(--portal-accent)", cursor: "pointer", padding: 0, font: "inherit", textDecoration: "underline" }}
+                          style={{
+                            background: "none",
+                            border: "none",
+                            color: "var(--portal-accent)",
+                            cursor: "pointer",
+                            padding: 0,
+                            font: "inherit",
+                            textDecoration: "underline",
+                          }}
                         >
                           Page Sections
                         </button>{" "}
@@ -1629,24 +1988,71 @@ function ProjectEditor({ projectId, slug, projectTitle, onBack }: EditorProps) {
                       placeholder={`Paste one Cloudinary URL per line:\nhttps://res.cloudinary.com/.../banner1.jpg`}
                       value={heroImages.join("\n")}
                       onChange={(e) => {
-                        const urls = e.target.value.split(/[,\n]/).map((s) => s.trim()).filter(Boolean);
+                        const urls = e.target.value
+                          .split(/[,\n]/)
+                          .map((s) => s.trim())
+                          .filter(Boolean);
                         updateSectionField("hero", "hero_images", urls);
                       }}
                     />
-                    <p style={{ fontSize: "11px", color: "var(--zinc-400)", marginTop: "0.25rem", marginBottom: 0 }}>
-                      💡 One image URL per line. Shown in the hero banner slideshow (16:9 landscape recommended).
+                    <p
+                      style={{
+                        fontSize: "11px",
+                        color: "var(--zinc-400)",
+                        marginTop: "0.25rem",
+                        marginBottom: 0,
+                      }}
+                    >
+                      💡 One image URL per line. Shown in the hero banner slideshow (16:9 landscape
+                      recommended).
                     </p>
                     {heroImages.length > 0 && (
-                      <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginTop: "0.75rem" }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: "0.5rem",
+                          flexWrap: "wrap",
+                          marginTop: "0.75rem",
+                        }}
+                      >
                         {heroImages.map((url, index) => (
-                          <div key={index} style={{ position: "relative", width: "96px", height: "60px", borderRadius: "6px", overflow: "hidden", border: "1px solid rgba(255,255,255,0.1)", background: "rgba(0,0,0,0.2)" }}>
+                          <div
+                            key={index}
+                            style={{
+                              position: "relative",
+                              width: "96px",
+                              height: "60px",
+                              borderRadius: "6px",
+                              overflow: "hidden",
+                              border: "1px solid rgba(255,255,255,0.1)",
+                              background: "rgba(0,0,0,0.2)",
+                            }}
+                          >
                             <img
                               src={url}
                               alt={`Slide ${index + 1}`}
                               style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                              onError={(e) => { (e.currentTarget as HTMLImageElement).style.outline = "2px solid #f87171"; (e.currentTarget as HTMLImageElement).style.outlineOffset = "-2px"; }}
+                              onError={(e) => {
+                                (e.currentTarget as HTMLImageElement).style.outline =
+                                  "2px solid #f87171";
+                                (e.currentTarget as HTMLImageElement).style.outlineOffset = "-2px";
+                              }}
                             />
-                            <span style={{ position: "absolute", bottom: "3px", right: "4px", fontSize: "9px", fontWeight: 700, color: "white", background: "rgba(0,0,0,0.6)", padding: "1px 4px", borderRadius: "3px" }}>{index + 1}</span>
+                            <span
+                              style={{
+                                position: "absolute",
+                                bottom: "3px",
+                                right: "4px",
+                                fontSize: "9px",
+                                fontWeight: 700,
+                                color: "white",
+                                background: "rgba(0,0,0,0.6)",
+                                padding: "1px 4px",
+                                borderRadius: "3px",
+                              }}
+                            >
+                              {index + 1}
+                            </span>
                           </div>
                         ))}
                       </div>
@@ -1658,26 +2064,73 @@ function ProjectEditor({ projectId, slug, projectTitle, onBack }: EditorProps) {
               {/* Image inventory across the project */}
               {(() => {
                 const inv: { src: string; label: string }[] = [];
-                (draft.buildings || []).forEach((b: any) => { if (b.image_url) inv.push({ src: b.image_url, label: `Building · ${b.name || "Untitled"}` }); });
-                (draft.units || []).forEach((u: any) => { if (u.image_url) inv.push({ src: u.image_url, label: `Unit · ${u.name || "Untitled"}` }); });
-                const media = (draft.layout_flow || []).find((s: any) => s.type === "media-experience");
-                (media?.payload?.photos || []).forEach((p: any) => { if (p.src) inv.push({ src: p.src, label: `Media · ${p.title || p.tab || "Photo"}` }); });
+                (draft.buildings || []).forEach((b: any) => {
+                  if (b.image_url)
+                    inv.push({ src: b.image_url, label: `Building · ${b.name || "Untitled"}` });
+                });
+                (draft.units || []).forEach((u: any) => {
+                  if (u.image_url)
+                    inv.push({ src: u.image_url, label: `Unit · ${u.name || "Untitled"}` });
+                });
+                const media = (draft.layout_flow || []).find(
+                  (s: any) => s.type === "media-experience",
+                );
+                (media?.payload?.photos || []).forEach((p: any) => {
+                  if (p.src)
+                    inv.push({ src: p.src, label: `Media · ${p.title || p.tab || "Photo"}` });
+                });
 
                 return (
                   <div className="portal-field border-t border-[var(--portal-border)] pt-4 mt-4">
-                    <label className="portal-field-label">Images used across this project ({inv.length})</label>
+                    <label className="portal-field-label">
+                      Images used across this project ({inv.length})
+                    </label>
                     {inv.length === 0 ? (
                       <p className="text-[11px] text-zinc-400 mt-1 mb-0">
-                        No building, unit, or media images added yet. Add them in the Buildings, Units &amp; Pricing, or Page Sections tabs.
+                        No building, unit, or media images added yet. Add them in the Buildings,
+                        Units &amp; Pricing, or Page Sections tabs.
                       </p>
                     ) : (
-                      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))", gap: "0.6rem", marginTop: "0.5rem" }}>
+                      <div
+                        style={{
+                          display: "grid",
+                          gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))",
+                          gap: "0.6rem",
+                          marginTop: "0.5rem",
+                        }}
+                      >
                         {inv.map((im, i) => (
-                          <div key={i} style={{ borderRadius: "8px", overflow: "hidden", border: "1px solid rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.02)" }}>
+                          <div
+                            key={i}
+                            style={{
+                              borderRadius: "8px",
+                              overflow: "hidden",
+                              border: "1px solid rgba(255,255,255,0.08)",
+                              background: "rgba(255,255,255,0.02)",
+                            }}
+                          >
                             <div style={{ height: "80px", background: "rgba(0,0,0,0.25)" }}>
-                              <img src={im.src} alt={im.label} style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
+                              <img
+                                src={im.src}
+                                alt={im.label}
+                                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                                onError={(e) => {
+                                  (e.currentTarget as HTMLImageElement).style.display = "none";
+                                }}
+                              />
                             </div>
-                            <div style={{ padding: "4px 6px", fontSize: "9.5px", color: "var(--zinc-400)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{im.label}</div>
+                            <div
+                              style={{
+                                padding: "4px 6px",
+                                fontSize: "9.5px",
+                                color: "var(--zinc-400)",
+                                whiteSpace: "nowrap",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                              }}
+                            >
+                              {im.label}
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -1704,13 +2157,22 @@ function ProjectEditor({ projectId, slug, projectTitle, onBack }: EditorProps) {
                   className="portal-input"
                   placeholder="sonora-garden-residences"
                 />
-                <p style={{ fontSize: "11px", color: "var(--zinc-400)", marginTop: "0.25rem", marginBottom: 0, lineHeight: 1.5 }}>
+                <p
+                  style={{
+                    fontSize: "11px",
+                    color: "var(--zinc-400)",
+                    marginTop: "0.25rem",
+                    marginBottom: 0,
+                    lineHeight: 1.5,
+                  }}
+                >
                   Public URL:{" "}
                   <span style={{ fontFamily: "var(--font-mono)", color: "var(--portal-text)" }}>
                     cityqlo.com/projects/{draft.project_meta.slug || "…"}
                   </span>
                   <br />
-                  ⚠️ Changing the slug changes the public link — update any shared URLs after publishing.
+                  ⚠️ Changing the slug changes the public link — update any shared URLs after
+                  publishing.
                 </p>
               </div>
 
@@ -1723,8 +2185,21 @@ function ProjectEditor({ projectId, slug, projectTitle, onBack }: EditorProps) {
                   onChange={(e) => updateMeta("meta_title", e.target.value)}
                   className="portal-input"
                 />
-                <p style={{ fontSize: "11px", color: (draft.project_meta.meta_title || "").length > 60 ? "oklch(0.74 0.137 79)" : "var(--zinc-400)", marginTop: "0.25rem", marginBottom: 0 }}>
-                  {(draft.project_meta.meta_title || "").length}/60 characters{(draft.project_meta.meta_title || "").length > 60 ? " · a bit long for Google" : ""}
+                <p
+                  style={{
+                    fontSize: "11px",
+                    color:
+                      (draft.project_meta.meta_title || "").length > 60
+                        ? "oklch(0.74 0.137 79)"
+                        : "var(--zinc-400)",
+                    marginTop: "0.25rem",
+                    marginBottom: 0,
+                  }}
+                >
+                  {(draft.project_meta.meta_title || "").length}/60 characters
+                  {(draft.project_meta.meta_title || "").length > 60
+                    ? " · a bit long for Google"
+                    : ""}
                 </p>
               </div>
 
@@ -1737,21 +2212,47 @@ function ProjectEditor({ projectId, slug, projectTitle, onBack }: EditorProps) {
                   onChange={(e) => updateMeta("meta_description", e.target.value)}
                   className="portal-textarea"
                 />
-                <p style={{ fontSize: "11px", color: (draft.project_meta.meta_description || "").length > 160 ? "oklch(0.74 0.137 79)" : "var(--zinc-400)", marginTop: "0.25rem", marginBottom: 0 }}>
-                  {(draft.project_meta.meta_description || "").length}/160 characters{(draft.project_meta.meta_description || "").length > 160 ? " · a bit long for Google" : ""}
+                <p
+                  style={{
+                    fontSize: "11px",
+                    color:
+                      (draft.project_meta.meta_description || "").length > 160
+                        ? "oklch(0.74 0.137 79)"
+                        : "var(--zinc-400)",
+                    marginTop: "0.25rem",
+                    marginBottom: 0,
+                  }}
+                >
+                  {(draft.project_meta.meta_description || "").length}/160 characters
+                  {(draft.project_meta.meta_description || "").length > 160
+                    ? " · a bit long for Google"
+                    : ""}
                 </p>
               </div>
 
               {/* Google-style search preview */}
               <div className="portal-field border-t border-[var(--portal-border)] pt-4 mt-2">
                 <label className="portal-field-label">Search Result Preview</label>
-                <div style={{ background: "#fff", borderRadius: "8px", padding: "12px 14px", border: "1px solid var(--portal-border)" }}>
-                  <div style={{ color: "#202124", fontSize: "12px" }}>cityqlo.com › projects › {draft.project_meta.slug || "…"}</div>
-                  <div style={{ color: "#1a0dab", fontSize: "18px", lineHeight: 1.3, margin: "2px 0" }}>
+                <div
+                  style={{
+                    background: "#fff",
+                    borderRadius: "8px",
+                    padding: "12px 14px",
+                    border: "1px solid var(--portal-border)",
+                  }}
+                >
+                  <div style={{ color: "#202124", fontSize: "12px" }}>
+                    cityqlo.com › projects › {draft.project_meta.slug || "…"}
+                  </div>
+                  <div
+                    style={{ color: "#1a0dab", fontSize: "18px", lineHeight: 1.3, margin: "2px 0" }}
+                  >
                     {draft.project_meta.meta_title || draft.project_meta.title || "Project title"}
                   </div>
                   <div style={{ color: "#4d5156", fontSize: "13px", lineHeight: 1.4 }}>
-                    {draft.project_meta.meta_description || draft.project_meta.description || "Add a meta description to control the snippet shown here."}
+                    {draft.project_meta.meta_description ||
+                      draft.project_meta.description ||
+                      "Add a meta description to control the snippet shown here."}
                   </div>
                 </div>
               </div>
@@ -1766,54 +2267,142 @@ function ProjectEditor({ projectId, slug, projectTitle, onBack }: EditorProps) {
               </div>
 
               {/* Status row */}
-              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1rem" }}>
-                <span className="portal-field-label" style={{ margin: 0 }}>Current status:</span>
-                <span className={`portal-status-badge status-${draft.project_meta.status || "draft"}`}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.75rem",
+                  marginBottom: "1rem",
+                }}
+              >
+                <span className="portal-field-label" style={{ margin: 0 }}>
+                  Current status:
+                </span>
+                <span
+                  className={`portal-status-badge status-${draft.project_meta.status || "draft"}`}
+                >
                   {draft.project_meta.status || "draft"}
                 </span>
-                {dirty && <span style={{ fontSize: "0.72rem", color: "oklch(0.7 0.18 25)", fontWeight: 600 }}>Unsaved changes</span>}
+                {dirty && (
+                  <span
+                    style={{ fontSize: "0.72rem", color: "oklch(0.7 0.18 25)", fontWeight: 600 }}
+                  >
+                    Unsaved changes
+                  </span>
+                )}
               </div>
 
               {/* Readiness checklist */}
               {validationIssues.length === 0 ? (
-                <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", background: "oklch(0.65 0.18 145 / 0.1)", border: "1px solid oklch(0.65 0.18 145 / 0.35)", borderRadius: "10px", padding: "0.85rem 1rem" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.6rem",
+                    background: "oklch(0.65 0.18 145 / 0.1)",
+                    border: "1px solid oklch(0.65 0.18 145 / 0.35)",
+                    borderRadius: "10px",
+                    padding: "0.85rem 1rem",
+                  }}
+                >
                   <CheckCircle size={18} style={{ color: "oklch(0.72 0.16 145)", flexShrink: 0 }} />
-                  <p style={{ margin: 0, fontSize: "0.82rem", fontWeight: 600, color: "oklch(0.72 0.16 145)" }}>
+                  <p
+                    style={{
+                      margin: 0,
+                      fontSize: "0.82rem",
+                      fontWeight: 600,
+                      color: "oklch(0.72 0.16 145)",
+                    }}
+                  >
                     Everything looks good — this project is ready to publish.
                   </p>
                 </div>
               ) : (
-                <div style={{ background: "oklch(0.65 0.2 25 / 0.08)", border: "1px solid oklch(0.65 0.2 25 / 0.35)", borderRadius: "10px", padding: "0.85rem 1rem" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
+                <div
+                  style={{
+                    background: "oklch(0.65 0.2 25 / 0.08)",
+                    border: "1px solid oklch(0.65 0.2 25 / 0.35)",
+                    borderRadius: "10px",
+                    padding: "0.85rem 1rem",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.5rem",
+                      marginBottom: "0.5rem",
+                    }}
+                  >
                     <AlertCircle size={16} style={{ color: "oklch(0.7 0.18 25)", flexShrink: 0 }} />
-                    <p style={{ margin: 0, fontSize: "0.82rem", fontWeight: 700, color: "oklch(0.7 0.18 25)" }}>
-                      Fix {validationIssues.length} item{validationIssues.length > 1 ? "s" : ""} before publishing
+                    <p
+                      style={{
+                        margin: 0,
+                        fontSize: "0.82rem",
+                        fontWeight: 700,
+                        color: "oklch(0.7 0.18 25)",
+                      }}
+                    >
+                      Fix {validationIssues.length} item{validationIssues.length > 1 ? "s" : ""}{" "}
+                      before publishing
                     </p>
                   </div>
-                  <ul style={{ margin: 0, paddingLeft: "1.5rem", display: "flex", flexDirection: "column", gap: "0.25rem" }}>
+                  <ul
+                    style={{
+                      margin: 0,
+                      paddingLeft: "1.5rem",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "0.25rem",
+                    }}
+                  >
                     {validationIssues.map((issue, i) => (
-                      <li key={i} style={{ fontSize: "0.78rem", color: "var(--portal-text-muted)" }}>{issue}</li>
+                      <li
+                        key={i}
+                        style={{ fontSize: "0.78rem", color: "var(--portal-text-muted)" }}
+                      >
+                        {issue}
+                      </li>
                     ))}
                   </ul>
                 </div>
               )}
 
               {/* Actions */}
-              <div style={{ display: "flex", gap: "0.6rem", marginTop: "1.25rem", flexWrap: "wrap" }}>
-                <button onClick={handleSave} disabled={!dirty || saveMutation.isPending} className="portal-btn-secondary">
+              <div
+                style={{ display: "flex", gap: "0.6rem", marginTop: "1.25rem", flexWrap: "wrap" }}
+              >
+                <button
+                  onClick={handleSave}
+                  disabled={!dirty || saveMutation.isPending}
+                  className="portal-btn-secondary"
+                >
                   <Save size={15} /> {saveMutation.isPending ? "Saving..." : "Save Draft"}
                 </button>
-                <button onClick={handlePublish} disabled={publishMutation.isPending || validationIssues.length > 0} className="portal-btn-primary">
-                  <Sparkles size={15} /> {publishMutation.isPending ? "Publishing..." : "Publish Live"}
+                <button
+                  onClick={handlePublish}
+                  disabled={publishMutation.isPending || validationIssues.length > 0}
+                  className="portal-btn-primary"
+                >
+                  <Sparkles size={15} />{" "}
+                  {publishMutation.isPending ? "Publishing..." : "Publish Live"}
                 </button>
-                <a href={`/projects/${draft.project_meta.slug}?preview=true`} target="_blank" rel="noreferrer" className="portal-btn-secondary">
+                <a
+                  href={`/projects/${draft.project_meta.slug}?preview=true`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="portal-btn-secondary"
+                >
                   <Eye size={15} /> Preview Draft
                 </a>
               </div>
 
               <p className="text-[11px] text-zinc-400 mt-4 leading-relaxed">
                 Publishing compiles your saved draft and makes it live at{" "}
-                <span style={{ fontFamily: "var(--font-mono)" }}>cityqlo.com/projects/{draft.project_meta.slug}</span>.
+                <span style={{ fontFamily: "var(--font-mono)" }}>
+                  cityqlo.com/projects/{draft.project_meta.slug}
+                </span>
+                .
               </p>
             </div>
           )}
@@ -1925,9 +2514,7 @@ function ProjectEditor({ projectId, slug, projectTitle, onBack }: EditorProps) {
                       }}
                     >
                       {SECTION_TYPES.map((st) => {
-                        const added = (draft.layout_flow || []).some(
-                          (s: any) => s.type === st.key,
-                        );
+                        const added = (draft.layout_flow || []).some((s: any) => s.type === st.key);
                         return (
                           <button
                             key={st.key}
@@ -2373,13 +2960,18 @@ function ProjectEditor({ projectId, slug, projectTitle, onBack }: EditorProps) {
           {/* LIVE PREVIEW TAB */}
           {activeTab === "preview" && (
             <div className="portal-card">
-              <div className="portal-card-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div
+                className="portal-card-header"
+                style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
+              >
                 <div className="portal-card-title flex items-center gap-2">
                   <Eye size={16} /> Live Draft Preview
                 </div>
                 <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
                   {dirty && (
-                    <span style={{ fontSize: "0.72rem", color: "oklch(0.7 0.18 25)", fontWeight: 600 }}>
+                    <span
+                      style={{ fontSize: "0.72rem", color: "oklch(0.7 0.18 25)", fontWeight: 600 }}
+                    >
                       Unsaved changes
                     </span>
                   )}
@@ -2585,13 +3177,30 @@ function SectionEditorBlock({ section, onChange }: SectionBlockProps) {
                 handleFieldChange("hero_images", urls);
               }}
             />
-            <p style={{ fontSize: "11px", color: "var(--zinc-400)", marginTop: "0.25rem", marginBottom: 0 }}>
-              💡 Paste one Cloudinary image URL per line. These are the photos shown in the homepage hero banner slideshow. Recommended: 16:9 wide landscape photos.
+            <p
+              style={{
+                fontSize: "11px",
+                color: "var(--zinc-400)",
+                marginTop: "0.25rem",
+                marginBottom: 0,
+              }}
+            >
+              💡 Paste one Cloudinary image URL per line. These are the photos shown in the homepage
+              hero banner slideshow. Recommended: 16:9 wide landscape photos.
             </p>
             {getVal("hero_images", []).length > 0 && (
               <div style={{ marginTop: "0.75rem" }}>
-                <span style={{ fontSize: "10px", color: "var(--zinc-400)", display: "block", marginBottom: "0.5rem", fontWeight: 600 }}>
-                  Hero Images Preview ({getVal("hero_images", []).length} image{getVal("hero_images", []).length !== 1 ? "s" : ""}):
+                <span
+                  style={{
+                    fontSize: "10px",
+                    color: "var(--zinc-400)",
+                    display: "block",
+                    marginBottom: "0.5rem",
+                    fontWeight: 600,
+                  }}
+                >
+                  Hero Images Preview ({getVal("hero_images", []).length} image
+                  {getVal("hero_images", []).length !== 1 ? "s" : ""}):
                 </span>
                 <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
                   {getVal("hero_images", []).map((url: string, index: number) => (
@@ -2604,7 +3213,7 @@ function SectionEditorBlock({ section, onChange }: SectionBlockProps) {
                         borderRadius: "6px",
                         overflow: "hidden",
                         border: "1px solid rgba(255,255,255,0.1)",
-                        background: "rgba(0,0,0,0.2)"
+                        background: "rgba(0,0,0,0.2)",
                       }}
                     >
                       <img
@@ -2616,7 +3225,19 @@ function SectionEditorBlock({ section, onChange }: SectionBlockProps) {
                           (e.target as HTMLImageElement).style.outlineOffset = "-2px";
                         }}
                       />
-                      <span style={{ position: "absolute", bottom: "3px", right: "4px", fontSize: "9px", fontWeight: 700, color: "white", background: "rgba(0,0,0,0.6)", padding: "1px 4px", borderRadius: "3px" }}>
+                      <span
+                        style={{
+                          position: "absolute",
+                          bottom: "3px",
+                          right: "4px",
+                          fontSize: "9px",
+                          fontWeight: 700,
+                          color: "white",
+                          background: "rgba(0,0,0,0.6)",
+                          padding: "1px 4px",
+                          borderRadius: "3px",
+                        }}
+                      >
                         {index + 1}
                       </span>
                     </div>
@@ -2638,7 +3259,9 @@ function SectionEditorBlock({ section, onChange }: SectionBlockProps) {
                 onChange={(e) => handleFieldChange("hide", e.target.checked)}
                 style={{ accentColor: "var(--portal-accent)" }}
               />
-              <span className="text-xs font-bold text-zinc-100">Hide this section on the project page</span>
+              <span className="text-xs font-bold text-zinc-100">
+                Hide this section on the project page
+              </span>
             </label>
           </div>
           <div className="portal-field">
@@ -2823,7 +3446,9 @@ function SectionEditorBlock({ section, onChange }: SectionBlockProps) {
                 onChange={(e) => handleFieldChange("hide", e.target.checked)}
                 style={{ accentColor: "var(--portal-accent)" }}
               />
-              <span className="text-xs font-bold text-zinc-100">Hide this section on the project page</span>
+              <span className="text-xs font-bold text-zinc-100">
+                Hide this section on the project page
+              </span>
             </label>
           </div>
           <div className="portal-field">
@@ -2937,7 +3562,9 @@ function SectionEditorBlock({ section, onChange }: SectionBlockProps) {
                 onChange={(e) => handleFieldChange("hide", e.target.checked)}
                 style={{ accentColor: "var(--portal-accent)" }}
               />
-              <span className="text-xs font-bold text-zinc-100">Hide this section on the project page</span>
+              <span className="text-xs font-bold text-zinc-100">
+                Hide this section on the project page
+              </span>
             </label>
           </div>
           <div className="portal-grid-2col">
@@ -3252,7 +3879,9 @@ function SectionEditorBlock({ section, onChange }: SectionBlockProps) {
                 onChange={(e) => handleFieldChange("hide", e.target.checked)}
                 style={{ accentColor: "var(--portal-accent)" }}
               />
-              <span className="text-xs font-bold text-zinc-100">Hide this section on the project page</span>
+              <span className="text-xs font-bold text-zinc-100">
+                Hide this section on the project page
+              </span>
             </label>
           </div>
           <div className="portal-field">
@@ -3310,10 +3939,22 @@ function SectionEditorBlock({ section, onChange }: SectionBlockProps) {
             }}
           >
             <p className="text-[12px] font-bold text-[#3B82F6] mb-1">📷 How to add media</p>
-            <ol className="text-[11px] text-zinc-300 leading-relaxed" style={{ paddingLeft: "16px", listStyle: "decimal" }}>
-              <li>Open your image in Cloudinary and copy its link (it starts with <span className="font-mono">https://res.cloudinary.com/…</span>).</li>
-              <li>Click <span className="font-bold">+ Add Photo</span> below, pick the tab it belongs to (Exterior / Amenities / Interiors), then paste the link into <span className="font-bold">Image link</span>.</li>
-              <li>A preview appears once the link is valid. If no preview shows, the link is wrong.</li>
+            <ol
+              className="text-[11px] text-zinc-300 leading-relaxed"
+              style={{ paddingLeft: "16px", listStyle: "decimal" }}
+            >
+              <li>
+                Open your image in Cloudinary and copy its link (it starts with{" "}
+                <span className="font-mono">https://res.cloudinary.com/…</span>).
+              </li>
+              <li>
+                Click <span className="font-bold">+ Add Photo</span> below, pick the tab it belongs
+                to (Exterior / Amenities / Interiors), then paste the link into{" "}
+                <span className="font-bold">Image link</span>.
+              </li>
+              <li>
+                A preview appears once the link is valid. If no preview shows, the link is wrong.
+              </li>
             </ol>
           </div>
 
@@ -3335,10 +3976,14 @@ function SectionEditorBlock({ section, onChange }: SectionBlockProps) {
             </label>
             {getVal("photos", []).length === 0 && (
               <p className="text-[11px] text-zinc-400 mt-1 leading-relaxed">
-                No photos yet. Click <span className="font-bold">+ Add Photo</span> to add your first Cloudinary image.
+                No photos yet. Click <span className="font-bold">+ Add Photo</span> to add your
+                first Cloudinary image.
               </p>
             )}
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }} className="mt-2">
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}
+              className="mt-2"
+            >
               {getVal("photos", []).map((ph: any, i: number) => (
                 <div
                   key={i}
@@ -3370,7 +4015,9 @@ function SectionEditorBlock({ section, onChange }: SectionBlockProps) {
                         }}
                       />
                     ) : (
-                      <span className="text-[9px] text-zinc-500 text-center px-1">No image yet</span>
+                      <span className="text-[9px] text-zinc-500 text-center px-1">
+                        No image yet
+                      </span>
                     )}
                   </div>
 
@@ -3464,9 +4111,13 @@ function SectionEditorBlock({ section, onChange }: SectionBlockProps) {
               </button>
             </label>
             <p className="text-[11px] text-zinc-400 mt-1 leading-relaxed">
-              The <span className="font-bold">Thumbnail</span> is the preview image shown before the video plays — paste a Cloudinary image link for it.
+              The <span className="font-bold">Thumbnail</span> is the preview image shown before the
+              video plays — paste a Cloudinary image link for it.
             </p>
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }} className="mt-2">
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}
+              className="mt-2"
+            >
               {getVal("videos", []).map((vd: any, i: number) => (
                 <div
                   key={i}
@@ -3498,7 +4149,9 @@ function SectionEditorBlock({ section, onChange }: SectionBlockProps) {
                         }}
                       />
                     ) : (
-                      <span className="text-[9px] text-zinc-500 text-center px-1">No image yet</span>
+                      <span className="text-[9px] text-zinc-500 text-center px-1">
+                        No image yet
+                      </span>
                     )}
                   </div>
 
@@ -3584,7 +4237,6 @@ function SectionEditorBlock({ section, onChange }: SectionBlockProps) {
               ))}
             </div>
           </div>
-
         </div>
       )}
 

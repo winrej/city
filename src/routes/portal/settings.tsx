@@ -78,7 +78,8 @@ const FIELDS: Record<SettingsSection, FieldDef[]> = {
     {
       key: "meta_description",
       label: "Meta Description",
-      placeholder: "CityQlo helps Filipino professionals, investors, and OFWs make smarter property decisions…",
+      placeholder:
+        "CityQlo helps Filipino professionals, investors, and OFWs make smarter property decisions…",
       hint: "Shown in search results below the title. Ideal: 140–160 characters.",
       maxLength: 220,
       textarea: true,
@@ -189,7 +190,9 @@ function OgPreviewCard({
         </div>
         {/* Card footer */}
         <div className="border-t border-slate-100 px-3 py-2.5">
-          <p className="text-[11px] text-slate-400 font-mono tracking-wide uppercase">cityqlo.com</p>
+          <p className="text-[11px] text-slate-400 font-mono tracking-wide uppercase">
+            cityqlo.com
+          </p>
           <p className="mt-0.5 text-[13px] font-bold text-slate-900 leading-snug line-clamp-1">
             {displayTitle}
           </p>
@@ -271,7 +274,15 @@ function ImageStatusBadge({ url }: { url: string }) {
 
 // ── Character Count ───────────────────────────────────────────────────────────
 
-function CharCount({ value, max, ideal }: { value: string; max: number; ideal?: [number, number] }) {
+function CharCount({
+  value,
+  max,
+  ideal,
+}: {
+  value: string;
+  max: number;
+  ideal?: [number, number];
+}) {
   const len = value.length;
   const isOver = len > max;
   const isIdeal = ideal ? len >= ideal[0] && len <= ideal[1] : false;
@@ -516,8 +527,10 @@ function SettingsPage() {
               <div className="p-5">
                 <p className="mb-4 text-[11px] text-slate-400 leading-relaxed">
                   This is how your site appears when shared on{" "}
-                  {previewMode === "facebook" ? "Facebook, Messenger, or iMessage" : "Twitter / X and Telegram"}.
-                  The preview updates in real time as you type.
+                  {previewMode === "facebook"
+                    ? "Facebook, Messenger, or iMessage"
+                    : "Twitter / X and Telegram"}
+                  . The preview updates in real time as you type.
                 </p>
 
                 <OgPreviewCard
@@ -531,11 +544,29 @@ function SettingsPage() {
                 <div className="mt-5 rounded-xl border border-border bg-surface p-4 space-y-2">
                   <p className="text-[11px] font-semibold text-ink">💡 Tips for a great preview</p>
                   <ul className="space-y-1 text-[11px] text-slate-500 leading-relaxed">
-                    <li>• Image should be <strong>1200 × 630 px</strong> and under 5 MB</li>
-                    <li>• Use a public absolute URL (e.g. hosted on Supabase Storage or Cloudflare R2)</li>
-                    <li>• Facebook may cache previews — use the <a href="https://developers.facebook.com/tools/debug/" target="_blank" rel="noopener noreferrer" className="text-primary underline inline-flex items-center gap-0.5">Sharing Debugger <ExternalLink size={10} /></a> to refresh</li>
+                    <li>
+                      • Image should be <strong>1200 × 630 px</strong> and under 5 MB
+                    </li>
+                    <li>
+                      • Use a public absolute URL (e.g. hosted on Supabase Storage or Cloudflare R2)
+                    </li>
+                    <li>
+                      • Facebook may cache previews — use the{" "}
+                      <a
+                        href="https://developers.facebook.com/tools/debug/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary underline inline-flex items-center gap-0.5"
+                      >
+                        Sharing Debugger <ExternalLink size={10} />
+                      </a>{" "}
+                      to refresh
+                    </li>
                     <li>• Twitter may take a few minutes to pick up changes</li>
-                    <li>• Supabase Storage bucket must have <strong>public read access</strong> enabled</li>
+                    <li>
+                      • Supabase Storage bucket must have <strong>public read access</strong>{" "}
+                      enabled
+                    </li>
                   </ul>
                 </div>
 

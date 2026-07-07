@@ -32,22 +32,26 @@ export function BreadcrumbJsonLd({ items }: Props) {
   const schema = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
-    "itemListElement": items.map((item, index) => ({
-      "@type": "ListItem",
-      "position": index + 1,
-      "name": item.name,
-      // Always include an absolute URL — even for the current page
-      "item": item.href
-        ? item.href.startsWith("http")
-          ? item.href
-          : `${BASE_URL}${item.href}`
-        : undefined,
-    })).filter((el) =>
-      // Remove undefined item keys cleanly
-      el.item !== undefined || true
-    ).map((el) =>
-      el.item === undefined ? { "@type": el["@type"], position: el.position, name: el.name } : el
-    ),
+    itemListElement: items
+      .map((item, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        name: item.name,
+        // Always include an absolute URL — even for the current page
+        item: item.href
+          ? item.href.startsWith("http")
+            ? item.href
+            : `${BASE_URL}${item.href}`
+          : undefined,
+      }))
+      .filter(
+        (el) =>
+          // Remove undefined item keys cleanly
+          el.item !== undefined || true,
+      )
+      .map((el) =>
+        el.item === undefined ? { "@type": el["@type"], position: el.position, name: el.name } : el,
+      ),
   };
 
   return (

@@ -186,8 +186,8 @@ export function VirtualTourSection() {
           <p>
             Walk the actual property and step inside every unit type without leaving your seat —
             drag to look around and use the hotspots to move between rooms. A fully furnished{" "}
-            <strong>3-bedroom model unit</strong> is included so you can picture the finished
-            space, alongside bare units in real turnover condition.
+            <strong>3-bedroom model unit</strong> is included so you can picture the finished space,
+            alongside bare units in real turnover condition.
           </p>
         </div>
       </Reveal>

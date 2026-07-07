@@ -5,7 +5,6 @@ import { Reveal } from "@/components/site/Reveal";
 import { BreadcrumbJsonLd } from "@/components/site/BreadcrumbJsonLd";
 import { getPublicBlogs } from "@/lib/api/admin.functions";
 
-
 export const Route = createFileRoute("/guides/")({
   head: () => ({
     meta: [
@@ -38,7 +37,6 @@ export const Route = createFileRoute("/guides/")({
   component: Guides,
 });
 
-
 type BlogPost = {
   id: string;
   title: string;
@@ -52,7 +50,11 @@ type BlogPost = {
 
 function formatDate(iso?: string | null) {
   if (!iso) return "Published";
-  return new Intl.DateTimeFormat("en-PH", { year: "numeric", month: "long", day: "numeric" }).format(new Date(iso));
+  return new Intl.DateTimeFormat("en-PH", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  }).format(new Date(iso));
 }
 
 function BlogCard({ post, index }: { post: BlogPost; index: number }) {
@@ -66,7 +68,10 @@ function BlogCard({ post, index }: { post: BlogPost; index: number }) {
         className="group block"
         style={{ pointerEvents: isPublished ? "auto" : "none" }}
       >
-        <article className="relative overflow-hidden rounded-2xl border border-border bg-white transition-all duration-700 hover:-translate-y-1 hover:shadow-lift" style={{ transitionTimingFunction: "var(--ease-luxe)" }}>
+        <article
+          className="relative overflow-hidden rounded-2xl border border-border bg-white transition-all duration-700 hover:-translate-y-1 hover:shadow-lift"
+          style={{ transitionTimingFunction: "var(--ease-luxe)" }}
+        >
           {/* Cover image */}
           <div className="relative aspect-[16/10] overflow-hidden bg-muted">
             {post.cover_image_url ? (
@@ -130,9 +135,17 @@ function BlogCard({ post, index }: { post: BlogPost; index: number }) {
             </div>
 
             {isPublished && (
-              <div className="mt-5 flex items-center gap-2 text-[12px] font-semibold tracking-[0.03em] text-primary transition-all duration-300 group-hover:gap-3" style={{ transitionTimingFunction: "var(--ease-luxe)" }}>
+              <div
+                className="mt-5 flex items-center gap-2 text-[12px] font-semibold tracking-[0.03em] text-primary transition-all duration-300 group-hover:gap-3"
+                style={{ transitionTimingFunction: "var(--ease-luxe)" }}
+              >
                 Read guide
-                <span aria-hidden className="transition-transform duration-300 group-hover:translate-x-1">→</span>
+                <span
+                  aria-hidden
+                  className="transition-transform duration-300 group-hover:translate-x-1"
+                >
+                  →
+                </span>
               </div>
             )}
           </div>
@@ -156,9 +169,7 @@ function Guides() {
   const mergedGuides: BlogPost[] = livePosts;
 
   // Collect all tags
-  const allTags = Array.from(
-    new Set(mergedGuides.flatMap((g) => g.tags ?? []))
-  ).sort();
+  const allTags = Array.from(new Set(mergedGuides.flatMap((g) => g.tags ?? []))).sort();
 
   // Filter
   const filtered = mergedGuides.filter((g) => {
@@ -191,13 +202,13 @@ function Guides() {
           </Reveal>
           <Reveal delay={120}>
             <h1 className="display-1 mt-8 max-w-4xl">
-              Guides,{" "}
-              <span className="text-primary">written like advice.</span>
+              Guides, <span className="text-primary">written like advice.</span>
             </h1>
           </Reveal>
           <Reveal delay={240}>
             <p className="lede mt-8 max-w-2xl">
-              Editorial, plain-spoken guides for the decisions that matter. Released one at a time, each one revised until it earns the page.
+              Editorial, plain-spoken guides for the decisions that matter. Released one at a time,
+              each one revised until it earns the page.
             </p>
           </Reveal>
 
@@ -212,7 +223,12 @@ function Guides() {
                   stroke="currentColor"
                   viewBox="0 0 24 24"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
                 </svg>
                 <input
                   id="guides-search"
@@ -269,7 +285,9 @@ function Guides() {
         <div className="container-prose">
           {filtered.length === 0 ? (
             <Reveal>
-              <p className="py-16 text-center text-muted-foreground">No guides match your search.</p>
+              <p className="py-16 text-center text-muted-foreground">
+                No guides match your search.
+              </p>
             </Reveal>
           ) : (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -298,12 +316,16 @@ function Guides() {
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                const btn = (e.currentTarget.querySelector("button[type=submit]") as HTMLButtonElement);
+                const btn = e.currentTarget.querySelector(
+                  "button[type=submit]",
+                ) as HTMLButtonElement;
                 if (btn) btn.textContent = "Thank you. We'll be in touch.";
               }}
             >
               <div className="flex flex-col gap-3 sm:flex-row">
-                <label htmlFor="guides-email" className="sr-only">Email address</label>
+                <label htmlFor="guides-email" className="sr-only">
+                  Email address
+                </label>
                 <input
                   id="guides-email"
                   type="email"

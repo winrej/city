@@ -112,7 +112,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     const description = seo?.meta_description?.trim() || DEFAULT_SEO.meta_description;
     const ogImage = seo?.og_image_url?.trim() || DEFAULT_SEO.og_image_url;
     const ogTitle = seo?.og_title?.trim() || seo?.meta_title?.trim() || DEFAULT_SEO.og_title;
-    const ogDesc = seo?.og_description?.trim() || seo?.meta_description?.trim() || DEFAULT_SEO.og_description;
+    const ogDesc =
+      seo?.og_description?.trim() || seo?.meta_description?.trim() || DEFAULT_SEO.og_description;
     const twitterTitle = seo?.twitter_title?.trim() || ogTitle;
     const twitterDesc = seo?.twitter_description?.trim() || ogDesc;
 

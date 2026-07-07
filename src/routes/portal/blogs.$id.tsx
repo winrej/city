@@ -15,11 +15,7 @@ import {
   AlertCircle,
   CheckCircle,
 } from "lucide-react";
-import {
-  getAdminBlogById,
-  createBlog,
-  updateBlog,
-} from "../../lib/api/admin.functions";
+import { getAdminBlogById, createBlog, updateBlog } from "../../lib/api/admin.functions";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/portal/blogs/$id")({
@@ -55,28 +51,32 @@ function mdToHtml(md: string): string {
     .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
 
   // GFM tables → <table> (must run before paragraph/line-break processing)
-  html = html.replace(
-    /^\|.+\|[ \t]*\n\|[ \t:|-]+\|[ \t]*\n(?:\|.+\|[ \t]*\n?)+/gm,
-    (block) => {
-      const lines = block.trim().split("\n");
-      const splitRow = (row: string) =>
-        row
-          .replace(/^\s*\|/, "")
-          .replace(/\|\s*$/, "")
-          .split("|")
-          .map((c) => c.trim());
-      const head = splitRow(lines[0]).map((c) => `<th>${c}</th>`).join("");
-      const body = lines
-        .slice(2)
-        .map((r) => "<tr>" + splitRow(r).map((c) => `<td>${c}</td>`).join("") + "</tr>")
-        .join("");
-      return `<table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
-    },
-  );
+  html = html.replace(/^\|.+\|[ \t]*\n\|[ \t:|-]+\|[ \t]*\n(?:\|.+\|[ \t]*\n?)+/gm, (block) => {
+    const lines = block.trim().split("\n");
+    const splitRow = (row: string) =>
+      row
+        .replace(/^\s*\|/, "")
+        .replace(/\|\s*$/, "")
+        .split("|")
+        .map((c) => c.trim());
+    const head = splitRow(lines[0])
+      .map((c) => `<th>${c}</th>`)
+      .join("");
+    const body = lines
+      .slice(2)
+      .map(
+        (r) =>
+          "<tr>" +
+          splitRow(r)
+            .map((c) => `<td>${c}</td>`)
+            .join("") +
+          "</tr>",
+      )
+      .join("");
+    return `<table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
+  });
 
-  html = html
-    .replace(/\n\n/g, "</p><p>")
-    .replace(/\n/g, "<br />");
+  html = html.replace(/\n\n/g, "</p><p>").replace(/\n/g, "<br />");
 
   html = `<p>${html}</p>`;
   html = html
@@ -122,7 +122,8 @@ const EMPTY_FORM: FormState = {
   title: "",
   slug: "",
   excerpt: "",
-  content: "## Introduction\n\nStart writing your guide here...\n\n## Section\n\nAdd your content...",
+  content:
+    "## Introduction\n\nStart writing your guide here...\n\n## Section\n\nAdd your content...",
   cover_image_url: "",
   status: "draft",
   tags: [],
@@ -232,7 +233,10 @@ function BlogEditor() {
   };
 
   const removeTag = (tag: string) => {
-    set("tags", form.tags.filter((t) => t !== tag));
+    set(
+      "tags",
+      form.tags.filter((t) => t !== tag),
+    );
   };
 
   const isSaving = saveMutation.isPending;
@@ -266,14 +270,16 @@ function BlogEditor() {
               textDecoration: "none",
               transition: "color 200ms ease",
             }}
-            onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--portal-text)")}
-            onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--portal-text-muted)")}
+            onMouseEnter={(e) =>
+              ((e.currentTarget as HTMLElement).style.color = "var(--portal-text)")
+            }
+            onMouseLeave={(e) =>
+              ((e.currentTarget as HTMLElement).style.color = "var(--portal-text-muted)")
+            }
           >
             <ArrowLeft size={14} /> All Articles
           </Link>
-          <div
-            style={{ width: "1px", height: "16px", background: "var(--portal-border)" }}
-          />
+          <div style={{ width: "1px", height: "16px", background: "var(--portal-border)" }} />
           <div>
             <h1 className="portal-page-title" style={{ fontSize: "1.125rem" }}>
               {isNew ? "New Article" : form.title || "Edit Article"}
@@ -290,7 +296,10 @@ function BlogEditor() {
               fontSize: "0.7rem",
               fontWeight: 700,
               textTransform: "capitalize",
-              background: form.status === "published" ? "oklch(0.65 0.18 145 / 0.15)" : "var(--portal-accent-dim)",
+              background:
+                form.status === "published"
+                  ? "oklch(0.65 0.18 145 / 0.15)"
+                  : "var(--portal-accent-dim)",
               color: form.status === "published" ? "oklch(0.65 0.18 145)" : "var(--portal-accent)",
             }}
           >
@@ -335,14 +344,29 @@ function BlogEditor() {
       </div>
 
       {/* ── Main layout ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: "1.5rem", alignItems: "start" }}>
-
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 320px",
+          gap: "1.5rem",
+          alignItems: "start",
+        }}
+      >
         {/* ── Left: Editor / Preview ── */}
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-
           {/* Title */}
           <div className="portal-card" style={{ padding: "1.25rem" }}>
-            <label style={{ display: "block", fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--portal-text-muted)", marginBottom: "0.5rem" }}>
+            <label
+              style={{
+                display: "block",
+                fontSize: "0.7rem",
+                fontWeight: 700,
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                color: "var(--portal-text-muted)",
+                marginBottom: "0.5rem",
+              }}
+            >
               Title *
             </label>
             <input
@@ -366,7 +390,16 @@ function BlogEditor() {
               }}
             />
             {errors.title && (
-              <p style={{ color: "oklch(0.6 0.18 25)", fontSize: "0.75rem", marginTop: "0.35rem", display: "flex", alignItems: "center", gap: "4px" }}>
+              <p
+                style={{
+                  color: "oklch(0.6 0.18 25)",
+                  fontSize: "0.75rem",
+                  marginTop: "0.35rem",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "4px",
+                }}
+              >
                 <AlertCircle size={12} /> {errors.title}
               </p>
             )}
@@ -394,7 +427,9 @@ function BlogEditor() {
                       fontWeight: 600,
                       background: "none",
                       border: "none",
-                      borderBottom: isActive ? "2px solid var(--portal-accent)" : "2px solid transparent",
+                      borderBottom: isActive
+                        ? "2px solid var(--portal-accent)"
+                        : "2px solid transparent",
                       color: isActive ? "var(--portal-accent)" : "var(--portal-text-muted)",
                       cursor: "pointer",
                       transition: "all 200ms ease",
@@ -418,11 +453,20 @@ function BlogEditor() {
                 {form.content ? (
                   <div
                     className="prose-cityqlo"
-                    style={{ "--foreground": "var(--portal-text)", "--muted-foreground": "var(--portal-text-muted)", "--ink": "var(--portal-text)", "--surface": "var(--portal-surface-2)" } as any}
+                    style={
+                      {
+                        "--foreground": "var(--portal-text)",
+                        "--muted-foreground": "var(--portal-text-muted)",
+                        "--ink": "var(--portal-text)",
+                        "--surface": "var(--portal-surface-2)",
+                      } as any
+                    }
                     dangerouslySetInnerHTML={{ __html: previewHtml }}
                   />
                 ) : (
-                  <p style={{ color: "var(--portal-text-muted)", fontStyle: "italic" }}>Nothing to preview yet.</p>
+                  <p style={{ color: "var(--portal-text-muted)", fontStyle: "italic" }}>
+                    Nothing to preview yet.
+                  </p>
                 )}
               </div>
             ) : (
@@ -434,7 +478,12 @@ function BlogEditor() {
                   value={form.content}
                   onChange={(e) => set("content", e.target.value)}
                   placeholder="Write your guide in Markdown…"
-                  style={{ minHeight: "520px", borderRadius: 0, border: "none", borderTop: errors.content ? "2px solid oklch(0.6 0.18 25)" : "none" }}
+                  style={{
+                    minHeight: "520px",
+                    borderRadius: 0,
+                    border: "none",
+                    borderTop: errors.content ? "2px solid oklch(0.6 0.18 25)" : "none",
+                  }}
                   spellCheck
                 />
                 {/* Markdown hint */}
@@ -460,7 +509,16 @@ function BlogEditor() {
               </div>
             )}
             {errors.content && (
-              <p style={{ color: "oklch(0.6 0.18 25)", fontSize: "0.75rem", padding: "0.5rem 1rem", display: "flex", alignItems: "center", gap: "4px" }}>
+              <p
+                style={{
+                  color: "oklch(0.6 0.18 25)",
+                  fontSize: "0.75rem",
+                  padding: "0.5rem 1rem",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "4px",
+                }}
+              >
                 <AlertCircle size={12} /> {errors.content}
               </p>
             )}
@@ -468,15 +526,34 @@ function BlogEditor() {
         </div>
 
         {/* ── Right: Metadata sidebar ── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "1rem", position: "sticky", top: "calc(var(--portal-topbar-h) + 1.5rem)" }}>
-
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "1rem",
+            position: "sticky",
+            top: "calc(var(--portal-topbar-h) + 1.5rem)",
+          }}
+        >
           {/* Slug */}
           <div className="portal-card" style={{ padding: "1.25rem" }}>
-            <label style={{ display: "block", fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--portal-text-muted)", marginBottom: "0.5rem" }}>
+            <label
+              style={{
+                display: "block",
+                fontSize: "0.7rem",
+                fontWeight: 700,
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                color: "var(--portal-text-muted)",
+                marginBottom: "0.5rem",
+              }}
+            >
               Slug *
             </label>
             <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-              <span style={{ color: "var(--portal-text-muted)", fontSize: "0.75rem" }}>/guides/</span>
+              <span style={{ color: "var(--portal-text-muted)", fontSize: "0.75rem" }}>
+                /guides/
+              </span>
               <input
                 id="blog-slug-input"
                 type="text"
@@ -500,12 +577,27 @@ function BlogEditor() {
               />
             </div>
             {!slugLocked && isNew && (
-              <p style={{ color: "var(--portal-text-muted)", fontSize: "0.7rem", marginTop: "0.35rem" }}>
+              <p
+                style={{
+                  color: "var(--portal-text-muted)",
+                  fontSize: "0.7rem",
+                  marginTop: "0.35rem",
+                }}
+              >
                 Auto-generated from title
               </p>
             )}
             {errors.slug && (
-              <p style={{ color: "oklch(0.6 0.18 25)", fontSize: "0.7rem", marginTop: "0.35rem", display: "flex", alignItems: "center", gap: "4px" }}>
+              <p
+                style={{
+                  color: "oklch(0.6 0.18 25)",
+                  fontSize: "0.7rem",
+                  marginTop: "0.35rem",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "4px",
+                }}
+              >
                 <AlertCircle size={11} /> {errors.slug}
               </p>
             )}
@@ -513,7 +605,17 @@ function BlogEditor() {
 
           {/* Excerpt */}
           <div className="portal-card" style={{ padding: "1.25rem" }}>
-            <label style={{ display: "block", fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--portal-text-muted)", marginBottom: "0.5rem" }}>
+            <label
+              style={{
+                display: "block",
+                fontSize: "0.7rem",
+                fontWeight: 700,
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                color: "var(--portal-text-muted)",
+                marginBottom: "0.5rem",
+              }}
+            >
               Excerpt *
             </label>
             <textarea
@@ -535,11 +637,26 @@ function BlogEditor() {
                 lineHeight: 1.6,
               }}
             />
-            <p style={{ fontSize: "0.65rem", color: "var(--portal-text-muted)", marginTop: "0.35rem", textAlign: "right" }}>
+            <p
+              style={{
+                fontSize: "0.65rem",
+                color: "var(--portal-text-muted)",
+                marginTop: "0.35rem",
+                textAlign: "right",
+              }}
+            >
               {form.excerpt.length} / 500
             </p>
             {errors.excerpt && (
-              <p style={{ color: "oklch(0.6 0.18 25)", fontSize: "0.7rem", display: "flex", alignItems: "center", gap: "4px" }}>
+              <p
+                style={{
+                  color: "oklch(0.6 0.18 25)",
+                  fontSize: "0.7rem",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "4px",
+                }}
+              >
                 <AlertCircle size={11} /> {errors.excerpt}
               </p>
             )}
@@ -547,7 +664,19 @@ function BlogEditor() {
 
           {/* Cover image */}
           <div className="portal-card" style={{ padding: "1.25rem" }}>
-            <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--portal-text-muted)", marginBottom: "0.5rem" }}>
+            <label
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+                fontSize: "0.7rem",
+                fontWeight: 700,
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                color: "var(--portal-text-muted)",
+                marginBottom: "0.5rem",
+              }}
+            >
               <ImageIcon size={12} /> Cover Image URL
             </label>
             <input
@@ -571,12 +700,29 @@ function BlogEditor() {
               <img
                 src={form.cover_image_url}
                 alt="cover preview"
-                style={{ marginTop: "0.75rem", width: "100%", aspectRatio: "4/3", objectFit: "cover", borderRadius: "8px" }}
-                onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+                style={{
+                  marginTop: "0.75rem",
+                  width: "100%",
+                  aspectRatio: "4/3",
+                  objectFit: "cover",
+                  borderRadius: "8px",
+                }}
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).style.display = "none";
+                }}
               />
             )}
             {errors.cover_image_url && (
-              <p style={{ color: "oklch(0.6 0.18 25)", fontSize: "0.7rem", marginTop: "0.35rem", display: "flex", alignItems: "center", gap: "4px" }}>
+              <p
+                style={{
+                  color: "oklch(0.6 0.18 25)",
+                  fontSize: "0.7rem",
+                  marginTop: "0.35rem",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "4px",
+                }}
+              >
                 <AlertCircle size={11} /> {errors.cover_image_url}
               </p>
             )}
@@ -584,7 +730,19 @@ function BlogEditor() {
 
           {/* Tags */}
           <div className="portal-card" style={{ padding: "1.25rem" }}>
-            <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--portal-text-muted)", marginBottom: "0.5rem" }}>
+            <label
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+                fontSize: "0.7rem",
+                fontWeight: 700,
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                color: "var(--portal-text-muted)",
+                marginBottom: "0.5rem",
+              }}
+            >
               <Tag size={12} /> Tags
             </label>
             <div style={{ display: "flex", gap: "6px", marginBottom: "0.5rem" }}>
@@ -646,21 +804,46 @@ function BlogEditor() {
                   {tag}
                   <button
                     onClick={() => removeTag(tag)}
-                    style={{ background: "none", border: "none", cursor: "pointer", color: "inherit", padding: 0, display: "flex" }}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      color: "inherit",
+                      padding: 0,
+                      display: "flex",
+                    }}
                   >
                     <X size={10} />
                   </button>
                 </span>
               ))}
             </div>
-            <p style={{ fontSize: "0.65rem", color: "var(--portal-text-muted)", marginTop: "0.5rem" }}>
+            <p
+              style={{
+                fontSize: "0.65rem",
+                color: "var(--portal-text-muted)",
+                marginTop: "0.5rem",
+              }}
+            >
               Press Enter or comma to add · {form.tags.length}/10
             </p>
           </div>
 
           {/* Read time */}
           <div className="portal-card" style={{ padding: "1.25rem" }}>
-            <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--portal-text-muted)", marginBottom: "0.5rem" }}>
+            <label
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+                fontSize: "0.7rem",
+                fontWeight: 700,
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                color: "var(--portal-text-muted)",
+                marginBottom: "0.5rem",
+              }}
+            >
               <Clock size={12} /> Read Time (minutes)
             </label>
             <input

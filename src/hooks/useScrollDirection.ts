@@ -14,7 +14,7 @@ export function useScrollDirection(threshold = 80) {
 
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      
+
       // Check if scrolled past threshold
       setIsScrolledPast(currentScrollY > threshold);
 

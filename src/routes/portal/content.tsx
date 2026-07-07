@@ -665,7 +665,9 @@ function HomepageEditorPage() {
     const matching = (adminProperties ?? []).filter((property: any) => {
       const city = String(property.city ?? "").toLowerCase();
       const location = String(property.location ?? "").toLowerCase();
-      return !property.is_deleted && (city === normalizedDistrict || location === normalizedDistrict);
+      return (
+        !property.is_deleted && (city === normalizedDistrict || location === normalizedDistrict)
+      );
     });
 
     const prices = matching
@@ -883,9 +885,7 @@ function HomepageEditorPage() {
             Manage landing page sections, district showcases, and supporting content.
           </p>
         </div>
-        {activeTab !== "featured_district" &&
-          activeTab !== "marketing_pages" &&
-          dirty && (
+        {activeTab !== "featured_district" && activeTab !== "marketing_pages" && dirty && (
           <button
             onClick={() => saveMutation.mutate()}
             disabled={saveMutation.isPending}
@@ -1105,7 +1105,10 @@ function HomepageEditorPage() {
           style={{
             display: "grid",
             gridTemplateColumns:
-              activeTab === "hero" || activeTab === "nav" || activeTab === "background" || activeTab === "featured_opps"
+              activeTab === "hero" ||
+              activeTab === "nav" ||
+              activeTab === "background" ||
+              activeTab === "featured_opps"
                 ? "1fr 1fr"
                 : "1fr",
             gap: "1.5rem",
@@ -1165,15 +1168,33 @@ function HomepageEditorPage() {
                 <div className="portal-card-header">
                   <div className="portal-card-title">Currently Featured Properties</div>
                 </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "1rem", marginTop: "1rem" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "1rem",
+                    marginTop: "1rem",
+                  }}
+                >
                   {(() => {
-                    const featured = (adminProperties ?? []).filter((p: any) => p.is_featured && !p.is_deleted);
+                    const featured = (adminProperties ?? []).filter(
+                      (p: any) => p.is_featured && !p.is_deleted,
+                    );
                     if (featured.length === 0) {
                       return (
                         <div className="portal-empty-state" style={{ padding: "1.5rem" }}>
-                          <p style={{ margin: 0, fontSize: "0.85rem" }}>No properties are currently marked as featured.</p>
-                          <p style={{ fontSize: "0.75rem", color: "var(--zinc-500)", margin: "0.25rem 0 0" }}>
-                            Go to the <strong>Properties</strong> page to select properties to show here.
+                          <p style={{ margin: 0, fontSize: "0.85rem" }}>
+                            No properties are currently marked as featured.
+                          </p>
+                          <p
+                            style={{
+                              fontSize: "0.75rem",
+                              color: "var(--zinc-500)",
+                              margin: "0.25rem 0 0",
+                            }}
+                          >
+                            Go to the <strong>Properties</strong> page to select properties to show
+                            here.
                           </p>
                         </div>
                       );
@@ -1181,7 +1202,8 @@ function HomepageEditorPage() {
                     return (
                       <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
                         <p style={{ fontSize: "0.75rem", color: "var(--zinc-400)", margin: 0 }}>
-                          The following {featured.length} properties are currently featured and will appear under this section on the homepage:
+                          The following {featured.length} properties are currently featured and will
+                          appear under this section on the homepage:
                         </p>
                         {featured.map((p: any) => (
                           <div
@@ -1200,7 +1222,12 @@ function HomepageEditorPage() {
                               <img
                                 src={p.image_url}
                                 alt={p.name}
-                                style={{ width: "50px", height: "38px", objectFit: "cover", borderRadius: "4px" }}
+                                style={{
+                                  width: "50px",
+                                  height: "38px",
+                                  objectFit: "cover",
+                                  borderRadius: "4px",
+                                }}
                               />
                             ) : (
                               <div
@@ -1213,21 +1240,36 @@ function HomepageEditorPage() {
                                   alignItems: "center",
                                   justifyContent: "center",
                                   fontSize: "10px",
-                                  color: "var(--zinc-500)"
+                                  color: "var(--zinc-500)",
                                 }}
                               >
                                 No Image
                               </div>
                             )}
                             <div style={{ flex: 1, minWidth: 0 }}>
-                              <div style={{ fontWeight: 600, fontSize: "0.85rem", color: "#fff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                              <div
+                                style={{
+                                  fontWeight: 600,
+                                  fontSize: "0.85rem",
+                                  color: "#fff",
+                                  whiteSpace: "nowrap",
+                                  overflow: "hidden",
+                                  textOverflow: "ellipsis",
+                                }}
+                              >
                                 {p.name}
                               </div>
                               <div style={{ fontSize: "0.75rem", color: "var(--zinc-400)" }}>
                                 {p.city} · {p.developer}
                               </div>
                             </div>
-                            <span style={{ fontSize: "0.7rem", color: "var(--zinc-500)", fontFamily: "monospace" }}>
+                            <span
+                              style={{
+                                fontSize: "0.7rem",
+                                color: "var(--zinc-500)",
+                                fontFamily: "monospace",
+                              }}
+                            >
                               Rank: {p.featured_rank ?? 0}
                             </span>
                           </div>
@@ -2362,6 +2404,33 @@ function HomepageEditorPage() {
                 </div>
               </div>
 
+              <div className="portal-field">
+                <label className="portal-field-label">
+                  Supervising Broker Photo (Joy Lachica) — shown on About page
+                </label>
+                <div className="portal-input-wrap">
+                  <ImageIcon size={16} className="portal-input-icon" />
+                  <input
+                    type="text"
+                    placeholder="https://example.com/joy-lachica.jpg"
+                    value={getVal("broker_image_url", "")}
+                    onChange={(e) => handleFieldChange("broker_image_url", e.target.value)}
+                    className="portal-input"
+                  />
+                </div>
+                <span
+                  style={{
+                    fontSize: "0.7rem",
+                    color: "var(--zinc-500)",
+                    marginTop: "0.35rem",
+                    display: "block",
+                  }}
+                >
+                  Appears in the Licensed Broker Oversight card on the About page. Leave blank to
+                  show initials placeholder.
+                </span>
+              </div>
+
               {/* ─── New: Cinematic Enhancements ─── */}
               <div
                 style={{
@@ -2374,7 +2443,14 @@ function HomepageEditorPage() {
                   gap: "1rem",
                 }}
               >
-                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.25rem" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                    marginBottom: "0.25rem",
+                  }}
+                >
                   <span
                     style={{
                       width: "8px",
@@ -2384,7 +2460,15 @@ function HomepageEditorPage() {
                       flexShrink: 0,
                     }}
                   />
-                  <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "oklch(0.74 0.137 79)", textTransform: "uppercase", letterSpacing: "0.15em" }}>
+                  <span
+                    style={{
+                      fontSize: "0.75rem",
+                      fontWeight: 700,
+                      color: "oklch(0.74 0.137 79)",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.15em",
+                    }}
+                  >
                     Cinematic Enhancements
                   </span>
                 </div>
@@ -2398,7 +2482,14 @@ function HomepageEditorPage() {
                     onChange={(e) => handleFieldChange("founder_quote", e.target.value)}
                     className="portal-textarea"
                   />
-                  <span style={{ fontSize: "0.7rem", color: "var(--zinc-500)", marginTop: "0.35rem", display: "block" }}>
+                  <span
+                    style={{
+                      fontSize: "0.7rem",
+                      color: "var(--zinc-500)",
+                      marginTop: "0.35rem",
+                      display: "block",
+                    }}
+                  >
                     Appears as a highlighted italic blockquote on the homepage. Leave blank to hide.
                   </span>
                 </div>
@@ -2412,7 +2503,14 @@ function HomepageEditorPage() {
                     onChange={(e) => handleFieldChange("founder_signature_text", e.target.value)}
                     className="portal-input"
                   />
-                  <span style={{ fontSize: "0.7rem", color: "var(--zinc-500)", marginTop: "0.35rem", display: "block" }}>
+                  <span
+                    style={{
+                      fontSize: "0.7rem",
+                      color: "var(--zinc-500)",
+                      marginTop: "0.35rem",
+                      display: "block",
+                    }}
+                  >
                     Displayed in a cursive script font in gold below the bio. Leave blank to hide.
                   </span>
                   {getVal("founder_signature_text", "") && (
@@ -2425,7 +2523,18 @@ function HomepageEditorPage() {
                         border: "1px solid rgba(255,255,255,0.06)",
                       }}
                     >
-                      <span style={{ fontSize: "0.65rem", color: "var(--zinc-500)", display: "block", marginBottom: "0.35rem", textTransform: "uppercase", letterSpacing: "0.1em" }}>Preview</span>
+                      <span
+                        style={{
+                          fontSize: "0.65rem",
+                          color: "var(--zinc-500)",
+                          display: "block",
+                          marginBottom: "0.35rem",
+                          textTransform: "uppercase",
+                          letterSpacing: "0.1em",
+                        }}
+                      >
+                        Preview
+                      </span>
                       <p
                         style={{
                           fontFamily: "'Dancing Script', 'Brush Script MT', cursive",
@@ -2508,8 +2617,16 @@ function HomepageEditorPage() {
                       onChange={(e) => handleFieldChange("team_member_quote", e.target.value)}
                       className="portal-textarea"
                     />
-                    <span style={{ fontSize: "0.7rem", color: "var(--zinc-500)", marginTop: "0.35rem", display: "block" }}>
-                      Appears as a highlighted italic blockquote under the team member. Leave blank to hide.
+                    <span
+                      style={{
+                        fontSize: "0.7rem",
+                        color: "var(--zinc-500)",
+                        marginTop: "0.35rem",
+                        display: "block",
+                      }}
+                    >
+                      Appears as a highlighted italic blockquote under the team member. Leave blank
+                      to hide.
                     </span>
                   </div>
 

@@ -16,6 +16,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as PropertiesRouteImport } from './routes/properties'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PortalRouteImport } from './routes/portal'
+import { Route as FortisResidencesRouteImport } from './routes/fortis-residences'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CareersRouteImport } from './routes/careers'
@@ -70,6 +71,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const PortalRoute = PortalRouteImport.update({
   id: '/portal',
   path: '/portal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FortisResidencesRoute = FortisResidencesRouteImport.update({
+  id: '/fortis-residences',
+  path: '/fortis-residences',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FaqRoute = FaqRouteImport.update({
@@ -179,6 +185,7 @@ export interface FileRoutesByFullPath {
   '/careers': typeof CareersRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
+  '/fortis-residences': typeof FortisResidencesRoute
   '/portal': typeof PortalRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/properties': typeof PropertiesRoute
@@ -208,6 +215,7 @@ export interface FileRoutesByTo {
   '/careers': typeof CareersRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
+  '/fortis-residences': typeof FortisResidencesRoute
   '/privacy': typeof PrivacyRoute
   '/properties': typeof PropertiesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -236,6 +244,7 @@ export interface FileRoutesById {
   '/careers': typeof CareersRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
+  '/fortis-residences': typeof FortisResidencesRoute
   '/portal': typeof PortalRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/properties': typeof PropertiesRoute
@@ -267,6 +276,7 @@ export interface FileRouteTypes {
     | '/careers'
     | '/contact'
     | '/faq'
+    | '/fortis-residences'
     | '/portal'
     | '/privacy'
     | '/properties'
@@ -296,6 +306,7 @@ export interface FileRouteTypes {
     | '/careers'
     | '/contact'
     | '/faq'
+    | '/fortis-residences'
     | '/privacy'
     | '/properties'
     | '/sitemap.xml'
@@ -323,6 +334,7 @@ export interface FileRouteTypes {
     | '/careers'
     | '/contact'
     | '/faq'
+    | '/fortis-residences'
     | '/portal'
     | '/privacy'
     | '/properties'
@@ -353,6 +365,7 @@ export interface RootRouteChildren {
   CareersRoute: typeof CareersRoute
   ContactRoute: typeof ContactRoute
   FaqRoute: typeof FaqRoute
+  FortisResidencesRoute: typeof FortisResidencesRoute
   PortalRoute: typeof PortalRouteWithChildren
   PrivacyRoute: typeof PrivacyRoute
   PropertiesRoute: typeof PropertiesRoute
@@ -414,6 +427,13 @@ declare module '@tanstack/react-router' {
       path: '/portal'
       fullPath: '/portal'
       preLoaderRoute: typeof PortalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fortis-residences': {
+      id: '/fortis-residences'
+      path: '/fortis-residences'
+      fullPath: '/fortis-residences'
+      preLoaderRoute: typeof FortisResidencesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/faq': {
@@ -608,6 +628,7 @@ const rootRouteChildren: RootRouteChildren = {
   CareersRoute: CareersRoute,
   ContactRoute: ContactRoute,
   FaqRoute: FaqRoute,
+  FortisResidencesRoute: FortisResidencesRoute,
   PortalRoute: PortalRouteWithChildren,
   PrivacyRoute: PrivacyRoute,
   PropertiesRoute: PropertiesRoute,

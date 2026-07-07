@@ -112,8 +112,6 @@ interface Property {
   featured_rank: number;
 }
 
-
-
 function PropertyCard({
   property,
   onShare,
@@ -323,7 +321,9 @@ function Properties() {
   const isMobile = useIsMobile();
   const [isFiltersSheetOpen, setIsFiltersSheetOpen] = useState(false);
   const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
-  const [sortBy, setSortBy] = useState<"default" | "price-asc" | "price-desc" | "featured">("default");
+  const [sortBy, setSortBy] = useState<"default" | "price-asc" | "price-desc" | "featured">(
+    "default",
+  );
 
   // Derive active filter labels
   const activeFilterLabels = useMemo(() => {
@@ -339,9 +339,8 @@ function Properties() {
     return labels;
   }, [selectedLocation, selectedPriceRange, selectedStatus, searchQuery]);
 
-  const filterSummaryText = activeFilterLabels.length > 0
-    ? activeFilterLabels.join(" · ")
-    : "Filters";
+  const filterSummaryText =
+    activeFilterLabels.length > 0 ? activeFilterLabels.join(" · ") : "Filters";
 
   const activeFiltersCount = activeFilterLabels.length;
 
@@ -353,7 +352,7 @@ function Properties() {
     if (focus && searchInputRef.current) {
       // Smooth scroll to the search input section
       searchInputRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
-      
+
       // Focus the search input with a minor delay to allow smooth scrolling to settle
       const timer = setTimeout(() => {
         searchInputRef.current?.focus();
@@ -387,9 +386,7 @@ function Properties() {
 
   // Broadcast active filter count to Nav pill badge via custom event
   useEffect(() => {
-    window.dispatchEvent(
-      new CustomEvent("filters-active-count", { detail: activeFiltersCount })
-    );
+    window.dispatchEvent(new CustomEvent("filters-active-count", { detail: activeFiltersCount }));
   }, [activeFiltersCount]);
 
   // Listen for Nav pill tap to open the bottom sheet
@@ -449,13 +446,7 @@ function Properties() {
 
       return matchesSearch && matchesStatus && matchesLocation && matchesPrice;
     });
-  }, [
-    propertiesData,
-    searchQuery,
-    selectedStatus,
-    selectedLocation,
-    selectedPriceRange,
-  ]);
+  }, [propertiesData, searchQuery, selectedStatus, selectedLocation, selectedPriceRange]);
 
   // Dynamically build location list from live data
   const locationsData = useMemo(() => {
@@ -566,7 +557,7 @@ function Properties() {
                       <Reveal delay={360}>
                         <div className="mt-10 flex flex-wrap gap-4">
                           <Link
-                             to={slide.link}
+                            to={slide.link}
                             className="inline-flex min-h-[50px] items-center justify-center gap-2 rounded-full bg-white px-8 text-[13px] font-semibold text-ink transition-all duration-300 hover:-translate-y-[2px] hover:shadow-lift"
                           >
                             Schedule Viewing
@@ -637,105 +628,109 @@ function Properties() {
         {/* ── Full filter rail (desktop always, mobile when not yet scrolled) ── */}
         <div className="container-prose py-3">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-              {/* Status tabs */}
-              <div className="flex items-center gap-1 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
-                {(["All", "RFO", "Pre-selling"] as const).map((status) => (
+            {/* Status tabs */}
+            <div className="flex items-center gap-1 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
+              {(["All", "RFO", "Pre-selling"] as const).map((status) => (
+                <button
+                  key={status}
+                  onClick={() => setSelectedStatus(status)}
+                  className={`px-5 py-2 text-[12.5px] font-semibold rounded-full tracking-wide transition-all ${
+                    selectedStatus === status
+                      ? "bg-ink text-white"
+                      : "text-muted-foreground hover:bg-surface hover:text-ink"
+                  }`}
+                >
+                  {status}
+                </button>
+              ))}
+            </div>
+
+            {/* Quick dropdown selectors and Search input */}
+            <div className="flex flex-wrap items-center gap-2 md:gap-3">
+              {/* Search bar */}
+              <div className="relative flex items-center min-w-[200px] flex-1 md:flex-initial">
+                <Search className="absolute left-4.5 h-4 w-4 text-muted-foreground" />
+                <input
+                  id="properties-search-input"
+                  ref={searchInputRef}
+                  type="text"
+                  placeholder="Search residences..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="h-10 w-full rounded-full border border-border/70 bg-surface/50 pl-11 pr-4 text-[13px] placeholder-muted-foreground/75 focus:border-ink focus:bg-background focus:outline-none transition-all duration-300"
+                />
+                {searchQuery && (
                   <button
-                    key={status}
-                    onClick={() => setSelectedStatus(status)}
-                    className={`px-5 py-2 text-[12.5px] font-semibold rounded-full tracking-wide transition-all ${
-                      selectedStatus === status
-                        ? "bg-ink text-white"
-                        : "text-muted-foreground hover:bg-surface hover:text-ink"
-                    }`}
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-3.5 text-muted-foreground hover:text-ink"
                   >
-                    {status}
-                  </button>
-                ))}
-              </div>
-
-              {/* Quick dropdown selectors and Search input */}
-              <div className="flex flex-wrap items-center gap-2 md:gap-3">
-                {/* Search bar */}
-                <div className="relative flex items-center min-w-[200px] flex-1 md:flex-initial">
-                  <Search className="absolute left-4.5 h-4 w-4 text-muted-foreground" />
-                  <input
-                    id="properties-search-input"
-                    ref={searchInputRef}
-                    type="text"
-                    placeholder="Search residences..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="h-10 w-full rounded-full border border-border/70 bg-surface/50 pl-11 pr-4 text-[13px] placeholder-muted-foreground/75 focus:border-ink focus:bg-background focus:outline-none transition-all duration-300"
-                  />
-                  {searchQuery && (
-                    <button
-                      onClick={() => setSearchQuery("")}
-                      className="absolute right-3.5 text-muted-foreground hover:text-ink"
-                    >
-                      <X className="h-3.5 w-3.5" />
-                    </button>
-                  )}
-                </div>
-
-                {/* Location Select */}
-                <div className="relative flex items-center">
-                  <select
-                    value={selectedLocation || ""}
-                    onChange={(e) => setSelectedLocation(e.target.value || null)}
-                    className="h-10 rounded-full border border-border/70 bg-surface/50 px-5 pr-9 text-[12.5px] font-semibold text-ink focus:border-ink focus:outline-none appearance-none cursor-pointer"
-                  >
-                    <option value="">All Districts</option>
-                    {locationsData.map((loc) => (
-                      <option key={loc.name} value={loc.name}>
-                        {loc.name}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="absolute right-3.5 pointer-events-none text-muted-foreground font-semibold text-[10px]">
-                    ▼
-                  </div>
-                </div>
-
-                {/* Price Select */}
-                <div className="relative flex items-center">
-                  <select
-                    value={selectedPriceRange || ""}
-                    onChange={(e) => setSelectedPriceRange(e.target.value || null)}
-                    className="h-10 rounded-full border border-border/70 bg-surface/50 px-5 pr-9 text-[12.5px] font-semibold text-ink focus:border-ink focus:outline-none appearance-none cursor-pointer"
-                  >
-                    <option value="">All Prices</option>
-                    <option value="under-6m">Under ₱6.0M</option>
-                    <option value="6m-8m">₱6.0M – ₱8.0M</option>
-                    <option value="above-8m">Above ₱8.0M</option>
-                  </select>
-                  <div className="absolute right-3.5 pointer-events-none text-muted-foreground font-semibold text-[10px]">
-                    ▼
-                  </div>
-                </div>
-
-                {/* Clear filters trigger */}
-                {(searchQuery ||
-                  selectedLocation ||
-                  selectedPriceRange ||
-                  selectedStatus !== "All") && (
-                  <button
-                    onClick={clearAllFilters}
-                    className="h-10 px-4 rounded-full border border-dashed border-border text-[12.5px] font-medium text-muted-foreground hover:border-ink hover:text-ink transition-colors"
-                  >
-                    Clear Filters
+                    <X className="h-3.5 w-3.5" />
                   </button>
                 )}
               </div>
+
+              {/* Location Select */}
+              <div className="relative flex items-center">
+                <select
+                  value={selectedLocation || ""}
+                  onChange={(e) => setSelectedLocation(e.target.value || null)}
+                  className="h-10 rounded-full border border-border/70 bg-surface/50 px-5 pr-9 text-[12.5px] font-semibold text-ink focus:border-ink focus:outline-none appearance-none cursor-pointer"
+                >
+                  <option value="">All Districts</option>
+                  {locationsData.map((loc) => (
+                    <option key={loc.name} value={loc.name}>
+                      {loc.name}
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute right-3.5 pointer-events-none text-muted-foreground font-semibold text-[10px]">
+                  ▼
+                </div>
+              </div>
+
+              {/* Price Select */}
+              <div className="relative flex items-center">
+                <select
+                  value={selectedPriceRange || ""}
+                  onChange={(e) => setSelectedPriceRange(e.target.value || null)}
+                  className="h-10 rounded-full border border-border/70 bg-surface/50 px-5 pr-9 text-[12.5px] font-semibold text-ink focus:border-ink focus:outline-none appearance-none cursor-pointer"
+                >
+                  <option value="">All Prices</option>
+                  <option value="under-6m">Under ₱6.0M</option>
+                  <option value="6m-8m">₱6.0M – ₱8.0M</option>
+                  <option value="above-8m">Above ₱8.0M</option>
+                </select>
+                <div className="absolute right-3.5 pointer-events-none text-muted-foreground font-semibold text-[10px]">
+                  ▼
+                </div>
+              </div>
+
+              {/* Clear filters trigger */}
+              {(searchQuery ||
+                selectedLocation ||
+                selectedPriceRange ||
+                selectedStatus !== "All") && (
+                <button
+                  onClick={clearAllFilters}
+                  className="h-10 px-4 rounded-full border border-dashed border-border text-[12.5px] font-medium text-muted-foreground hover:border-ink hover:text-ink transition-colors"
+                >
+                  Clear Filters
+                </button>
+              )}
             </div>
           </div>
         </div>
+      </div>
 
       {/* ── FILTER BOTTOM SHEET ── */}
       {isFiltersSheetOpen && (
         <div
           className="fixed inset-0 z-50 flex items-end"
-          style={{ background: "rgba(10,12,20,0.60)", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)" }}
+          style={{
+            background: "rgba(10,12,20,0.60)",
+            backdropFilter: "blur(10px)",
+            WebkitBackdropFilter: "blur(10px)",
+          }}
           onClick={() => setIsFiltersSheetOpen(false)}
         >
           <div
@@ -757,7 +752,9 @@ function Properties() {
             {/* Sheet header */}
             <div className="flex items-center justify-between px-6 py-3 border-b border-border/40">
               <div>
-                <p className="text-[10px] font-mono tracking-[0.22em] uppercase text-muted-foreground">Refine results</p>
+                <p className="text-[10px] font-mono tracking-[0.22em] uppercase text-muted-foreground">
+                  Refine results
+                </p>
                 <p className="text-[17px] font-bold text-ink mt-0.5">Filters</p>
               </div>
               <button
@@ -771,7 +768,9 @@ function Properties() {
             <div className="px-6 pt-5 space-y-6">
               {/* Search */}
               <div>
-                <p className="text-[10.5px] font-mono tracking-[0.18em] uppercase text-muted-foreground mb-3">Search</p>
+                <p className="text-[10.5px] font-mono tracking-[0.18em] uppercase text-muted-foreground mb-3">
+                  Search
+                </p>
                 <div className="relative flex items-center">
                   <Search className="absolute left-4 h-4 w-4 text-muted-foreground" />
                   <input
@@ -782,7 +781,10 @@ function Properties() {
                     className="h-11 w-full rounded-2xl border border-border/70 bg-white pl-11 pr-4 text-[14px] placeholder-muted-foreground/60 focus:border-ink focus:outline-none transition-all duration-300"
                   />
                   {searchQuery && (
-                    <button onClick={() => setSearchQuery("")} className="absolute right-4 text-muted-foreground">
+                    <button
+                      onClick={() => setSearchQuery("")}
+                      className="absolute right-4 text-muted-foreground"
+                    >
                       <X className="h-3.5 w-3.5" />
                     </button>
                   )}
@@ -791,7 +793,9 @@ function Properties() {
 
               {/* Status */}
               <div>
-                <p className="text-[10.5px] font-mono tracking-[0.18em] uppercase text-muted-foreground mb-3">Availability</p>
+                <p className="text-[10.5px] font-mono tracking-[0.18em] uppercase text-muted-foreground mb-3">
+                  Availability
+                </p>
                 <div className="flex gap-2">
                   {(["All", "RFO", "Pre-selling"] as const).map((status) => (
                     <button
@@ -811,7 +815,9 @@ function Properties() {
 
               {/* District */}
               <div>
-                <p className="text-[10.5px] font-mono tracking-[0.18em] uppercase text-muted-foreground mb-3">District</p>
+                <p className="text-[10.5px] font-mono tracking-[0.18em] uppercase text-muted-foreground mb-3">
+                  District
+                </p>
                 <div className="relative">
                   <select
                     value={selectedLocation || ""}
@@ -825,13 +831,17 @@ function Properties() {
                       </option>
                     ))}
                   </select>
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground text-[10px] font-bold">▼</div>
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground text-[10px] font-bold">
+                    ▼
+                  </div>
                 </div>
               </div>
 
               {/* Price Range */}
               <div>
-                <p className="text-[10.5px] font-mono tracking-[0.18em] uppercase text-muted-foreground mb-3">Price Range</p>
+                <p className="text-[10.5px] font-mono tracking-[0.18em] uppercase text-muted-foreground mb-3">
+                  Price Range
+                </p>
                 <div className="grid grid-cols-2 gap-2">
                   {[
                     { value: "", label: "All Prices" },
@@ -858,7 +868,9 @@ function Properties() {
               <div className="flex gap-3 pt-1">
                 {activeFiltersCount > 0 && (
                   <button
-                    onClick={() => { clearAllFilters(); }}
+                    onClick={() => {
+                      clearAllFilters();
+                    }}
                     className="flex-1 h-12 rounded-2xl border border-dashed border-border text-[13.5px] font-semibold text-muted-foreground hover:border-ink hover:text-ink transition-colors"
                   >
                     Clear all
@@ -881,104 +893,104 @@ function Properties() {
       {/* "THE PASIG COLLECTION" — DARK INVERSION BLOCK */}
       {showFeaturedDistrict && (
         <section className="px-4 section-pad">
-        <div className="container-prose">
-          <div className="relative overflow-hidden rounded-[2.5rem] bg-ink px-8 py-16 text-white md:px-20 md:py-24 shadow-lift">
-            {/* Background elements */}
-            <div
-              aria-hidden
-              className="pointer-events-none absolute -right-32 -top-32 h-[32rem] w-[32rem] rounded-full opacity-30"
-              style={{
-                background:
-                  "radial-gradient(closest-side, color-mix(in oklab, var(--primary) 40%, transparent), transparent 70%)",
-              }}
-            />
-            <div
-              aria-hidden
-              className="pointer-events-none absolute -bottom-48 -left-32 h-[28rem] w-[28rem] rounded-full opacity-20"
-              style={{
-                background:
-                  "radial-gradient(closest-side, color-mix(in oklab, var(--gold) 25%, transparent), transparent 70%)",
-              }}
-            />
+          <div className="container-prose">
+            <div className="relative overflow-hidden rounded-[2.5rem] bg-ink px-8 py-16 text-white md:px-20 md:py-24 shadow-lift">
+              {/* Background elements */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute -right-32 -top-32 h-[32rem] w-[32rem] rounded-full opacity-30"
+                style={{
+                  background:
+                    "radial-gradient(closest-side, color-mix(in oklab, var(--primary) 40%, transparent), transparent 70%)",
+                }}
+              />
+              <div
+                aria-hidden
+                className="pointer-events-none absolute -bottom-48 -left-32 h-[28rem] w-[28rem] rounded-full opacity-20"
+                style={{
+                  background:
+                    "radial-gradient(closest-side, color-mix(in oklab, var(--gold) 25%, transparent), transparent 70%)",
+                }}
+              />
 
-            <div className="grid md:grid-cols-12 gap-12 md:gap-16 items-center relative z-10">
-              {/* Left Column: Asymmetric portrait image */}
-              <div className="md:col-span-5">
-                <Reveal>
-                  <div className="img-luxe img-luxe-hover overflow-hidden rounded-3xl aspect-[3/4] max-w-sm mx-auto shadow-lift bg-[#18181b]">
-                    <img
-                      src={featuredDistrict?.image_url || towerImg}
-                      alt={`${featuredDistrict?.district_name || "Pasig"} architectural tower`}
-                      className="img-luxe h-full w-full object-cover"
-                      loading="lazy"
-                    />
-                  </div>
-                </Reveal>
-              </div>
+              <div className="grid md:grid-cols-12 gap-12 md:gap-16 items-center relative z-10">
+                {/* Left Column: Asymmetric portrait image */}
+                <div className="md:col-span-5">
+                  <Reveal>
+                    <div className="img-luxe img-luxe-hover overflow-hidden rounded-3xl aspect-[3/4] max-w-sm mx-auto shadow-lift bg-[#18181b]">
+                      <img
+                        src={featuredDistrict?.image_url || towerImg}
+                        alt={`${featuredDistrict?.district_name || "Pasig"} architectural tower`}
+                        className="img-luxe h-full w-full object-cover"
+                        loading="lazy"
+                      />
+                    </div>
+                  </Reveal>
+                </div>
 
-              {/* Right Column: Collection details */}
-              <div className="md:col-span-7">
-                <Reveal>
-                  <p className="font-mono tracking-[0.25em] text-[#60A5FA] text-[11px] uppercase font-bold">
-                    {featuredDistrict?.tagline || "Featured District"}
-                  </p>
-                  <h2 className="display-2 mt-6 text-white tracking-tighter leading-none">
-                    {featuredDistrict?.headline ? (
-                      renderHeadlineWithBreaks(featuredDistrict.headline)
-                    ) : (
-                      <>
-                        The Pasig
-                        <br />
-                        Collection.
-                      </>
-                    )}
-                  </h2>
-                  <p className="mt-8 text-[15px] leading-relaxed text-white/70 font-light max-w-xl">
-                    {featuredDistrict?.description ||
-                      "Pasig City stands as Metro Manila's residential sweet spot—blending central business accessibility to Ortigas, Bonifacio Global City, and Quezon City with expansive resort-inspired developments."}
-                  </p>
-                </Reveal>
+                {/* Right Column: Collection details */}
+                <div className="md:col-span-7">
+                  <Reveal>
+                    <p className="font-mono tracking-[0.25em] text-[#60A5FA] text-[11px] uppercase font-bold">
+                      {featuredDistrict?.tagline || "Featured District"}
+                    </p>
+                    <h2 className="display-2 mt-6 text-white tracking-tighter leading-none">
+                      {featuredDistrict?.headline ? (
+                        renderHeadlineWithBreaks(featuredDistrict.headline)
+                      ) : (
+                        <>
+                          The Pasig
+                          <br />
+                          Collection.
+                        </>
+                      )}
+                    </h2>
+                    <p className="mt-8 text-[15px] leading-relaxed text-white/70 font-light max-w-xl">
+                      {featuredDistrict?.description ||
+                        "Pasig City stands as Metro Manila's residential sweet spot—blending central business accessibility to Ortigas, Bonifacio Global City, and Quezon City with expansive resort-inspired developments."}
+                    </p>
+                  </Reveal>
 
-                {/* Stats Row */}
-                <Reveal
-                  delay={140}
-                  className="mt-12 grid grid-cols-2 gap-8 border-t border-white/10 pt-10"
-                >
-                  <div>
-                    <p className="text-[32px] md:text-[40px] font-extrabold tracking-tight text-white leading-none">
-                      {featuredDistrict?.projects_count ?? 12}
-                    </p>
-                    <p className="text-[10px] font-mono tracking-widest uppercase text-white/50 mt-3">
-                      Current Projects
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-[32px] md:text-[40px] font-extrabold tracking-tight text-white leading-none">
-                      {featuredDistrict?.entry_price || "₱4.8M+"}
-                    </p>
-                    <p className="text-[10px] font-mono tracking-widest uppercase text-white/50 mt-3">
-                      Entry Price
-                    </p>
-                  </div>
-                </Reveal>
-
-                {/* CTA Link */}
-                <Reveal delay={240} className="mt-10">
-                  <button
-                    onClick={() => {
-                      setSelectedLocation(featuredDistrict?.district_name || "Pasig");
-                      scrollToResidences();
-                    }}
-                    className="inline-flex items-center gap-2 text-[12.5px] font-semibold tracking-wider uppercase text-white hover:text-[#60A5FA] transition-colors border-b border-white/20 pb-1 hover:border-[#60A5FA]/40"
+                  {/* Stats Row */}
+                  <Reveal
+                    delay={140}
+                    className="mt-12 grid grid-cols-2 gap-8 border-t border-white/10 pt-10"
                   >
-                    View {featuredDistrict?.district_name || "Pasig"} listings{" "}
-                    <ArrowRight className="h-4.5 w-4.5" />
-                  </button>
-                </Reveal>
+                    <div>
+                      <p className="text-[32px] md:text-[40px] font-extrabold tracking-tight text-white leading-none">
+                        {featuredDistrict?.projects_count ?? 12}
+                      </p>
+                      <p className="text-[10px] font-mono tracking-widest uppercase text-white/50 mt-3">
+                        Current Projects
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-[32px] md:text-[40px] font-extrabold tracking-tight text-white leading-none">
+                        {featuredDistrict?.entry_price || "₱4.8M+"}
+                      </p>
+                      <p className="text-[10px] font-mono tracking-widest uppercase text-white/50 mt-3">
+                        Entry Price
+                      </p>
+                    </div>
+                  </Reveal>
+
+                  {/* CTA Link */}
+                  <Reveal delay={240} className="mt-10">
+                    <button
+                      onClick={() => {
+                        setSelectedLocation(featuredDistrict?.district_name || "Pasig");
+                        scrollToResidences();
+                      }}
+                      className="inline-flex items-center gap-2 text-[12.5px] font-semibold tracking-wider uppercase text-white hover:text-[#60A5FA] transition-colors border-b border-white/20 pb-1 hover:border-[#60A5FA]/40"
+                    >
+                      View {featuredDistrict?.district_name || "Pasig"} listings{" "}
+                      <ArrowRight className="h-4.5 w-4.5" />
+                    </button>
+                  </Reveal>
+                </div>
               </div>
             </div>
           </div>
-        </div>
         </section>
       )}
 
@@ -1180,7 +1192,11 @@ function Properties() {
         <div
           id="share-modal"
           className="fixed inset-0 z-50 flex items-end sm:items-center justify-center px-0 sm:px-4"
-          style={{ background: "rgba(10,12,20,0.75)", backdropFilter: "blur(18px)", WebkitBackdropFilter: "blur(18px)" }}
+          style={{
+            background: "rgba(10,12,20,0.75)",
+            backdropFilter: "blur(18px)",
+            WebkitBackdropFilter: "blur(18px)",
+          }}
           onClick={() => setActiveShareProperty(null)}
         >
           <div
@@ -1190,25 +1206,42 @@ function Properties() {
               background: "oklch(0.14 0.018 252)",
               border: "1px solid oklch(1 0 0 / 0.09)",
               boxShadow: "0 -8px 60px -10px rgba(0,0,0,0.7), 0 0 0 0.5px oklch(1 0 0 / 0.06)",
-              ...(typeof window !== "undefined" && window.innerWidth >= 640 ? { borderRadius: "28px" } : {})
+              ...(typeof window !== "undefined" && window.innerWidth >= 640
+                ? { borderRadius: "28px" }
+                : {}),
             }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Property hero image strip */}
             {activeShareProperty.hero_images?.[0] && (
-              <div className="relative h-36 overflow-hidden" style={{ borderRadius: "28px 28px 0 0" }}>
+              <div
+                className="relative h-36 overflow-hidden"
+                style={{ borderRadius: "28px 28px 0 0" }}
+              >
                 <img
                   src={activeShareProperty.hero_images[0]}
                   alt={activeShareProperty.name}
                   className="w-full h-full object-cover"
                   style={{ filter: "brightness(0.55) saturate(1.1)" }}
                 />
-                <div className="absolute inset-0" style={{ background: "linear-gradient(to top, oklch(0.14 0.018 252) 0%, transparent 60%)" }} />
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background:
+                      "linear-gradient(to top, oklch(0.14 0.018 252) 0%, transparent 60%)",
+                  }}
+                />
                 <div className="absolute bottom-3 left-5 right-10">
-                  <p className="text-[10px] font-mono tracking-[0.22em] uppercase text-white/50 mb-0.5">Share this property</p>
-                  <p className="text-[16px] font-bold text-white leading-tight line-clamp-1">{activeShareProperty.name}</p>
+                  <p className="text-[10px] font-mono tracking-[0.22em] uppercase text-white/50 mb-0.5">
+                    Share this property
+                  </p>
+                  <p className="text-[16px] font-bold text-white leading-tight line-clamp-1">
+                    {activeShareProperty.name}
+                  </p>
                   {activeShareProperty.city && (
-                    <p className="text-[12px] text-white/60 font-medium mt-0.5">{activeShareProperty.city}</p>
+                    <p className="text-[12px] text-white/60 font-medium mt-0.5">
+                      {activeShareProperty.city}
+                    </p>
                   )}
                 </div>
               </div>
@@ -1218,12 +1251,22 @@ function Properties() {
             {!activeShareProperty.hero_images?.[0] && (
               <div className="pt-7 px-6 pb-0">
                 <div className="flex items-center gap-3 mb-1">
-                  <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "oklch(0.43 0.20 258 / 0.2)" }}>
+                  <div
+                    className="w-9 h-9 rounded-xl flex items-center justify-center"
+                    style={{ background: "oklch(0.43 0.20 258 / 0.2)" }}
+                  >
                     <Share2 size={16} style={{ color: "oklch(0.72 0.16 258)" }} />
                   </div>
                   <div>
-                    <p className="text-[10px] font-mono tracking-[0.22em] uppercase" style={{ color: "oklch(0.72 0.16 258)" }}>Share property</p>
-                    <p className="text-[15px] font-bold text-white leading-tight">{activeShareProperty.name}</p>
+                    <p
+                      className="text-[10px] font-mono tracking-[0.22em] uppercase"
+                      style={{ color: "oklch(0.72 0.16 258)" }}
+                    >
+                      Share property
+                    </p>
+                    <p className="text-[15px] font-bold text-white leading-tight">
+                      {activeShareProperty.name}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -1242,7 +1285,12 @@ function Properties() {
               {/* Gold divider rule */}
               <div className="flex items-center gap-3 mb-5">
                 <div className="h-px flex-1" style={{ background: "oklch(1 0 0 / 0.08)" }} />
-                <span className="text-[9px] font-mono tracking-[0.25em] uppercase" style={{ color: "oklch(0.74 0.137 79)" }}>Share via</span>
+                <span
+                  className="text-[9px] font-mono tracking-[0.25em] uppercase"
+                  style={{ color: "oklch(0.74 0.137 79)" }}
+                >
+                  Share via
+                </span>
                 <div className="h-px flex-1" style={{ background: "oklch(1 0 0 / 0.08)" }} />
               </div>
 
@@ -1253,25 +1301,59 @@ function Properties() {
                     name: "Facebook",
                     url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`${typeof window !== "undefined" ? window.location.origin : ""}/projects/${activeShareProperty.slug || activeShareProperty.id}`)}`,
                     bg: "#1877F2",
-                    svg: (<svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path fillRule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clipRule="evenodd" /></svg>)
+                    svg: (
+                      <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                        <path
+                          fillRule="evenodd"
+                          d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    ),
                   },
                   {
                     name: "X / Twitter",
                     url: `https://twitter.com/intent/tweet?url=${encodeURIComponent(`${typeof window !== "undefined" ? window.location.origin : ""}/projects/${activeShareProperty.slug || activeShareProperty.id}`)}&text=${encodeURIComponent(`${activeShareProperty.name} — ${activeShareProperty.city} · CityQlo`)}`,
                     bg: "#000000",
-                    svg: (<svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>)
+                    svg: (
+                      <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                      </svg>
+                    ),
                   },
                   {
                     name: "WhatsApp",
                     url: `https://api.whatsapp.com/send?text=${encodeURIComponent(`${activeShareProperty.name} — ${activeShareProperty.city} · CityQlo ${typeof window !== "undefined" ? window.location.origin : ""}/projects/${activeShareProperty.slug || activeShareProperty.id}`)}`,
                     bg: "#25D366",
-                    svg: (<svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path fillRule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.16L2 22l5.002-1.332A9.954 9.954 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm4.56 13.06c-.22.617-.98 1.134-1.62 1.257-.59.112-1.35.203-3.95-.87-3.32-1.374-5.46-4.757-5.625-4.978-.165-.221-1.32-1.756-1.32-3.35 0-1.593.83-2.378 1.127-2.699.3-.321.66-.401.88-.401.22 0 .44.004.63.012.2.008.47-.076.73.562.26.638.9 2.197.98 2.358.08.16.13.348.02.562-.11.214-.16.348-.32.535-.16.188-.34.42-.49.562-.165.152-.338.318-.147.647.19.329.84 1.377 1.8 2.234 1.23 1.1 2.27 1.44 2.59 1.6.32.16.51.13.7-.09.19-.22.82-.95 1.04-1.28.22-.33.44-.27.74-.16.3.11 1.91.9 2.24 1.06.33.16.55.24.63.38.08.14.08.816-.14 1.433z" clipRule="evenodd" /></svg>)
+                    svg: (
+                      <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                        <path
+                          fillRule="evenodd"
+                          d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.16L2 22l5.002-1.332A9.954 9.954 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm4.56 13.06c-.22.617-.98 1.134-1.62 1.257-.59.112-1.35.203-3.95-.87-3.32-1.374-5.46-4.757-5.625-4.978-.165-.221-1.32-1.756-1.32-3.35 0-1.593.83-2.378 1.127-2.699.3-.321.66-.401.88-.401.22 0 .44.004.63.012.2.008.47-.076.73.562.26.638.9 2.197.98 2.358.08.16.13.348.02.562-.11.214-.16.348-.32.535-.16.188-.34.42-.49.562-.165.152-.338.318-.147.647.19.329.84 1.377 1.8 2.234 1.23 1.1 2.27 1.44 2.59 1.6.32.16.51.13.7-.09.19-.22.82-.95 1.04-1.28.22-.33.44-.27.74-.16.3.11 1.91.9 2.24 1.06.33.16.55.24.63.38.08.14.08.816-.14 1.433z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    ),
                   },
                   {
                     name: "Viber",
                     url: `viber://forward?text=${encodeURIComponent(`${activeShareProperty.name} — ${activeShareProperty.city} · CityQlo ${typeof window !== "undefined" ? window.location.origin : ""}/projects/${activeShareProperty.slug || activeShareProperty.id}`)}`,
                     bg: "#7360F2",
-                    svg: (<svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>)
+                    svg: (
+                      <svg
+                        className="h-4 w-4"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                        />
+                      </svg>
+                    ),
                   },
                 ].map((s) => (
                   <a
@@ -1291,7 +1373,10 @@ function Properties() {
               {/* Copy Link */}
               <div
                 className="flex gap-2 items-center rounded-2xl p-1 pl-4"
-                style={{ background: "oklch(1 0 0 / 0.06)", border: "1px solid oklch(1 0 0 / 0.1)" }}
+                style={{
+                  background: "oklch(1 0 0 / 0.06)",
+                  border: "1px solid oklch(1 0 0 / 0.1)",
+                }}
               >
                 <input
                   type="text"
@@ -1303,7 +1388,9 @@ function Properties() {
                 <button
                   onClick={() => {
                     if (typeof window !== "undefined") {
-                      navigator.clipboard.writeText(`${window.location.origin}/projects/${activeShareProperty.slug || activeShareProperty.id}`);
+                      navigator.clipboard.writeText(
+                        `${window.location.origin}/projects/${activeShareProperty.slug || activeShareProperty.id}`,
+                      );
                       toast.success("Link copied to clipboard!");
                     }
                   }}

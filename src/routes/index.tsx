@@ -1,31 +1,20 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import lifestyleImg from "@/assets/lifestyle-couple.jpg";
 import interiorImg from "@/assets/interior-living.jpg";
 import towerImg from "@/assets/tower-exterior.jpg";
-import poolImg from "@/assets/amenity-pool.jpg";
-import founderImg from "@/assets/founder-portrait.jpg";
 import { ConsultationCTA } from "@/components/site/ConsultationCTA";
 import { Reveal } from "@/components/site/Reveal";
-import { Testimonials } from "@/components/site/Testimonials";
-import {
-  getSiteSettings,
-  getPublicTestimonials,
-  getPublicPropertiesPageContent,
-} from "../lib/api/admin.functions";
+import { GoogleReviews } from "@/components/site/GoogleReviews";
+import { getSiteSettings, getPublicPropertiesPageContent } from "../lib/api/admin.functions";
 
 export const Route = createFileRoute("/")({
   loader: async ({ context }) => {
-    // Fetch settings, testimonials, and page content on server — return data so component gets it synchronously
-    const [settingsResult, testimonialsResult, pageContentResult] = await Promise.allSettled([
+    // Fetch settings and page content on server — return data so component gets it synchronously
+    const [settingsResult, pageContentResult] = await Promise.allSettled([
       context.queryClient.ensureQueryData({
         queryKey: ["portal-settings"],
         queryFn: () => getSiteSettings(),
-      }),
-      context.queryClient.ensureQueryData({
-        queryKey: ["public_testimonials"],
-        queryFn: () => getPublicTestimonials(),
       }),
       context.queryClient.ensureQueryData({
         queryKey: ["properties-page-content"],
@@ -34,19 +23,14 @@ export const Route = createFileRoute("/")({
     ]);
     return {
       initialSettings: settingsResult.status === "fulfilled" ? settingsResult.value : null,
-      initialTestimonials:
-        testimonialsResult.status === "fulfilled" ? testimonialsResult.value : [],
       initialPageContent: pageContentResult.status === "fulfilled" ? pageContentResult.value : null,
       settingsError: settingsResult.status === "rejected" ? String(settingsResult.reason) : null,
-      testimonialsError:
-        testimonialsResult.status === "rejected" ? String(testimonialsResult.reason) : null,
     };
   },
   head: () => ({
     meta: [
       {
-        title:
-          "DMCI Homes Accredited Property Consultant in Metro Manila | CityQlo",
+        title: "DMCI Homes Accredited Property Consultant in Metro Manila | CityQlo",
       },
       {
         name: "description",
@@ -132,11 +116,70 @@ interface HomepageSettings {
 // ─── CUSTOMIZABLE HERO OVERLAY ──────────────────────────────────────────────
 // Modify the value below (0 to 100) to adjust the default darkness of the home hero section.
 // (e.g. 40 for 40% opacity). If a value is saved in the CMS settings, that will take precedence.
-const HERO_OVERLAY_OPACITY_PERCENT = 40; 
+const HERO_OVERLAY_OPACITY_PERCENT = 40;
 
 const cleanBadgeText = (text: string) => {
   return text.replace(/acccredited/gi, "Accredited");
 };
+
+const ConsultantCard = ({ isMobile }: { isMobile: boolean }) => (
+  <div
+    className={`flex ${
+      isMobile ? "flex-col items-center text-center p-6 gap-4" : "items-start gap-4 p-5"
+    } rounded-[28px] border border-white/10 bg-zinc-950/20 shadow-[0_8px_32px_rgba(0,0,0,0.37)] backdrop-blur-xl transition-all duration-300 hover:border-white/20 hover:bg-zinc-950/30`}
+  >
+    <div className="relative shrink-0">
+      <img
+        src="https://res.cloudinary.com/dcnohpztl/image/upload/q_auto/f_auto/v1780922893/photo_2026-06-06_09-41-17_drf5cu.jpg"
+        alt="Jerwin Daliva"
+        className={`${
+          isMobile ? "h-20 w-20" : "h-[96px] w-[96px]"
+        } rounded-full border border-white/20 object-cover shadow-md`}
+      />
+      {/* Verified badge */}
+      <span
+        className="absolute bottom-0.5 right-0.5 flex h-6 w-6 items-center justify-center rounded-full border-2 border-[#18181b] bg-[#1A56DB] shadow-md"
+        title="Verified DMCI Accredited Consultant"
+        aria-label="Verified"
+      >
+        <svg viewBox="0 0 24 24" fill="none" className="h-3 w-3 text-white" aria-hidden="true">
+          <path
+            d="M5 12.5l4 4 10-10"
+            stroke="currentColor"
+            strokeWidth="3.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </span>
+    </div>
+    <div className={isMobile ? "w-full" : "min-w-0"}>
+      <div className={`flex items-center gap-1.5 ${isMobile ? "justify-center" : ""}`}>
+        <p className="text-[15px] font-semibold leading-tight text-white">Jerwin Daliva</p>
+        <svg viewBox="0 0 24 24" className="h-4 w-4 shrink-0 text-[#93B4FF]" aria-hidden="true">
+          <path
+            fill="currentColor"
+            d="M12 1l2.9 2.1 3.5-.4 1.1 3.4 2.9 2.1-1.1 3.4 1.1 3.4-2.9 2.1-1.1 3.4-3.5-.4L12 23l-2.9-2.1-3.5.4-1.1-3.4L1.6 15l1.1-3.4L1.6 8.2l2.9-2.1 1.1-3.4 3.5.4L12 1z"
+          />
+          <path
+            d="M8 12l2.5 2.5L16 9"
+            stroke="#0B1220"
+            strokeWidth="2.5"
+            fill="none"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </div>
+      <p className="mt-1 text-[11px] font-bold uppercase tracking-[0.08em] text-[#93B4FF]">
+        Official DMCI Accredited Property Consultant
+      </p>
+      <p className="mt-2.5 text-[13px] leading-relaxed text-white/70">
+        Helping buyers make informed, goal-first property decisions.
+      </p>
+    </div>
+  </div>
+);
 
 function Home() {
   // loaderData is available synchronously — no loading flash
@@ -148,6 +191,23 @@ function Home() {
   const [activeSlide, setActiveSlide] = useState(0);
   const [prevSlide, setPrevSlide] = useState<number | null>(null);
   const autoplayRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [showEstimator, setShowEstimator] = useState(false);
+  const [priceValue, setPriceValue] = useState(8000000);
+  const [dpPercent, setDpPercent] = useState(12);
+  const [dpTerm, setDpTerm] = useState(36);
+  const [loanTerm, setLoanTerm] = useState(20);
+
+  // Promo discounts tied to each DP tier (matches DMCI promo sheets)
+  const dpDiscountMap: Record<number, number> = { 5: 0.02, 12: 0.01 };
+  const promoDiscount = dpDiscountMap[dpPercent] ?? 0;
+  const netPrice = priceValue * (1 - promoDiscount);
+  const dpAmount = netPrice * (dpPercent / 100);
+  const monthlyDP = dpAmount / dpTerm;
+  const loanAmount = netPrice - dpAmount;
+  const interestRate = 0.065; // 6.5% — matches DMCI promo sheets
+  const monthlyRate = interestRate / 12;
+  const totalMonths = loanTerm * 12;
+  const monthlyBank = (loanAmount * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -totalMonths));
 
   const { data: siteSettings } = useQuery({
     queryKey: ["portal-settings"],
@@ -181,6 +241,10 @@ function Home() {
         location: p.location || `${p.city} · ${p.developer}`,
         developer: p.developer,
         status: p.status,
+        priceDisplay: p.price_display || null,
+        beds: p.beds || null,
+        area: p.area || null,
+        unitTypes: p.unit_types || null,
         img: p.image_url || (idx === 0 ? towerImg : interiorImg),
         isDb: true,
       }));
@@ -289,7 +353,7 @@ function Home() {
         role="region"
         aria-roledescription="carousel"
         aria-label="Hero Property Carousel"
-        className="relative h-[100svh] min-h-[600px] w-full overflow-hidden"
+        className="relative h-[100svh] md:h-[100svh] md:min-h-[600px] w-full overflow-hidden"
         style={{
           backgroundColor: "#18181b",
           // Instant fallback image from the JS bundle — eliminates the black flash
@@ -336,33 +400,47 @@ function Home() {
           </div>
         )}
 
-        {/* Overlay Dark Filter */}
+        {/* Overlay Dark Filter & Layered Gradients */}
         <div
-          className="absolute inset-0 bg-black transition-opacity duration-700"
-          style={{ opacity: homepageSettings.hero_overlay_opacity ?? (HERO_OVERLAY_OPACITY_PERCENT / 100) }}
+          className="absolute inset-0 bg-[#0c0c0e]/30 transition-opacity duration-700"
+          style={{
+            opacity: homepageSettings.hero_overlay_opacity ?? HERO_OVERLAY_OPACITY_PERCENT / 100,
+          }}
         />
+        {/* Left-to-right dark mask for desktop readability */}
         <div
           aria-hidden
-          className="absolute inset-0"
+          className="absolute inset-0 pointer-events-none z-[2] hidden md:block"
           style={{
             background:
-              "radial-gradient(120% 70% at 20% 30%, transparent 40%, rgba(0,0,0,0.35) 100%)",
+              "linear-gradient(to right, rgba(12,12,14,0.9) 0%, rgba(12,12,14,0.65) 30%, rgba(12,12,14,0.2) 65%, transparent 100%)",
           }}
         />
-
-        {/* Text protection gradients to shield hero subtext (left gradient on desktop, bottom gradient on mobile) */}
+        {/* Bottom-to-top dark mask for mobile readability */}
         <div
           aria-hidden
-          className="absolute inset-0 pointer-events-none z-[5] hidden md:block"
+          className="absolute inset-0 pointer-events-none z-[2] block md:hidden"
           style={{
-            background: "linear-gradient(to right, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.2) 60%, transparent 100%)",
+            background:
+              "linear-gradient(to top, rgba(10,10,12,0.98) 0%, rgba(10,10,12,0.92) 30%, rgba(10,10,12,0.75) 55%, rgba(10,10,12,0.35) 78%, transparent 100%)",
           }}
         />
+        {/* Top-down scrim for mobile — ensures eyebrow text is always readable */}
         <div
           aria-hidden
-          className="absolute inset-0 pointer-events-none z-[5] block md:hidden"
+          className="absolute inset-0 pointer-events-none z-[2] block md:hidden"
           style={{
-            background: "linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.25) 60%, transparent 100%)",
+            background:
+              "linear-gradient(to bottom, rgba(10,10,12,0.65) 0%, rgba(10,10,12,0.35) 20%, transparent 45%)",
+          }}
+        />
+        {/* Subtle vignette layer around the edges */}
+        <div
+          aria-hidden
+          className="absolute inset-0 pointer-events-none z-[2]"
+          style={{
+            background:
+              "radial-gradient(circle at center, transparent 35%, rgba(12,12,14,0.55) 100%)",
           }}
         />
 
@@ -372,7 +450,7 @@ function Home() {
             className="hidden md:flex"
             style={{
               position: "absolute",
-              bottom: "6rem",
+              bottom: "12.5rem",
               left: "50%",
               transform: "translateX(-50%)",
               zIndex: 20,
@@ -409,18 +487,47 @@ function Home() {
 
         <div
           ref={heroContentRef}
-          className="relative z-10 flex h-full items-center pt-28 pb-32 will-change-transform md:pt-32 md:pb-28 hero-home-container"
+          className="relative z-10 flex h-full items-start md:items-center pt-[88px] md:pt-32 pb-[160px] md:pb-28 hero-home-container"
         >
-          <div className="container-prose">
-            <div className="max-w-4xl text-white hero-content-inner">
+          <div className="container-prose w-full">
+            <div className="max-w-[660px] text-white hero-content-inner relative">
+              {/* Eyebrow — desktop only (hidden on mobile to reduce redundancy) */}
               {homepageSettings.hero_eyebrow !== "" && (
-                <p className="eyebrow rise text-white/55">
-                  <span className="gold-rule" />
-                  {homepageSettings.hero_eyebrow || "CityQlo · Metro Manila"}
-                </p>
+                <div className="rise hidden lg:flex items-center gap-2.5 mb-2 md:mb-3">
+                  <span
+                    className="h-2 w-2 rounded-full shrink-0"
+                    style={{ backgroundColor: "oklch(0.74 0.137 79)" }}
+                  />
+                  <span className="text-[10px] font-mono tracking-[0.22em] uppercase text-white/70">
+                    {homepageSettings.hero_eyebrow ||
+                      "Official DMCI Accredited Property Consultant"}
+                  </span>
+                </div>
               )}
+
+              {/* Broker trust line — mobile only, always visible near top */}
+              <div className="rise mb-4 md:mb-6 flex items-center gap-1.5 lg:hidden">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  className="h-3 w-3 shrink-0 text-[#93B4FF]"
+                  aria-hidden="true"
+                >
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+                <span
+                  className="text-[11px] font-mono text-white/50 leading-snug"
+                  style={{ fontFamily: "var(--font-mono, 'JetBrains Mono', monospace)" }}
+                >
+                  Supervised by Joy Lachica · PRC Lic. 10101 · DHSUD NCR-B-6055
+                </span>
+              </div>
+
+              {/* Headline */}
               <h1
-                className={`display-1 rise rise-delay-1 mt-5 md:mt-8 text-shadow-hero ${
+                className={`display-1 rise rise-delay-1 tracking-tight font-extrabold leading-[1.08] ${
                   homepageSettings.hero_title_color?.startsWith("text-")
                     ? homepageSettings.hero_title_color
                     : ""
@@ -431,31 +538,41 @@ function Home() {
                     !homepageSettings.hero_title_color.startsWith("text-")
                       ? homepageSettings.hero_title_color
                       : "#ffffff",
-                  lineHeight: 1.0,
+                  fontSize: "clamp(2rem, 5.5vw, 4.5rem)",
+                  textShadow: "0 2px 16px rgba(0,0,0,0.3)",
                 }}
               >
-                {homepageSettings.hero_headline_1 || "Find the right"}
+                {homepageSettings.hero_headline_1 || "Find the"}
                 <br />
-                {homepageSettings.hero_headline_2 || "property."}
-                <span
-                  className={`block text-shadow-sub ${
-                    homepageSettings.hero_subtitle_color?.startsWith("text-")
-                      ? homepageSettings.hero_subtitle_color
-                      : ""
-                  }`}
-                  style={{
-                    color:
-                      homepageSettings.hero_subtitle_color &&
-                      !homepageSettings.hero_subtitle_color.startsWith("text-")
-                        ? homepageSettings.hero_subtitle_color
-                        : "#1A56DB",
-                  }}
-                >
-                  {homepageSettings.hero_headline_sub || "Not just another condo."}
-                </span>
+                {homepageSettings.hero_headline_2 || "Right Property"}
               </h1>
+
+              {/* Subtitle line */}
               <p
-                className={`lede rise rise-delay-2 mt-6 max-w-xl md:mt-10 text-shadow-sm ${
+                className={`rise rise-delay-1 mt-2.5 text-[19px] sm:text-[22px] md:text-[28px] font-semibold tracking-tight leading-snug ${
+                  homepageSettings.hero_subtitle_color?.startsWith("text-")
+                    ? homepageSettings.hero_subtitle_color
+                    : ""
+                }`}
+                style={{
+                  color:
+                    homepageSettings.hero_subtitle_color &&
+                    !homepageSettings.hero_subtitle_color.startsWith("text-")
+                      ? homepageSettings.hero_subtitle_color
+                      : "#ffffff",
+                  textShadow: "0 2px 10px rgba(0,0,0,0.25)",
+                }}
+              >
+                {(homepageSettings.hero_headline_sub || "Without the Sales Pressure").replace(
+                  /\.$/,
+                  "",
+                )}
+                <span style={{ color: "oklch(0.74 0.137 79)" }}>.</span>
+              </p>
+
+              {/* Body text */}
+              <p
+                className={`rise rise-delay-2 mt-4 max-w-[520px] text-shadow-sm ${
                   homepageSettings.hero_lede_color?.startsWith("text-")
                     ? homepageSettings.hero_lede_color
                     : ""
@@ -465,137 +582,600 @@ function Home() {
                     homepageSettings.hero_lede_color &&
                     !homepageSettings.hero_lede_color.startsWith("text-")
                       ? homepageSettings.hero_lede_color
-                      : "#e4e4e7",
-                  fontSize: "clamp(1.0625rem, 1.5vw, 1.125rem)",
+                      : "rgba(255,255,255,0.85)",
+                  fontSize: "clamp(0.88rem, 1.1vw, 1.05rem)",
+                  lineHeight: "1.6",
                 }}
               >
                 {homepageSettings.hero_lede ||
-                  "Helping Filipino professionals, investors, and OFWs make smarter property decisions — with guidance, not pressure."}
+                  "Compare DMCI condos, view sample monthly payments, and get expert guidance before you reserve."}
               </p>
-              <div className="rise rise-delay-3 mt-8 flex flex-row flex-wrap gap-3 md:mt-12">
+
+              {/* CTA buttons:
+                   - Below ~420px (max-[420px]): stacked full-width for readability
+                   - 420px and above: side-by-side */}
+              <div className="rise rise-delay-3 mt-4 flex flex-col max-[420px]:gap-2.5 min-[421px]:flex-row min-[421px]:gap-2.5">
                 <Link
                   to={homepageSettings.hero_cta_link || "/contact"}
-                  className="inline-flex flex-1 min-h-[42px] md:min-h-[50px] items-center justify-center gap-2 rounded-full bg-white px-4 md:px-5 py-2 md:py-3 text-[12px] md:text-[13px] font-semibold tracking-[0.02em] text-ink transition-all duration-700 hover:-translate-y-[2px] hover:shadow-lift"
+                  className="inline-flex h-[46px] w-full min-[421px]:w-auto items-center justify-center gap-1.5 rounded-full bg-white px-5 sm:px-7 text-[13.5px] sm:text-[14px] font-bold tracking-[0.01em] text-[#0f172a] transition-all duration-300 hover:bg-zinc-100 hover:scale-[1.02] active:scale-[0.98] shadow-lg"
                   style={{ transitionTimingFunction: "var(--ease-luxe)" }}
                 >
-                  {homepageSettings.hero_cta_text || "Book consultation"}
-                  <span aria-hidden>→</span>
+                  {homepageSettings.hero_cta_text || "Explore Properties"}
+                  <span aria-hidden className="ml-0.5">
+                    →
+                  </span>
                 </Link>
-                <Link
-                  to={homepageSettings.hero_secondary_cta_link || "/why-invest"}
-                  className="inline-flex flex-1 min-h-[42px] md:min-h-[50px] items-center justify-center gap-2 rounded-full border-2 border-white/60 px-4 md:px-5 py-2 md:py-3 text-[12px] md:text-[13px] font-semibold tracking-[0.02em] text-white transition-all duration-700 hover:border-white hover:bg-white/10"
+                <button
+                  onClick={() => setShowEstimator(!showEstimator)}
+                  className={`hidden sm:inline-flex h-[46px] w-full min-[421px]:w-auto items-center justify-center gap-2 rounded-full border px-4 sm:px-6 text-[13px] sm:text-[13.5px] font-semibold transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] cursor-pointer ${
+                    showEstimator
+                      ? "border-[#1A56DB] bg-[#1A56DB]/20 text-white font-bold"
+                      : "border-white/20 bg-zinc-900/60 backdrop-blur-sm text-white hover:bg-zinc-800/70 hover:border-white/35"
+                  }`}
                   style={{ transitionTimingFunction: "var(--ease-luxe)" }}
                 >
-                  {homepageSettings.hero_secondary_cta_text || "Why invest"}
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Floating Consultant Card — bottom right, glassmorphism */}
-        <div className="rise rise-delay-4 absolute right-6 bottom-[calc(7.5rem+20%)] z-20 hidden w-[360px] max-w-[calc(100vw-3rem)] lg:block">
-          <div className="flex items-start gap-4 rounded-[28px] border border-white/20 bg-white/10 p-5 shadow-[0_8px_40px_-8px_rgba(0,0,0,0.5)] backdrop-blur-2xl">
-            <div className="relative shrink-0">
-              <img
-                src="https://res.cloudinary.com/dcnohpztl/image/upload/q_auto/f_auto/v1780922893/photo_2026-06-06_09-41-17_drf5cu.jpg"
-                alt="Jerwin Daliva"
-                className="h-[104px] w-[104px] rounded-full border border-white/30 object-cover"
-              />
-              {/* Verified badge */}
-              <span
-                className="absolute bottom-0.5 right-0.5 flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-[#1A56DB] shadow-md"
-                title="Verified DMCI Accredited Consultant"
-                aria-label="Verified"
-              >
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  className="h-3.5 w-3.5 text-white"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M5 12.5l4 4 10-10"
-                    stroke="currentColor"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </span>
-            </div>
-            <div className="min-w-0">
-              <div className="flex items-center gap-1.5">
-                <p className="text-[15px] font-semibold leading-tight text-white">Jerwin Daliva</p>
-                <svg
-                  viewBox="0 0 24 24"
-                  className="h-4 w-4 shrink-0 text-[#93B4FF]"
-                  aria-hidden="true"
-                >
-                  <path
-                    fill="currentColor"
-                    d="M12 1l2.9 2.1 3.5-.4 1.1 3.4 2.9 2.1-1.1 3.4 1.1 3.4-2.9 2.1-1.1 3.4-3.5-.4L12 23l-2.9-2.1-3.5.4-1.1-3.4L1.6 15l1.1-3.4L1.6 8.2l2.9-2.1 1.1-3.4 3.5.4L12 1z"
-                  />
-                  <path
-                    d="M8 12l2.5 2.5L16 9"
-                    stroke="#0B1220"
-                    strokeWidth="2"
+                  {/* Calculator icon */}
+                  <svg
+                    className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0 opacity-80"
+                    viewBox="0 0 24 24"
                     fill="none"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    aria-hidden="true"
+                  >
+                    <rect x="4" y="2" width="16" height="20" rx="2" />
+                    <path d="M8 7h8M8 11h2m4 0h2M8 15h2m4 0h2M8 19h2m4 0h2" strokeLinecap="round" />
+                  </svg>
+                  <span>
+                    {showEstimator
+                      ? "Hide Estimator"
+                      : homepageSettings.hero_secondary_cta_text || "Calculate Payment"}
+                  </span>
+                </button>
               </div>
-              <p className="mt-1 text-[11.5px] font-medium uppercase tracking-[0.06em] text-[#93B4FF]">
-                Official DMCI Accredited Property Consultant
-              </p>
-              <p className="mt-3 text-[13px] leading-snug text-white/80">
-                Helping buyers make informed property decisions.
-              </p>
+
+              {showEstimator && (
+                <div className="rise mt-5 rounded-[24px] border border-white/10 bg-zinc-950/65 backdrop-blur-xl p-5 shadow-[0_20px_50px_rgba(0,0,0,0.6)] space-y-4">
+                  <div className="flex items-center justify-between border-b border-white/5 pb-2.5">
+                    <div className="flex items-center gap-2">
+                      <span className="flex h-5 w-5 items-center justify-center rounded-md bg-[#1A56DB]/20 border border-[#1A56DB]/30 text-primary">
+                        <svg
+                          className="h-3 w-3 text-[#93B4FF]"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth={2.5}
+                        >
+                          <rect x="4" y="2" width="16" height="20" rx="2" />
+                          <path d="M8 7h8M8 11h2m4 0h2" strokeLinecap="round" />
+                        </svg>
+                      </span>
+                      <h4 className="text-[12px] font-bold uppercase tracking-wider text-white font-mono">
+                        Monthly Payment Estimator
+                      </h4>
+                    </div>
+                    <span className="font-mono text-[8.5px] text-zinc-400 bg-white/5 px-2 py-0.5 rounded border border-white/5 uppercase">
+                      6.5% Est. Bank Rate
+                    </span>
+                  </div>
+
+                  {/* Price Slider */}
+                  <div className="space-y-1.5">
+                    <div className="flex justify-between text-[11px]">
+                      <span className="text-zinc-400">List Price</span>
+                      <span className="font-mono font-bold text-white">
+                        ₱{(priceValue / 1000000).toFixed(1)}M &nbsp;({priceValue.toLocaleString()})
+                      </span>
+                    </div>
+                    <input
+                      type="range"
+                      min={4000000}
+                      max={20000000}
+                      step={500000}
+                      value={priceValue}
+                      onChange={(e) => setPriceValue(Number(e.target.value))}
+                      className="h-1 w-full bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-[#1A56DB] focus:outline-none"
+                    />
+                    <div className="flex justify-between text-[9px] text-zinc-500 font-mono">
+                      <span>₱4.0M</span>
+                      <span>₱12.0M</span>
+                      <span>₱20.0M</span>
+                    </div>
+                    {promoDiscount > 0 && (
+                      <div className="flex justify-between items-center pt-1 border-t border-white/[0.04]">
+                        <span className="text-[9px] text-emerald-400 font-mono font-semibold uppercase tracking-wider">
+                          {promoDiscount * 100}% Promo Discount
+                        </span>
+                        <span className="text-[9px] font-mono text-emerald-400">
+                          −₱{Math.round(priceValue * promoDiscount).toLocaleString()} → Net ₱
+                          {Math.round(netPrice).toLocaleString()}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Inputs Grid */}
+                  <div className="grid grid-cols-3 gap-2">
+                    {/* DP % Selection */}
+                    <div className="space-y-1">
+                      <label className="text-[9px] font-semibold uppercase tracking-wider text-zinc-400 block font-mono">
+                        Downpayment %
+                      </label>
+                      <div className="flex rounded-lg overflow-hidden border border-white/5 bg-zinc-900/60 p-0.5">
+                        {[5, 12].map((pct) => (
+                          <button
+                            key={pct}
+                            type="button"
+                            onClick={() => setDpPercent(pct)}
+                            className={`flex-1 text-[10.5px] py-1 font-bold rounded-md transition-colors cursor-pointer text-center ${
+                              dpPercent === pct
+                                ? "bg-[#1A56DB] text-white"
+                                : "text-zinc-400 hover:text-white"
+                            }`}
+                          >
+                            {pct}%
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* DP Spread Term */}
+                    <div className="space-y-1">
+                      <label className="text-[9px] font-semibold uppercase tracking-wider text-zinc-400 block font-mono">
+                        DP Spread (Mos)
+                      </label>
+                      <div className="flex rounded-lg overflow-hidden border border-white/5 bg-zinc-900/60 p-0.5">
+                        {[24, 36, 48].map((term) => (
+                          <button
+                            key={term}
+                            type="button"
+                            onClick={() => setDpTerm(term)}
+                            className={`flex-1 text-[10px] py-1 font-bold rounded-md transition-colors cursor-pointer text-center ${
+                              dpTerm === term
+                                ? "bg-[#1A56DB] text-white"
+                                : "text-zinc-400 hover:text-white"
+                            }`}
+                          >
+                            {term}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Loan Term */}
+                    <div className="space-y-1">
+                      <label className="text-[9px] font-semibold uppercase tracking-wider text-zinc-400 block font-mono">
+                        Bank Loan Term
+                      </label>
+                      <div className="flex rounded-lg overflow-hidden border border-white/5 bg-zinc-900/60 p-0.5">
+                        {[15, 20].map((term) => (
+                          <button
+                            key={term}
+                            type="button"
+                            onClick={() => setLoanTerm(term)}
+                            className={`flex-1 text-[10.5px] py-1 font-bold rounded-md transition-colors cursor-pointer text-center ${
+                              loanTerm === term
+                                ? "bg-[#1A56DB] text-white"
+                                : "text-zinc-400 hover:text-white"
+                            }`}
+                          >
+                            {term}y
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Calculations Breakdown */}
+                  <div className="grid grid-cols-2 gap-3 pt-2.5 border-t border-white/5">
+                    <div className="rounded-xl bg-white/[0.02] border border-white/[0.04] p-3">
+                      <p className="text-[9px] font-mono uppercase tracking-wider text-zinc-400 mb-1 leading-none">
+                        Downpayment Period
+                      </p>
+                      <p className="text-[17px] font-bold text-white font-mono leading-tight">
+                        ₱{Math.round(monthlyDP).toLocaleString()}
+                        <span className="text-[11px] font-normal text-zinc-400 font-mono">/mo</span>
+                      </p>
+                      <p className="text-[8.5px] text-[#93B4FF] mt-1 font-mono leading-none">
+                        0% Interest · {dpTerm} mos
+                      </p>
+                    </div>
+
+                    <div className="rounded-xl bg-white/[0.02] border border-white/[0.04] p-3">
+                      <p className="text-[9px] font-mono uppercase tracking-wider text-zinc-400 mb-1 leading-none">
+                        Bank Loan Phase
+                      </p>
+                      <p className="text-[17px] font-bold text-gold font-mono leading-tight">
+                        ₱{Math.round(monthlyBank).toLocaleString()}
+                        <span className="text-[11px] font-normal text-zinc-400 font-mono">/mo</span>
+                      </p>
+                      <p className="text-[8.5px] text-zinc-400 mt-1 font-mono leading-none">
+                        Est. bank amort. · {loanTerm} yrs
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Social proof row */}
+              <a
+                href="#reviews"
+                className="rise rise-delay-4 mt-4 flex items-center gap-3 hover:opacity-85 transition-opacity cursor-pointer group w-fit"
+              >
+                {/* Avatar stack */}
+                <div className="flex -space-x-2">
+                  {[
+                    "https://i.pravatar.cc/40?img=11",
+                    "https://i.pravatar.cc/40?img=25",
+                    "https://i.pravatar.cc/40?img=47",
+                    "https://i.pravatar.cc/40?img=32",
+                    "https://i.pravatar.cc/40?img=60",
+                  ].map((src, i) => (
+                    <img
+                      key={i}
+                      src={src}
+                      alt=""
+                      aria-hidden="true"
+                      className="h-7 w-7 rounded-full border-2 border-[#0c0c0e] object-cover"
+                    />
+                  ))}
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  {/* Stars */}
+                  <div className="flex items-center gap-0.5" aria-label="5 stars">
+                    {[1, 2, 3, 4, 5].map((s) => (
+                      <svg
+                        key={s}
+                        className="h-3 w-3 transition-transform group-hover:scale-110"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                      >
+                        <path
+                          fill="oklch(0.74 0.137 79)"
+                          d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                        />
+                      </svg>
+                    ))}
+                  </div>
+                  <span className="text-[11px] font-medium text-white/65 group-hover:text-white transition-colors">
+                    Trusted by OFW Buyers
+                  </span>
+                </div>
+              </a>
+
+              {/* Mobile-only: compact consultant identity strip (no card, no vertical space waste) */}
+              <div className="rise rise-delay-4 mt-3 flex items-center gap-3 lg:hidden">
+                <div className="relative shrink-0">
+                  <img
+                    src="https://res.cloudinary.com/dcnohpztl/image/upload/q_auto/f_auto/v1780922893/photo_2026-06-06_09-41-17_drf5cu.jpg"
+                    alt="Jerwin Daliva"
+                    className="h-10 w-10 rounded-full border border-white/25 object-cover"
+                  />
+                  <span className="absolute -bottom-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full border border-[#0c0c0e] bg-[#1A56DB]">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      className="h-2 w-2 text-white"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M5 12.5l4 4 10-10"
+                        stroke="currentColor"
+                        strokeWidth="3.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </span>
+                </div>
+                <div>
+                  <p className="text-[13px] font-semibold text-white leading-none">Jerwin Daliva</p>
+                  <p className="mt-0.5 text-[10.5px] font-mono uppercase tracking-[0.08em] text-[#93B4FF]/80">
+                    DMCI Accredited Consultant
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
+        {/* Desktop Consultant Card — mid-right, absolutely positioned */}
         <div
-          className="rise rise-delay-4 absolute inset-x-0 bottom-0 z-10 border-t border-[#1A56DB]/30 bg-black/30 backdrop-blur-md"
+          className="rise rise-delay-4 absolute z-20 hidden lg:block"
+          style={{ right: "3.5rem", top: "50%", transform: "translateY(-40%)", width: "340px" }}
+        >
+          <ConsultantCard isMobile={false} />
+        </div>
+
+        {/* Bottom Trust Bar — absolute bottom on all screen sizes */}
+        <div
+          className="rise rise-delay-4 absolute inset-x-0 bottom-0 z-10 border-t border-white/[0.07] bg-zinc-950/60 backdrop-blur-xl"
           style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
         >
-          <div className="container-prose grid grid-cols-2 gap-x-4 gap-y-3 py-4 text-white/90 md:grid-cols-4 md:py-7">
+          {/* Mobile: 2×2 grid / Desktop: 4-column grid */}
+          <div className="container-prose grid grid-cols-2 md:grid-cols-4">
             {[
-              [
-                homepageSettings.hero_badge_1_bold || "Goal-first",
-                homepageSettings.hero_badge_1_regular || "advisory",
-              ],
-              [
-                homepageSettings.hero_badge_2_bold || "DMCI",
-                homepageSettings.hero_badge_2_regular || "Accredited",
-              ],
-              [
-                homepageSettings.hero_badge_3_bold || "OFW",
-                homepageSettings.hero_badge_3_regular || "friendly",
-              ],
-              [
-                homepageSettings.hero_badge_4_bold || "No-pressure",
-                homepageSettings.hero_badge_4_regular || "consultations",
-              ],
-            ].map(([a, b]) => {
-              const cleanedA = cleanBadgeText(a);
-              const cleanedB = cleanBadgeText(b);
-              return (
+              {
+                icon: (
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={1.8}
+                    className="h-4 w-4"
+                    aria-hidden="true"
+                  >
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="m21 21-4.35-4.35" strokeLinecap="round" />
+                  </svg>
+                ),
+                label: homepageSettings.hero_badge_1_bold || "Personalized",
+                value: homepageSettings.hero_badge_1_regular || "Property Matching",
+              },
+              {
+                icon: (
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={1.8}
+                    className="h-4 w-4"
+                    aria-hidden="true"
+                  >
+                    <path d="M12 2l2.4 4.87L20 8l-4 3.9.94 5.47L12 15l-4.94 2.37L9 11.9 5 8l5.6-1.13L12 2z" />
+                  </svg>
+                ),
+                label: homepageSettings.hero_badge_2_bold || "Official DMCI",
+                value: homepageSettings.hero_badge_2_regular || "Accredited Partner",
+              },
+              {
+                icon: (
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={1.8}
+                    className="h-4 w-4"
+                    aria-hidden="true"
+                  >
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+                  </svg>
+                ),
+                label: homepageSettings.hero_badge_3_bold || "Trusted By",
+                value: homepageSettings.hero_badge_3_regular || "OFW Buyers",
+              },
+              {
+                icon: (
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={1.8}
+                    className="h-4 w-4"
+                    aria-hidden="true"
+                  >
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                  </svg>
+                ),
+                label: homepageSettings.hero_badge_4_bold || "No Pressure.",
+                value: homepageSettings.hero_badge_4_regular || "No Hidden Fees.",
+              },
+            ].map(({ icon, label, value }, idx) => (
+              <div
+                key={idx}
+                className="flex items-center gap-2 px-3 py-3 md:px-6 md:py-5 border-r border-b md:border-b-0 border-white/[0.07] last:border-r-0 [&:nth-child(2)]:border-r-0 md:[&:nth-child(2)]:border-r [&:nth-child(3)]:border-b-0 [&:nth-child(4)]:border-b-0"
+              >
+                {/* Icon circle */}
                 <div
-                  key={a}
-                  className="text-[12.5px] tracking-wide md:text-[13px]"
+                  className="shrink-0 flex items-center justify-center h-7 w-7 md:h-8 md:w-8 rounded-full text-[#93B4FF]"
+                  style={{
+                    background: "rgba(147,180,255,0.08)",
+                    border: "1px solid rgba(147,180,255,0.12)",
+                  }}
                 >
-                  <span className="font-semibold">{cleanedA}</span>{" "}
-                  <span className="text-white/65">{cleanedB}</span>
+                  {icon}
                 </div>
-              );
-            })}
+                <div className="min-w-0">
+                  <p className="text-[8.5px] md:text-[9px] font-mono uppercase tracking-[0.12em] md:tracking-[0.14em] text-[#93B4FF] font-bold leading-none mb-0.5">
+                    {cleanBadgeText(label)}
+                  </p>
+                  <p className="text-[11px] md:text-[12.5px] font-semibold text-white/85 leading-snug">
+                    {cleanBadgeText(value)}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Credential trust strip — visible on all screens, hidden on mobile (shown in hero eyebrow area instead) */}
+          <div
+            className="hidden md:block border-t border-white/[0.06] py-2.5 text-center text-[9px] tracking-[0.18em] text-white/35 uppercase px-4 leading-normal"
+            style={{ fontFamily: "var(--font-mono, 'JetBrains Mono', monospace)" }}
+          >
+            Supervised by Licensed Real Estate Broker Joy Lachica &nbsp;·&nbsp; PRC Lic. No. 10101
+            &nbsp;·&nbsp; DHSUD NCR-B-6055
           </div>
         </div>
       </section>
 
-      {/* SECTION 2 — A different perspective */}
+      {/* SECTION 2 — Selected Opportunities (post-hero secondary CTA) */}
+      <section className="px-4 section-pad">
+        <div className="container-prose">
+          {/* Section header — CMS-controlled */}
+          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+            <Reveal>
+              <p className="eyebrow">
+                <span className="gold-rule" />
+                {homepageSettings.featured_eyebrow || "Start Here"}
+              </p>
+              <h2 className="display-2 mt-6 max-w-xl">
+                {homepageSettings.featured_title || "Find the property that fits your goals."}
+              </h2>
+            </Reveal>
+            <Reveal delay={120} className="hidden md:block shrink-0">
+              <Link
+                to="/properties"
+                className="inline-flex items-center gap-2.5 rounded-full bg-[oklch(0.43_0.20_258)] px-7 py-3.5 text-[13px] font-semibold text-white tracking-[0.02em] transition-all duration-500 hover:-translate-y-[3px] hover:shadow-[0_8px_32px_oklch(0.43_0.20_258/0.35)] group"
+                style={{ transitionTimingFunction: "var(--ease-luxe)" }}
+              >
+                View All Properties
+                <span
+                  aria-hidden
+                  className="inline-block transition-transform duration-300 group-hover:translate-x-1"
+                >
+                  →
+                </span>
+              </Link>
+            </Reveal>
+          </div>
+
+          {/* Cards grid */}
+          <div className="mt-12 grid grid-cols-1 gap-8 md:mt-16 md:grid-cols-2 md:gap-10">
+            {featuredOpportunities.map((opp, idx) => (
+              <Reveal key={opp.slug} as="article" delay={idx * 140}>
+                <Link
+                  to="/projects/$slug"
+                  params={{ slug: opp.slug }}
+                  className="group block rounded-[1.75rem] border border-border bg-background transition-all duration-500 hover:-translate-y-[6px] hover:border-[oklch(0.43_0.20_258/0.35)] hover:shadow-[0_20px_60px_oklch(0_0_0/0.14)]"
+                  style={{ transitionTimingFunction: "var(--ease-luxe)" }}
+                >
+                  {/* Image */}
+                  <div className="overflow-hidden rounded-t-[1.75rem] relative">
+                    <img
+                      src={opp.img}
+                      alt={opp.name}
+                      className="aspect-[16/9] w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                      style={{ transitionTimingFunction: "var(--ease-luxe)" }}
+                      width={1280}
+                      height={720}
+                      loading="lazy"
+                    />
+                    {/* Single status badge */}
+                    {/ready/i.test(opp.status ?? "") ? (
+                      <img
+                        src="/rfo.png"
+                        alt="Ready for Occupancy"
+                        className="absolute top-3 left-3 z-10 w-14 h-14 rounded-xl shadow-lg select-none"
+                        draggable={false}
+                      />
+                    ) : (
+                      <span className="absolute top-4 left-4 z-10 font-mono text-[9px] font-bold uppercase tracking-[0.15em] text-white bg-[#0c0c0e]/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 shadow-lg select-none">
+                        {opp.status}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Card body */}
+                  <div className="p-7">
+                    {/* Location + Name */}
+                    <p className="eyebrow mb-2">{opp.location}</p>
+                    <h3 className="display-3 group-hover:text-primary transition-colors duration-300">
+                      {opp.name}
+                    </h3>
+
+                    {/* Stats block */}
+                    <div className="mt-6 space-y-4">
+                      {/* Price */}
+                      {opp.priceDisplay && (
+                        <>
+                          <div>
+                            <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground mb-1">
+                              Starts at
+                            </p>
+                            <p className="font-mono text-[22px] font-bold text-ink leading-none">
+                              {opp.priceDisplay}
+                            </p>
+                          </div>
+                          <hr className="border-border" />
+                        </>
+                      )}
+
+                      {/* Beds + Area */}
+                      {(opp.beds || opp.area || opp.unitTypes) && (
+                        <>
+                          <div className="space-y-2">
+                            {(opp.beds || opp.unitTypes) && (
+                              <p className="text-[13px] text-muted-foreground flex items-center gap-2">
+                                <span aria-hidden>🛏</span>
+                                {opp.unitTypes ||
+                                  `${opp.beds} Bedroom${opp.beds !== "1" ? "s" : ""}`}
+                              </p>
+                            )}
+                            {opp.area && (
+                              <p className="text-[13px] text-muted-foreground flex items-center gap-2">
+                                <span aria-hidden>📐</span>
+                                {opp.area}
+                              </p>
+                            )}
+                          </div>
+                          <hr className="border-border" />
+                        </>
+                      )}
+
+                      {/* Status text */}
+                      <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
+                        {opp.status}
+                      </p>
+                    </div>
+
+                    {/* CTA */}
+                    <div className="mt-7 inline-flex items-center gap-2 rounded-full border border-border px-5 py-2.5 text-[12px] font-semibold tracking-[0.04em] text-ink transition-all duration-300 group-hover:border-[oklch(0.43_0.20_258/0.5)] group-hover:text-primary">
+                      Explore Property
+                      <span
+                        aria-hidden
+                        className="inline-block transition-transform duration-300 group-hover:translate-x-1"
+                      >
+                        →
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              </Reveal>
+            ))}
+          </div>
+
+          {/* Trust strip */}
+          <Reveal delay={200}>
+            <div className="mt-10 flex flex-col items-center gap-2.5 md:flex-row md:justify-center md:gap-8 text-[12px] text-muted-foreground">
+              <span className="flex items-center gap-2">
+                <span className="text-[oklch(0.74_0.137_79)] font-bold">✓</span>
+                Licensed Real Estate Broker Supervision
+              </span>
+              <span className="hidden md:block text-border">·</span>
+              <span className="flex items-center gap-2">
+                <span className="text-[oklch(0.74_0.137_79)] font-bold">✓</span>
+                Official DMCI Homes Accredited Partner
+              </span>
+              <span className="hidden md:block text-border">·</span>
+              <span className="flex items-center gap-2">
+                <span className="text-[oklch(0.74_0.137_79)] font-bold">✓</span>
+                Free Consultation · No Buyer Fees
+              </span>
+            </div>
+          </Reveal>
+
+          {/* Mobile-only View All CTA */}
+          <Reveal delay={240} className="mt-10 flex justify-center md:hidden">
+            <Link
+              to="/properties"
+              className="inline-flex items-center gap-2.5 rounded-full bg-[oklch(0.43_0.20_258)] px-7 py-3.5 text-[13px] font-semibold text-white tracking-[0.02em] transition-all duration-500 hover:-translate-y-[3px] group"
+              style={{ transitionTimingFunction: "var(--ease-luxe)" }}
+            >
+              View All Properties
+              <span
+                aria-hidden
+                className="inline-block transition-transform duration-300 group-hover:translate-x-1"
+              >
+                →
+              </span>
+            </Link>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* SECTION 3 — A different perspective */}
       <section className="px-4 section-pad">
         <div className="container-prose">
           <Reveal>
@@ -626,7 +1206,7 @@ function Home() {
         </div>
       </section>
 
-      {/* SECTION 3 — Why Invest pillars */}
+      {/* SECTION 4 — Why Invest pillars */}
       <section className="surface px-4 section-pad">
         <div className="container-prose">
           <div className="flex flex-col items-start justify-between gap-10 md:flex-row md:items-end">
@@ -690,81 +1270,6 @@ function Home() {
               </Reveal>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* SECTION 4 — Featured Opportunities */}
-      <section className="px-4 section-pad">
-        <div className="container-prose">
-          <div className="grid items-end gap-6 md:grid-cols-12">
-            <Reveal className="md:col-span-7">
-              {homepageSettings.featured_eyebrow !== "" && (
-                <p className="eyebrow">
-                  <span className="gold-rule" />
-                  {homepageSettings.featured_eyebrow || "Selected"}
-                </p>
-              )}
-              <h2 className="display-2 mt-6">
-                {homepageSettings.featured_title || "Featured opportunities."}
-              </h2>
-            </Reveal>
-            <Reveal delay={160} className="md:col-span-4 md:col-start-9">
-              <p className="text-[15px] leading-relaxed text-muted-foreground">
-                {homepageSettings.featured_description ||
-                  "A curated, ever-evolving shortlist — chosen for resilience, lifestyle, and long-term value."}
-              </p>
-            </Reveal>
-          </div>
-
-          <div className="mt-16 grid md:mt-24 gap-12 md:grid-cols-12 md:gap-16">
-            {featuredOpportunities.map((opp, idx) => {
-              const isEven = idx % 2 === 0;
-              const colSpan = isEven ? "md:col-span-7" : "md:col-span-5 md:pt-32";
-              return (
-                <Reveal key={opp.slug} as="article" delay={idx * 160} className={colSpan}>
-                  <Link
-                    to="/projects/$slug"
-                    params={{ slug: opp.slug }}
-                    className="block group"
-                  >
-                    <div className="img-luxe img-luxe-hover overflow-hidden rounded-[1.5rem]">
-                      <img
-                        src={opp.img}
-                        alt={opp.name}
-                        className="img-luxe aspect-[4/5] w-full object-cover"
-                        width={isEven ? 1600 : 1920}
-                        height={isEven ? 2000 : 1280}
-                        loading="lazy"
-                      />
-                    </div>
-                    <div className="mt-8 flex items-end justify-between">
-                      <div>
-                        <p className="eyebrow">{opp.location}</p>
-                        <h3 className="display-3 mt-3 group-hover:text-primary transition-colors">
-                          {opp.name}
-                        </h3>
-                      </div>
-                      <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                        {opp.status}
-                      </p>
-                    </div>
-                  </Link>
-                </Reveal>
-              );
-            })}
-          </div>
-
-          <Reveal delay={200}>
-            <div className="mt-16 md:mt-24">
-              <Link
-                to="/properties"
-                className="inline-flex items-center gap-3 rounded-full border border-border bg-background px-8 py-4 text-[13px] font-semibold tracking-[0.02em] text-ink transition-all duration-700 hover:-translate-y-[2px] hover:border-ink"
-                style={{ transitionTimingFunction: "var(--ease-luxe)" }}
-              >
-                View opportunities <span aria-hidden>→</span>
-              </Link>
-            </div>
-          </Reveal>
         </div>
       </section>
 
@@ -978,11 +1483,14 @@ function Home() {
                         transitionTimingFunction: "var(--ease-luxe)",
                       }}
                       onMouseEnter={(e) => {
-                        (e.currentTarget as HTMLAnchorElement).style.borderColor = "oklch(1 0 0 / 0.7)";
-                        (e.currentTarget as HTMLAnchorElement).style.background = "oklch(1 0 0 / 0.07)";
+                        (e.currentTarget as HTMLAnchorElement).style.borderColor =
+                          "oklch(1 0 0 / 0.7)";
+                        (e.currentTarget as HTMLAnchorElement).style.background =
+                          "oklch(1 0 0 / 0.07)";
                       }}
                       onMouseLeave={(e) => {
-                        (e.currentTarget as HTMLAnchorElement).style.borderColor = "oklch(1 0 0 / 0.25)";
+                        (e.currentTarget as HTMLAnchorElement).style.borderColor =
+                          "oklch(1 0 0 / 0.25)";
                         (e.currentTarget as HTMLAnchorElement).style.background = "transparent";
                       }}
                     >
@@ -1169,10 +1677,7 @@ function Home() {
                 </p>
 
                 {/* Main headline */}
-                <h2
-                  className="display-2 mt-6"
-                  style={{ color: "#fff", lineHeight: 1.05 }}
-                >
+                <h2 className="display-2 mt-6" style={{ color: "#fff", lineHeight: 1.05 }}>
                   {homepageSettings.founder_headline || "A quieter way to invest."}
                 </h2>
 
@@ -1234,7 +1739,13 @@ function Home() {
 
                 {/* Handwritten signature in Dancing Script */}
                 {homepageSettings.founder_signature_text && (
-                  <div style={{ marginTop: "2.25rem", paddingTop: "1.5rem", borderTop: "1px solid oklch(1 0 0 / 0.08)" }}>
+                  <div
+                    style={{
+                      marginTop: "2.25rem",
+                      paddingTop: "1.5rem",
+                      borderTop: "1px solid oklch(1 0 0 / 0.08)",
+                    }}
+                  >
                     <p
                       style={{
                         fontFamily: "'Dancing Script', 'Brush Script MT', cursive",
@@ -1273,11 +1784,14 @@ function Home() {
                       transitionTimingFunction: "var(--ease-luxe)",
                     }}
                     onMouseEnter={(e) => {
-                      (e.currentTarget as HTMLAnchorElement).style.borderColor = "oklch(1 0 0 / 0.65)";
-                      (e.currentTarget as HTMLAnchorElement).style.background = "oklch(1 0 0 / 0.07)";
+                      (e.currentTarget as HTMLAnchorElement).style.borderColor =
+                        "oklch(1 0 0 / 0.65)";
+                      (e.currentTarget as HTMLAnchorElement).style.background =
+                        "oklch(1 0 0 / 0.07)";
                     }}
                     onMouseLeave={(e) => {
-                      (e.currentTarget as HTMLAnchorElement).style.borderColor = "oklch(1 0 0 / 0.22)";
+                      (e.currentTarget as HTMLAnchorElement).style.borderColor =
+                        "oklch(1 0 0 / 0.22)";
                       (e.currentTarget as HTMLAnchorElement).style.background = "transparent";
                     }}
                   >
@@ -1291,41 +1805,11 @@ function Home() {
         </div>
       </section>
 
+      {/* Social proof — real Google reviews, shown before the ask */}
+      <GoogleReviews />
+
       {/* Final CTA */}
       <ConsultationCTA />
-
-      {/* Lifestyle band */}
-      <section className="px-4">
-        <div className="container-prose">
-          <div className="grid gap-6 md:grid-cols-2 md:gap-8">
-            <Reveal className="img-luxe img-luxe-hover overflow-hidden rounded-[1.5rem]">
-              <img
-                src={lifestyleImg}
-                alt="Couple at home overlooking Manila"
-                className="img-luxe aspect-[4/5] w-full object-cover md:aspect-[3/4]"
-                width={1600}
-                height={1920}
-                loading="lazy"
-              />
-            </Reveal>
-            <Reveal
-              delay={140}
-              className="img-luxe img-luxe-hover overflow-hidden rounded-[1.5rem]"
-            >
-              <img
-                src={poolImg}
-                alt="Rooftop amenity overlooking Manila"
-                className="img-luxe aspect-[4/5] w-full object-cover md:aspect-[3/4]"
-                width={1920}
-                height={1080}
-                loading="lazy"
-              />
-            </Reveal>
-          </div>
-        </div>
-      </section>
-
-      <Testimonials />
     </>
   );
 }

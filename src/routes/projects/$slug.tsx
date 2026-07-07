@@ -378,6 +378,147 @@ const FALLBACK_PROJECTS: Record<string, ProjectPageData> = {
       },
     ],
   },
+  "fortis-residences": {
+    meta: {
+      id: "fortis-residences",
+      name: "Fortis Residences",
+      tagline: "One Address. Endless Possibilities.",
+      developer: "DMCI Homes",
+      location: "Chino Roces Ave, Makati City",
+      city: "Makati",
+      fullAddress: "Chino Roces Avenue, Makati City",
+      status: "Pre-selling",
+      architecturalTheme: "Modern Contemporary",
+      landArea: "7,200 sq.m.",
+      floors: "36 Levels",
+      totalUnits: "Inquire for details",
+      turnover: "Under Construction",
+      description:
+        "Fortis Residences is DMCI Homes' premier modern contemporary high-rise development situated along the active Chino Roces Avenue in Makati City. Located at the heart of Makati's emerging mixed-use district, it features DMCI's signature Lumiventt Technology for natural airflow and light, resort-inspired sky pools, and a premium Business Center designed for urban professionals.",
+    },
+    sections: {
+      hero: {
+        tagline: "One Address. Endless Possibilities.",
+        secondary_tagline: "A premium DMCI Homes development along Chino Roces Avenue, Makati.",
+        hero_images: [towerImg, poolImg, interiorImg],
+        cta_primary_text: "Request Price List",
+        cta_secondary_text: "Free Computation",
+      },
+      emotional_hook: {
+        headline: "Live where the heartbeat of Makati CBD meets resort-style sanctuary —",
+        sub: "enjoy sky-high pools, fresh cross-breezes, and unmatched city accessibility.",
+        eyebrow: "The Fortis Lifestyle",
+        points: [
+          "Located directly along Chino Roces Avenue, Makati",
+          "Lumiventt sky patios provide fresh air and natural light",
+          "Stunning Sky Deck Pool and lounge overlooking the skyline",
+          "Vertically integrated construction backed by DMCI Homes quality",
+        ],
+      },
+      pricing: {
+        title: "Pricing",
+        sub_title: "starting from",
+        description:
+          "Pre-selling pricing offers maximum capital appreciation. Secure early-stage pricing before the next official increase.",
+        show_urgency: true,
+      },
+      overview: {
+        title: "Project Overview",
+        headline_span: "Fortis Residences.",
+      },
+      highlights: {
+        eyebrow: "Why Fortis Residences",
+        items: [
+          {
+            icon: "shield",
+            title: "Vertically Integrated Quality",
+            description:
+              "Built entirely in-house by DMCI Homes, ensuring strict quality control and structural integrity.",
+          },
+          {
+            icon: "trees",
+            title: "Lumiventt Airflow",
+            description:
+              "Signature three-storey garden atriums channel cool air and daylight throughout the tower.",
+          },
+          {
+            icon: "waves",
+            title: "Premium Sky Amenities",
+            description:
+              "Access a multi-tiered sky pool deck, modern fitness gym, play courts, and sky promenade.",
+          },
+        ],
+      },
+      testimonials: {
+        stats: [
+          { value: "Makati", label: "Address location" },
+          { value: "36", label: "Residential levels" },
+          { value: "7,200㎡", label: "Land footprint" },
+        ],
+        testimonials: [
+          {
+            name: "Maria Santos",
+            role: "OFW Investor, Dubai",
+            quote:
+              "CityQlo made the entire process seamless from abroad. No pressure, just clear advice.",
+          },
+        ],
+      },
+      faq: {
+        items: [
+          {
+            q: "Where is Fortis Residences located?",
+            a: "Fortis Residences is located along Chino Roces Avenue in Makati City, offering excellent accessibility to the business district and major transportation hubs.",
+          },
+        ],
+      },
+      lead_capture: {
+        eyebrow: "Inquire Now",
+        headline: "Interested in",
+        headline_accent: "Fortis Residences?",
+        sub: "Leave your details and we'll prepare your personalized price list and payment computation within 24 hours.",
+        unit_options: ["1-Bedroom", "2-Bedroom", "3-Bedroom", "Price List Only"],
+      },
+      media: {
+        photos: [
+          { tab: "exterior", src: towerImg, thumb: towerImg, title: "Tower Exterior" },
+          { tab: "amenities", src: poolImg, thumb: poolImg, title: "Resort Pool" },
+          { tab: "interiors", src: interiorImg, thumb: interiorImg, title: "Living Area View" },
+        ],
+        videos: [{ title: "Project Walkthrough", duration: "3:15", thumb: towerImg }],
+      },
+      related: {
+        related_slugs: ["allegra-garden", "satori-residences", "atherton"],
+      },
+    },
+    units: [
+      {
+        name: "1-Bedroom",
+        area_sqm: 45.0,
+        starting_price: 14251000,
+        description:
+          "Modern 1BR unit ideal for professionals looking for a premium Makati address.",
+        profile_target: "Professionals & Investors",
+        image_url: interiorImg,
+      },
+      {
+        name: "2-Bedroom",
+        area_sqm: 72.0,
+        starting_price: 18540000,
+        description: "Spacious 2BR configurations with balconies, designed for style and comfort.",
+        profile_target: "Couples & Small Families",
+        image_url: poolImg,
+      },
+      {
+        name: "3-Bedroom",
+        area_sqm: 100.0,
+        starting_price: 33904000,
+        description: "Premium 3BR units featuring wide layouts, perfect for urban families.",
+        profile_target: "Growing Families & Premium Buyers",
+        image_url: propOriana,
+      },
+    ],
+  },
 };
 
 // Related project cards for the fallback sidebar
@@ -628,6 +769,7 @@ function adaptReadModel(rm: any): ProjectPageData | null {
 // project page so the two pages interlink both ways.
 const PILLAR_GUIDES: Record<string, string> = {
   "sonora-garden-residences": "/sonora-garden-residences",
+  "fortis-residences": "/fortis-residences",
 };
 
 // ─── Route ────────────────────────────────────────────────────────────────────
@@ -659,7 +801,7 @@ export const Route = createFileRoute("/projects/$slug")({
     const description = `${p.meta.name} by ${p.meta.developer} in ${p.meta.city}. ${condoDescriptor} starting from ${startingPrice}. Get your free price list and payment computation today.`;
     const title = `${p.meta.name} — ${p.meta.city} · CityQlo`;
     const url = `/projects/${p.meta.id}`;
-    
+
     // Get the first hero image — must be an absolute, publicly accessible URL
     // Local Vite-hashed /assets/... paths are not accessible to social crawlers
     let heroImg = p.sections.hero?.hero_images?.[0] || "";
@@ -839,8 +981,13 @@ function ProjectDetailPage() {
   const whatsappUrl = `https://wa.me/${cleanWhatsapp}`;
 
   const rawViber = contactSettings.viber || contactSettings.phone || "+639000000000";
-  const isViberLink = rawViber.startsWith("http://") || rawViber.startsWith("https://") || rawViber.startsWith("viber://");
-  const viberUrl = isViberLink ? rawViber : `viber://chat?number=%2B${rawViber.replace(/[^0-9]/g, "")}`;
+  const isViberLink =
+    rawViber.startsWith("http://") ||
+    rawViber.startsWith("https://") ||
+    rawViber.startsWith("viber://");
+  const viberUrl = isViberLink
+    ? rawViber
+    : `viber://chat?number=%2B${rawViber.replace(/[^0-9]/g, "")}`;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -1307,40 +1454,74 @@ function ProjectDetailPage() {
                   url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(typeof window !== "undefined" ? window.location.href : "")}`,
                   color: "bg-[#1877F2]/10 text-[#1877F2] hover:bg-[#1877F2] hover:text-white",
                   svg: (
-                    <svg className="h-5.5 w-5.5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                      <path fillRule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clipRule="evenodd" />
+                    <svg
+                      className="h-5.5 w-5.5"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"
+                        clipRule="evenodd"
+                      />
                     </svg>
-                  )
+                  ),
                 },
                 {
                   name: "X",
                   url: `https://twitter.com/intent/tweet?url=${encodeURIComponent(typeof window !== "undefined" ? window.location.href : "")}&text=${encodeURIComponent(`${meta.name} — ${meta.city} · CityQlo`)}`,
                   color: "bg-black/5 text-black hover:bg-black hover:text-white",
                   svg: (
-                    <svg className="h-5.5 w-5.5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <svg
+                      className="h-5.5 w-5.5"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                    >
                       <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                     </svg>
-                  )
+                  ),
                 },
                 {
                   name: "WhatsApp",
                   url: `https://api.whatsapp.com/send?text=${encodeURIComponent(`${meta.name} — ${meta.city} · CityQlo ${typeof window !== "undefined" ? window.location.href : ""}`)}`,
                   color: "bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366] hover:text-white",
                   svg: (
-                    <svg className="h-5.5 w-5.5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                      <path fillRule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.16L2 22l5.002-1.332A9.954 9.954 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm4.56 13.06c-.22.617-.98 1.134-1.62 1.257-.59.112-1.35.203-3.95-.87-3.32-1.374-5.46-4.757-5.625-4.978-.165-.221-1.32-1.756-1.32-3.35 0-1.593.83-2.378 1.127-2.699.3-.321.66-.401.88-.401.22 0 .44.004.63.012.2.008.47-.076.73.562.26.638.9 2.197.98 2.358.08.16.13.348.02.562-.11.214-.16.348-.32.535-.16.188-.34.42-.49.562-.165.152-.338.318-.147.647.19.329.84 1.377 1.8 2.234 1.23 1.1 2.27 1.44 2.59 1.6.32.16.51.13.7-.09.19-.22.82-.95 1.04-1.28.22-.33.44-.27.74-.16.3.11 1.91.9 2.24 1.06.33.16.55.24.63.38.08.14.08.816-.14 1.433z" clipRule="evenodd" />
+                    <svg
+                      className="h-5.5 w-5.5"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.16L2 22l5.002-1.332A9.954 9.954 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm4.56 13.06c-.22.617-.98 1.134-1.62 1.257-.59.112-1.35.203-3.95-.87-3.32-1.374-5.46-4.757-5.625-4.978-.165-.221-1.32-1.756-1.32-3.35 0-1.593.83-2.378 1.127-2.699.3-.321.66-.401.88-.401.22 0 .44.004.63.012.2.008.47-.076.73.562.26.638.9 2.197.98 2.358.08.16.13.348.02.562-.11.214-.16.348-.32.535-.16.188-.34.42-.49.562-.165.152-.338.318-.147.647.19.329.84 1.377 1.8 2.234 1.23 1.1 2.27 1.44 2.59 1.6.32.16.51.13.7-.09.19-.22.82-.95 1.04-1.28.22-.33.44-.27.74-.16.3.11 1.91.9 2.24 1.06.33.16.55.24.63.38.08.14.08.816-.14 1.433z"
+                        clipRule="evenodd"
+                      />
                     </svg>
-                  )
+                  ),
                 },
                 {
                   name: "Viber",
                   url: `viber://forward?text=${encodeURIComponent(`${meta.name} — ${meta.city} · CityQlo ${typeof window !== "undefined" ? window.location.href : ""}`)}`,
                   color: "bg-[#7309F3]/10 text-[#7309F3] hover:bg-[#7309F3] hover:text-white",
                   svg: (
-                    <svg className="h-5.5 w-5.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    <svg
+                      className="h-5.5 w-5.5"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                      />
                     </svg>
-                  )
+                  ),
                 },
               ].map((social) => (
                 <a
@@ -1503,10 +1684,7 @@ function ProjectDetailPage() {
             </>
           )}
 
-          <figure
-            className="flex flex-col items-center gap-4"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <figure className="flex flex-col items-center gap-4" onClick={(e) => e.stopPropagation()}>
             <img
               key={visibleMedia[lightboxIndex].src}
               src={visibleMedia[lightboxIndex].src}
@@ -1545,7 +1723,6 @@ function ProjectDetailPage() {
 
         <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/40 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-
 
         {/* Content */}
         <div className="relative z-10 flex h-full items-end pb-20 md:pb-28">
@@ -1747,7 +1924,6 @@ function ProjectDetailPage() {
                   </p>
                 </div>
               )}
-
             </div>
           </div>
 
@@ -1755,18 +1931,18 @@ function ProjectDetailPage() {
               DESKTOP (md and up) — original layout, unchanged
           ══════════════════════════════════════════════════════════ */}
           <div className="hidden md:block">
-          {/* Tabs */}
-          <Reveal delay={200}>
-            <div className="flex flex-wrap gap-2 mb-8">
-              {(
-                [
-                  "exterior",
-                  "amenities",
-                  "interiors",
-                  ...(tours.length ? (["tour"] as const) : []),
-                  "videos",
-                ] as ("exterior" | "amenities" | "interiors" | "tour" | "videos")[]
-              ).map((tab) => {
+            {/* Tabs */}
+            <Reveal delay={200}>
+              <div className="flex flex-wrap gap-2 mb-8">
+                {(
+                  [
+                    "exterior",
+                    "amenities",
+                    "interiors",
+                    ...(tours.length ? (["tour"] as const) : []),
+                    "videos",
+                  ] as ("exterior" | "amenities" | "interiors" | "tour" | "videos")[]
+                ).map((tab) => {
                   const labels: Record<
                     "exterior" | "amenities" | "interiors" | "tour" | "videos",
                     string
@@ -1791,82 +1967,80 @@ function ProjectDetailPage() {
                       {labels[tab]}
                     </button>
                   );
-                },
-              )}
-            </div>
-          </Reveal>
-
-          {/* Photo grid */}
-          {mediaTab !== "videos" && mediaTab !== "tour" && (
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {visibleMedia.map((item, i) => (
-                <Reveal key={item.src + i} delay={i * 60}>
-                  <div
-                    className={`group relative overflow-hidden rounded-2xl cursor-pointer shadow-soft hover:shadow-lift transition-all duration-500 ${i === 0 ? "md:col-span-2 aspect-[16/9]" : "aspect-[4/3]"}`}
-                    onClick={() => setLightboxIndex(i)}
-                  >
-                    <img
-                      src={item.thumb}
-                      alt={item.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[1500ms]"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-400 flex items-center justify-center">
-                      <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-lift">
-                        <ZoomIn size={16} className="text-ink" />
-                      </div>
-                    </div>
-                    <div className="absolute bottom-3 left-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <span className="bg-black/60 text-white text-[11px] font-semibold px-3 py-1 rounded-full">
-                        {item.title}
-                      </span>
-                    </div>
-                  </div>
-                </Reveal>
-              ))}
-            </div>
-          )}
-
-          {/* 360° Tour tab */}
-          {mediaTab === "tour" && (
-            <Reveal>
-              <TourViewer tours={tours} poster={poolImg} />
-              <p className="mt-3 text-[12.5px] text-muted-foreground text-center">
-                Drag to look around · tap the hotspots to move between rooms. Bare-unit tours show
-                actual turnover condition; the model unit is styled for illustration.
-              </p>
-            </Reveal>
-          )}
-
-          {/* Videos tab */}
-          {mediaTab === "videos" && (
-            <Reveal>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                {(media.videos || []).map((vid) => (
-                  <div
-                    key={vid.title}
-                    className="group relative rounded-2xl overflow-hidden cursor-pointer shadow-soft hover:shadow-lift transition-all duration-400"
-                    onClick={() => setActiveVideo(vid)}
-                  >
-                    <img
-                      src={vid.thumb}
-                      alt={vid.title}
-                      className="w-full aspect-video object-cover group-hover:scale-105 transition-transform duration-[1200ms]"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors flex flex-col items-center justify-center gap-3">
-                      <div className="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center shadow-lift">
-                        <Play size={22} className="text-ink ml-1" />
-                      </div>
-                      <p className="text-white font-bold text-[13px]">{vid.title}</p>
-                      <p className="text-white/70 text-[11px] font-mono">{vid.duration}</p>
-                    </div>
-                  </div>
-                ))}
+                })}
               </div>
             </Reveal>
-          )}
 
+            {/* Photo grid */}
+            {mediaTab !== "videos" && mediaTab !== "tour" && (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {visibleMedia.map((item, i) => (
+                  <Reveal key={item.src + i} delay={i * 60}>
+                    <div
+                      className={`group relative overflow-hidden rounded-2xl cursor-pointer shadow-soft hover:shadow-lift transition-all duration-500 ${i === 0 ? "md:col-span-2 aspect-[16/9]" : "aspect-[4/3]"}`}
+                      onClick={() => setLightboxIndex(i)}
+                    >
+                      <img
+                        src={item.thumb}
+                        alt={item.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[1500ms]"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-400 flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-lift">
+                          <ZoomIn size={16} className="text-ink" />
+                        </div>
+                      </div>
+                      <div className="absolute bottom-3 left-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <span className="bg-black/60 text-white text-[11px] font-semibold px-3 py-1 rounded-full">
+                          {item.title}
+                        </span>
+                      </div>
+                    </div>
+                  </Reveal>
+                ))}
+              </div>
+            )}
+
+            {/* 360° Tour tab */}
+            {mediaTab === "tour" && (
+              <Reveal>
+                <TourViewer tours={tours} poster={poolImg} />
+                <p className="mt-3 text-[12.5px] text-muted-foreground text-center">
+                  Drag to look around · tap the hotspots to move between rooms. Bare-unit tours show
+                  actual turnover condition; the model unit is styled for illustration.
+                </p>
+              </Reveal>
+            )}
+
+            {/* Videos tab */}
+            {mediaTab === "videos" && (
+              <Reveal>
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                  {(media.videos || []).map((vid) => (
+                    <div
+                      key={vid.title}
+                      className="group relative rounded-2xl overflow-hidden cursor-pointer shadow-soft hover:shadow-lift transition-all duration-400"
+                      onClick={() => setActiveVideo(vid)}
+                    >
+                      <img
+                        src={vid.thumb}
+                        alt={vid.title}
+                        className="w-full aspect-video object-cover group-hover:scale-105 transition-transform duration-[1200ms]"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors flex flex-col items-center justify-center gap-3">
+                        <div className="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center shadow-lift">
+                          <Play size={22} className="text-ink ml-1" />
+                        </div>
+                        <p className="text-white font-bold text-[13px]">{vid.title}</p>
+                        <p className="text-white/70 text-[11px] font-mono">{vid.duration}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Reveal>
+            )}
           </div>
 
           {/* Video modal — shared across breakpoints */}
@@ -1894,13 +2068,16 @@ function ProjectDetailPage() {
                         <div className="text-center text-white/60">
                           <Play size={48} className="mx-auto mb-4 opacity-40" />
                           <p className="text-[14px]">No video link configured.</p>
-                          <p className="text-[12px] mt-1 opacity-60">Please add a link in the project editor.</p>
+                          <p className="text-[12px] mt-1 opacity-60">
+                            Please add a link in the project editor.
+                          </p>
                         </div>
                       );
                     }
 
                     // YouTube Match
-                    const ytRegex = /^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+                    const ytRegex =
+                      /^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
                     const ytMatch = url.match(ytRegex);
                     if (ytMatch && ytMatch[1]) {
                       return (
@@ -1953,12 +2130,16 @@ function ProjectDetailPage() {
           <div
             aria-hidden
             className="absolute -right-48 top-0 w-[600px] h-[600px] rounded-full opacity-20 pointer-events-none"
-            style={{ background: "radial-gradient(closest-side, oklch(0.43 0.20 258), transparent)" }}
+            style={{
+              background: "radial-gradient(closest-side, oklch(0.43 0.20 258), transparent)",
+            }}
           />
           <div
             aria-hidden
             className="absolute -left-24 bottom-0 w-[400px] h-[400px] rounded-full opacity-10 pointer-events-none"
-            style={{ background: "radial-gradient(closest-side, oklch(0.74 0.137 79), transparent)" }}
+            style={{
+              background: "radial-gradient(closest-side, oklch(0.74 0.137 79), transparent)",
+            }}
           />
 
           <div className="container-prose relative z-10">
@@ -2238,8 +2419,13 @@ function ProjectDetailPage() {
                         ) : (
                           // Fallback to building placeholder
                           <div className="w-full h-full flex flex-col items-center justify-center p-8 bg-zinc-950 text-white/40">
-                            <Building2 size={40} className="stroke-[1.5] mb-2 opacity-50 text-primary" />
-                            <span className="text-[11px] uppercase tracking-wider font-mono font-bold">Image coming soon</span>
+                            <Building2
+                              size={40}
+                              className="stroke-[1.5] mb-2 opacity-50 text-primary"
+                            />
+                            <span className="text-[11px] uppercase tracking-wider font-mono font-bold">
+                              Image coming soon
+                            </span>
                           </div>
                         )}
                         <div className="absolute top-4 left-4">
@@ -2248,7 +2434,10 @@ function ProjectDetailPage() {
                             let imgPath = "";
                             if (statusLower === "rfo") {
                               imgPath = "/building Status/rfo.png";
-                            } else if (statusLower === "coming soon" || statusLower === "comingsoon") {
+                            } else if (
+                              statusLower === "coming soon" ||
+                              statusLower === "comingsoon"
+                            ) {
                               imgPath = "/building Status/comingsoon.png";
                             } else {
                               imgPath = "/building Status/underconstruction.png";
@@ -2274,18 +2463,26 @@ function ProjectDetailPage() {
                             {bld.description}
                           </p>
                         )}
-                        
+
                         <div className="mt-auto pt-4 border-t border-border/50 grid grid-cols-2 gap-4">
                           {bld.floors && (
                             <div>
-                              <p className="text-[9.5px] font-bold uppercase tracking-wider text-muted-foreground mb-0.5">Floors</p>
-                              <p className="text-[13px] font-semibold text-ink leading-none">{bld.floors}</p>
+                              <p className="text-[9.5px] font-bold uppercase tracking-wider text-muted-foreground mb-0.5">
+                                Floors
+                              </p>
+                              <p className="text-[13px] font-semibold text-ink leading-none">
+                                {bld.floors}
+                              </p>
                             </div>
                           )}
                           {bld.total_units && (
                             <div>
-                              <p className="text-[9.5px] font-bold uppercase tracking-wider text-muted-foreground mb-0.5">Total Units</p>
-                              <p className="text-[13px] font-semibold text-ink leading-none">{bld.total_units}</p>
+                              <p className="text-[9.5px] font-bold uppercase tracking-wider text-muted-foreground mb-0.5">
+                                Total Units
+                              </p>
+                              <p className="text-[13px] font-semibold text-ink leading-none">
+                                {bld.total_units}
+                              </p>
                             </div>
                           )}
                         </div>

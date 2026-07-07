@@ -121,10 +121,14 @@ function formatDate(iso?: string | null) {
 // Lightweight Markdown → HTML renderer (no dependencies)
 function markdownToHtml(md: string): string {
   if (!md) return "";
-  
+
   // Helper to slugify heading text for ID
-  const slugify = (text: string) => 
-    text.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
+  const slugify = (text: string) =>
+    text
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, "")
+      .replace(/\s+/g, "-");
 
   let html = md
     .replace(/\r\n/g, "\n")
@@ -166,24 +170,30 @@ function markdownToHtml(md: string): string {
 
   // GFM tables → <table> (must run before paragraph/line-break processing,
   // while table rows still occupy their own newline-separated lines)
-  html = html.replace(
-    /^\|.+\|[ \t]*\n\|[ \t:|-]+\|[ \t]*\n(?:\|.+\|[ \t]*\n?)+/gm,
-    (block) => {
-      const lines = block.trim().split("\n");
-      const splitRow = (row: string) =>
-        row
-          .replace(/^\s*\|/, "")
-          .replace(/\|\s*$/, "")
-          .split("|")
-          .map((c) => c.trim());
-      const head = splitRow(lines[0]).map((c) => `<th>${c}</th>`).join("");
-      const body = lines
-        .slice(2)
-        .map((r) => "<tr>" + splitRow(r).map((c) => `<td>${c}</td>`).join("") + "</tr>")
-        .join("");
-      return `<table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
-    },
-  );
+  html = html.replace(/^\|.+\|[ \t]*\n\|[ \t:|-]+\|[ \t]*\n(?:\|.+\|[ \t]*\n?)+/gm, (block) => {
+    const lines = block.trim().split("\n");
+    const splitRow = (row: string) =>
+      row
+        .replace(/^\s*\|/, "")
+        .replace(/\|\s*$/, "")
+        .split("|")
+        .map((c) => c.trim());
+    const head = splitRow(lines[0])
+      .map((c) => `<th>${c}</th>`)
+      .join("");
+    const body = lines
+      .slice(2)
+      .map(
+        (r) =>
+          "<tr>" +
+          splitRow(r)
+            .map((c) => `<td>${c}</td>`)
+            .join("") +
+          "</tr>",
+      )
+      .join("");
+    return `<table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
+  });
 
   html = html
     // Line breaks / paragraphs
@@ -246,7 +256,8 @@ function ShareButton({ title, slug }: { title: string; slug: string }) {
   const [copied, setCopied] = useState(false);
   const [open, setOpen] = useState(false);
 
-  const url = typeof window !== "undefined" ? window.location.href : `https://cityqlo.com/guides/${slug}`;
+  const url =
+    typeof window !== "undefined" ? window.location.href : `https://cityqlo.com/guides/${slug}`;
 
   const handleCopy = async () => {
     try {
@@ -261,7 +272,11 @@ function ShareButton({ title, slug }: { title: string; slug: string }) {
   const platforms = [
     {
       name: "Copy Link",
-      icon: copied ? <Check className="h-3.5 w-3.5 text-emerald-500" /> : <Link2 className="h-3.5 w-3.5" />,
+      icon: copied ? (
+        <Check className="h-3.5 w-3.5 text-emerald-500" />
+      ) : (
+        <Link2 className="h-3.5 w-3.5" />
+      ),
       onClick: handleCopy,
     },
     {
@@ -286,7 +301,7 @@ function ShareButton({ title, slug }: { title: string; slug: string }) {
     {
       name: "WhatsApp",
       icon: <Send className="h-3.5 w-3.5" />,
-      url: `https://api.whatsapp.com/send?text=${encodeURIComponent(title + ' ' + url)}`,
+      url: `https://api.whatsapp.com/send?text=${encodeURIComponent(title + " " + url)}`,
     },
   ];
 
@@ -375,7 +390,11 @@ function BlogPost() {
           <div className="skeleton h-5 w-64 rounded-full" />
           <div className="mt-16 space-y-4">
             {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="skeleton h-4 rounded-full" style={{ width: `${75 + (i % 3) * 10}%` }} />
+              <div
+                key={i}
+                className="skeleton h-4 rounded-full"
+                style={{ width: `${75 + (i % 3) * 10}%` }}
+              />
             ))}
           </div>
         </div>
@@ -427,57 +446,58 @@ function BlogPost() {
               aria-hidden="true"
             />
           )}
-          <div className="absolute inset-0 bg-gradient-to-b from-white/90 via-white/75 to-white" aria-hidden="true" />
+          <div
+            className="absolute inset-0 bg-gradient-to-b from-white/90 via-white/75 to-white"
+            aria-hidden="true"
+          />
           <div className="container-wide relative z-10 grid min-h-[calc(100vh-9rem)] items-center gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(420px,0.82fr)] lg:gap-16">
             <div>
-            {/* Breadcrumb */}
-            <Link
-              to="/guides"
-              className="inline-flex items-center gap-2 text-[12px] font-semibold tracking-[0.06em] uppercase text-muted-foreground transition-colors duration-300 hover:text-ink"
-              style={{ transitionTimingFunction: "var(--ease-luxe)" }}
-            >
-              <span aria-hidden>←</span> All Guides
-            </Link>
+              {/* Breadcrumb */}
+              <Link
+                to="/guides"
+                className="inline-flex items-center gap-2 text-[12px] font-semibold tracking-[0.06em] uppercase text-muted-foreground transition-colors duration-300 hover:text-ink"
+                style={{ transitionTimingFunction: "var(--ease-luxe)" }}
+              >
+                <span aria-hidden>←</span> All Guides
+              </Link>
 
-            {/* Tags */}
-            {post.tags && post.tags.length > 0 && (
-              <div className="mt-6 flex flex-wrap gap-2">
-                {post.tags.map((tag: string) => (
-                  <span
-                    key={tag}
-                    className="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-[10px] font-semibold tracking-[0.1em] uppercase text-primary"
-                  >
-                    {tag}
+              {/* Tags */}
+              {post.tags && post.tags.length > 0 && (
+                <div className="mt-6 flex flex-wrap gap-2">
+                  {post.tags.map((tag: string) => (
+                    <span
+                      key={tag}
+                      className="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-[10px] font-semibold tracking-[0.1em] uppercase text-primary"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {/* Title */}
+              <h1 className="display-1 mt-6 max-w-3xl text-ink">{post.title}</h1>
+
+              {/* Excerpt */}
+              {post.excerpt && <p className="lede mt-6 max-w-2xl">{post.excerpt}</p>}
+
+              {/* Meta */}
+              <div className="mt-8 flex flex-wrap items-center gap-6">
+                {post.published_at && (
+                  <time className="font-mono text-[11px] tracking-[0.16em] uppercase text-muted-foreground">
+                    {formatDate(post.published_at)}
+                  </time>
+                )}
+                {post.read_time && (
+                  <span className="font-mono text-[11px] tracking-[0.16em] uppercase text-muted-foreground">
+                    {post.read_time} min read
                   </span>
-                ))}
+                )}
+                <ShareButton title={post.title} slug={post.slug} />
               </div>
-            )}
 
-            {/* Title */}
-            <h1 className="display-1 mt-6 max-w-3xl text-ink">{post.title}</h1>
-
-            {/* Excerpt */}
-            {post.excerpt && (
-              <p className="lede mt-6 max-w-2xl">{post.excerpt}</p>
-            )}
-
-            {/* Meta */}
-            <div className="mt-8 flex flex-wrap items-center gap-6">
-              {post.published_at && (
-                <time className="font-mono text-[11px] tracking-[0.16em] uppercase text-muted-foreground">
-                  {formatDate(post.published_at)}
-                </time>
-              )}
-              {post.read_time && (
-                <span className="font-mono text-[11px] tracking-[0.16em] uppercase text-muted-foreground">
-                  {post.read_time} min read
-                </span>
-              )}
-              <ShareButton title={post.title} slug={post.slug} />
-            </div>
-
-            {/* Divider */}
-            <div className="mt-12 h-px w-full max-w-xl bg-gradient-to-r from-gold/60 via-border to-transparent" />
+              {/* Divider */}
+              <div className="mt-12 h-px w-full max-w-xl bg-gradient-to-r from-gold/60 via-border to-transparent" />
             </div>
 
             {post.cover_image_url && (
@@ -508,11 +528,10 @@ function BlogPost() {
                 <span className="gold-rule" />
                 CityQlo Advisory
               </p>
-              <h2 className="display-3 mt-6 max-w-xl">
-                Have questions about this guide?
-              </h2>
+              <h2 className="display-3 mt-6 max-w-xl">Have questions about this guide?</h2>
               <p className="mt-4 text-[15px] leading-relaxed text-muted-foreground">
-                Book a complimentary consultation. No pressure, no sales pitch — just honest guidance.
+                Book a complimentary consultation. No pressure, no sales pitch — just honest
+                guidance.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link

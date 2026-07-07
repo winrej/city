@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import founderImg from "@/assets/founder-portrait.jpg";
+import { useQuery } from "@tanstack/react-query";
+import founderFallback from "@/assets/founder-portrait.jpg";
 import interiorImg from "@/assets/interior-living.jpg";
+import { getSiteSettings } from "../lib/api/admin.functions";
 import { ConsultationCTA } from "@/components/site/ConsultationCTA";
 import { Reveal } from "@/components/site/Reveal";
 import { BreadcrumbJsonLd } from "@/components/site/BreadcrumbJsonLd";
@@ -37,6 +39,14 @@ const values = [
 ];
 
 function About() {
+  const { data: siteSettings } = useQuery({
+    queryKey: ["portal-settings"],
+    queryFn: () => getSiteSettings(),
+  });
+  const homepageSettings = siteSettings?.find((r: any) => r.key === "homepage")?.value ?? {};
+  const founderImgSrc: string = homepageSettings.founder_image_url || founderFallback;
+  const brokerImgSrc: string = homepageSettings.broker_image_url || "";
+
   return (
     <>
       <BreadcrumbJsonLd
@@ -144,12 +154,84 @@ function About() {
         </div>
       </section>
 
+      {/* Compliance & Licensing */}
+      <section className="px-4 section-pad">
+        <div className="container-prose">
+          <Reveal>
+            <div className="rounded-[1.5rem] border border-hairline bg-surface px-8 py-10 md:px-14 md:py-12">
+              <div className="flex flex-col gap-6 md:flex-row md:items-start md:gap-16">
+                <div className="shrink-0">
+                  <p className="eyebrow">
+                    <span className="gold-rule" />
+                    Licensing
+                  </p>
+                </div>
+                <div className="flex-1">
+                  <h2 className="text-[22px] font-bold tracking-[-0.02em] md:text-[26px]">
+                    Licensed Broker Oversight
+                  </h2>
+                  <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-muted-foreground">
+                    CityQlo works under the supervision of licensed real estate broker{" "}
+                    <span className="font-semibold text-foreground">Joy Lachica</span> (PRC Lic.
+                    No.&nbsp;10101 · DHSUD NCR-B-6055). Property reservations and transactions are
+                    processed in coordination with our supervising broker to help ensure compliance
+                    with applicable Philippine real estate regulations.
+                  </p>
+
+                  {/* Joy Lachica card */}
+                  <div className="mt-8 flex items-center gap-5 rounded-[1rem] border border-hairline bg-background px-5 py-4">
+                    {brokerImgSrc ? (
+                      <img
+                        src={brokerImgSrc}
+                        alt="Joy Lachica — Licensed Real Estate Broker"
+                        className="h-16 w-16 rounded-full object-cover shrink-0 border border-hairline"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="h-16 w-16 rounded-full bg-surface border border-hairline shrink-0 flex items-center justify-center text-[22px] font-bold text-muted-foreground">
+                        JL
+                      </div>
+                    )}
+                    <div>
+                      <p className="font-semibold text-[15px] tracking-[-0.01em]">Joy Lachica</p>
+                      <p className="text-[12px] text-muted-foreground mt-0.5">
+                        Licensed Real Estate Broker
+                      </p>
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        <span className="rounded-full bg-surface border border-hairline px-3 py-1 text-[10px] font-semibold tracking-[0.14em] uppercase text-muted-foreground">
+                          PRC Lic. No. 10101
+                        </span>
+                        <span className="rounded-full bg-surface border border-hairline px-3 py-1 text-[10px] font-semibold tracking-[0.14em] uppercase text-muted-foreground">
+                          DHSUD NCR-B-6055
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-6 flex flex-wrap gap-3">
+                    <div className="rounded-full border border-hairline px-5 py-2.5 text-[11px] font-semibold tracking-[0.16em] uppercase text-muted-foreground">
+                      PRC Lic. No. 10101
+                    </div>
+                    <div className="rounded-full border border-hairline px-5 py-2.5 text-[11px] font-semibold tracking-[0.16em] uppercase text-muted-foreground">
+                      DHSUD NCR-B-6055
+                    </div>
+                    <div className="rounded-full border border-hairline px-5 py-2.5 text-[11px] font-semibold tracking-[0.16em] uppercase text-muted-foreground">
+                      DMCI Homes Accredited
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
       <section className="surface px-4 section-pad">
         <div className="container-prose grid items-center gap-16 md:grid-cols-12 md:gap-24">
           <Reveal className="md:col-span-6">
             <div className="img-luxe img-luxe-hover overflow-hidden rounded-[1.5rem]">
               <img
-                src={founderImg}
+                src={founderImgSrc}
                 alt="Founder portrait"
                 className="img-luxe aspect-[4/5] w-full object-cover"
                 width={1400}
@@ -183,7 +265,6 @@ function About() {
           </Reveal>
         </div>
       </section>
-
 
       <ConsultationCTA />
     </>

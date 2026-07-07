@@ -14,7 +14,8 @@ export const Route = createFileRoute("/careers")({
       { title: "Careers — CityQlo" },
       {
         name: "description",
-        content: "Join the CityQlo team. Build a career in advisory-first real estate discovery in Metro Manila.",
+        content:
+          "Join the CityQlo team. Build a career in advisory-first real estate discovery in Metro Manila.",
       },
       { property: "og:title", content: "Careers — CityQlo" },
       { property: "og:url", content: "https://cityqlo.com/careers" },
@@ -189,9 +190,7 @@ function ApplyModal({ role, onClose }: { role: string; onClose: () => void }) {
                   placeholder="Maria Santos"
                   className={`w-full rounded-xl border bg-surface px-4 py-3 text-[14px] text-ink placeholder:text-muted-foreground/50 outline-none transition-all duration-200 focus:border-[#1A56DB]/40 focus:ring-2 focus:ring-[#1A56DB]/10 ${errors.name ? "border-red-400/60" : "border-border"}`}
                 />
-                {errors.name && (
-                  <p className="text-[11px] text-red-500">{errors.name.message}</p>
-                )}
+                {errors.name && <p className="text-[11px] text-red-500">{errors.name.message}</p>}
               </div>
 
               {/* Email + Phone */}
@@ -285,7 +284,14 @@ function ApplyModal({ role, onClose }: { role: string; onClose: () => void }) {
                 {isSubmitting ? (
                   <>
                     <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
                     </svg>
                     Submitting...
@@ -360,7 +366,6 @@ function CareersPage() {
             <h1 className="display-1 mt-10 max-w-5xl text-white text-shadow-hero relative">
               Build the future of
               <span className="block text-primary text-shadow-sub">property advisory.</span>
-
               <span
                 className="absolute hidden lg:inline-block pointer-events-none opacity-80 text-[26px] tracking-wide rotate-[-3deg] select-none text-gold font-normal"
                 style={{
@@ -375,7 +380,8 @@ function CareersPage() {
           </Reveal>
           <Reveal delay={240}>
             <p className="lede mt-12 max-w-3xl text-zinc-300 text-shadow-sm">
-              We are restructuring how real estate transactions are done in the Philippines—focusing on objective advice, premium content discovery, and long-term client relationships.
+              We are restructuring how real estate transactions are done in the Philippines—focusing
+              on objective advice, premium content discovery, and long-term client relationships.
             </p>
           </Reveal>
         </div>
@@ -438,11 +444,15 @@ function CareersPage() {
               </p>
               <h2 className="display-2 mt-6">Open Roles</h2>
               <p className="mt-4 text-[15px] leading-relaxed text-muted-foreground">
-                We are actively looking for professionals who align with our values of transparency and patient growth.
+                We are actively looking for professionals who align with our values of transparency
+                and patient growth.
               </p>
               <p className="mt-4 text-[15px] leading-relaxed text-muted-foreground">
                 Don't see your specific role? Send an open application to{" "}
-                <a href="mailto:careers@cityqlo.com" className="font-semibold text-primary hover:underline">
+                <a
+                  href="mailto:careers@cityqlo.com"
+                  className="font-semibold text-primary hover:underline"
+                >
                   careers@cityqlo.com
                 </a>
                 .
@@ -476,9 +486,7 @@ function CareersPage() {
                     <h3 className="text-[22px] md:text-[24px] font-bold tracking-tight text-ink mt-2">
                       {job.title}
                     </h3>
-                    <p className="text-[15px] leading-relaxed text-muted-foreground">
-                      {job.desc}
-                    </p>
+                    <p className="text-[15px] leading-relaxed text-muted-foreground">{job.desc}</p>
 
                     <div className="mt-4 flex justify-between items-center">
                       <button
@@ -501,9 +509,7 @@ function CareersPage() {
       <ConsultationCTA />
 
       {/* Apply Modal */}
-      {applyingFor && (
-        <ApplyModal role={applyingFor} onClose={() => setApplyingFor(null)} />
-      )}
+      {applyingFor && <ApplyModal role={applyingFor} onClose={() => setApplyingFor(null)} />}
     </>
   );
 }

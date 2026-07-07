@@ -514,8 +514,8 @@
     margin-top: 1rem !important;
   }
   .hero-home-container {
-    padding-top: 5rem !important;
-    padding-bottom: 7rem !important;
+    padding-top: 6.5rem !important;
+    padding-bottom: 15rem !important;
   }
   .hero-properties-container {
     padding-top: 5.5rem !important;
@@ -544,16 +544,29 @@
   margin-bottom: 0.75em;
   line-height: 1.15;
 }
-.prose-cityqlo h1 { font-size: clamp(1.75rem, 3.5vw, 2.75rem); }
-.prose-cityqlo h2 { font-size: clamp(1.375rem, 2.5vw, 2rem); }
-.prose-cityqlo h3 { font-size: clamp(1.125rem, 2vw, 1.5rem); }
-.prose-cityqlo h4 { font-size: 1.125rem; }
+.prose-cityqlo h1 {
+  font-size: clamp(1.75rem, 3.5vw, 2.75rem);
+}
+.prose-cityqlo h2 {
+  font-size: clamp(1.375rem, 2.5vw, 2rem);
+}
+.prose-cityqlo h3 {
+  font-size: clamp(1.125rem, 2vw, 1.5rem);
+}
+.prose-cityqlo h4 {
+  font-size: 1.125rem;
+}
 .prose-cityqlo p {
   margin-top: 0;
   margin-bottom: 1.6em;
 }
-.prose-cityqlo strong { font-weight: 700; color: var(--ink); }
-.prose-cityqlo em { font-style: italic; }
+.prose-cityqlo strong {
+  font-weight: 700;
+  color: var(--ink);
+}
+.prose-cityqlo em {
+  font-style: italic;
+}
 .prose-cityqlo a {
   color: var(--primary);
   text-decoration: underline;
@@ -561,13 +574,17 @@
   text-underline-offset: 3px;
   transition: color 300ms var(--ease-luxe);
 }
-.prose-cityqlo a:hover { color: oklch(0.35 0.20 258); }
+.prose-cityqlo a:hover {
+  color: oklch(0.35 0.2 258);
+}
 .prose-cityqlo ul,
 .prose-cityqlo ol {
   padding-left: 1.5em;
   margin-bottom: 1.6em;
 }
-.prose-cityqlo li { margin-bottom: 0.5em; }
+.prose-cityqlo li {
+  margin-bottom: 0.5em;
+}
 .prose-cityqlo blockquote {
   border-left: 3px solid var(--gold);
   padding: 1em 1.5em;
@@ -603,7 +620,7 @@
 .prose-cityqlo hr {
   border: none;
   height: 1px;
-  background: linear-gradient(to right, var(--gold)/60%, var(--border), transparent);
+  background: linear-gradient(to right, var(--gold) / 60%, var(--border), transparent);
   margin: 3em 0;
 }
 .prose-cityqlo img {
@@ -655,8 +672,9 @@
   outline: none;
   transition: border-color 300ms ease;
 }
-.blog-editor-textarea:focus { border-color: var(--portal-accent); }
-
+.blog-editor-textarea:focus {
+  border-color: var(--portal-accent);
+}
 
 /* ═══════════════════════════════════════════════════════════════════════════
    ADMIN PORTAL — Design system
@@ -2080,7 +2098,9 @@
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  transition: border-color 200ms ease, transform 200ms ease;
+  transition:
+    border-color 200ms ease,
+    transform 200ms ease;
   position: relative;
 }
 .portal-item-card:hover {
@@ -2412,4 +2432,3 @@ header.fixed.inset-x-0.top-0 nav a[href="/contact"] {
   padding-bottom: 0.5rem !important;
   font-size: 13px !important;
 }
-

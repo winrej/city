@@ -36,10 +36,10 @@ export function BottomNav() {
 
   if (isPortal || isProjectDetail) return null;
 
-  const isHomeActive       = pathname === "/";
+  const isHomeActive = pathname === "/";
   const isPropertiesActive = pathname.startsWith("/properties");
-  const isGuidesActive     = pathname.startsWith("/guides");
-  const isContactActive    = pathname.startsWith("/contact");
+  const isGuidesActive = pathname.startsWith("/guides");
+  const isContactActive = pathname.startsWith("/contact");
 
   const handleSearchClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -66,15 +66,17 @@ export function BottomNav() {
       className="fixed inset-x-3 z-40 md:hidden transition-transform duration-500 max-w-sm mx-auto"
       style={{
         bottom: "calc(0.85rem + env(safe-area-inset-bottom))",
-        transform: (isScrolling || !hasScrolledPastHero)
-          ? "translateY(calc(100% + 32px))"
-          : "translateY(0)",
+        transform:
+          isScrolling || !hasScrolledPastHero ? "translateY(calc(100% + 32px))" : "translateY(0)",
         transitionTimingFunction: "var(--ease-luxe)",
       }}
     >
       <div
         className="flex items-center justify-between rounded-[22px] border border-black/[0.07] bg-white/90 px-1 py-1 shadow-[0_12px_40px_-8px_rgba(0,0,0,0.16),0_2px_8px_-2px_rgba(0,0,0,0.06)]"
-        style={{ backdropFilter: "blur(20px) saturate(180%)", WebkitBackdropFilter: "blur(20px) saturate(180%)" }}
+        style={{
+          backdropFilter: "blur(20px) saturate(180%)",
+          WebkitBackdropFilter: "blur(20px) saturate(180%)",
+        }}
       >
         {/* Tab 1: Home */}
         <Link

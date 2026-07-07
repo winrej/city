@@ -17,6 +17,7 @@ export const Route = createFileRoute("/sitemap.xml")({
         const staticEntries: SitemapEntry[] = [
           { path: "/", changefreq: "daily", priority: "1.0" },
           { path: "/sonora-garden-residences", changefreq: "weekly", priority: "0.9" },
+          { path: "/fortis-residences", changefreq: "weekly", priority: "0.9" },
           { path: "/why-invest", changefreq: "monthly", priority: "0.8" },
           { path: "/properties", changefreq: "weekly", priority: "0.9" },
           { path: "/guides", changefreq: "weekly", priority: "0.8" },
@@ -27,17 +28,16 @@ export const Route = createFileRoute("/sitemap.xml")({
 
         let projectSlugs: string[] = [];
         let guideSlugs: string[] = [];
-        
+
         try {
           // Fetch projects
           projectSlugs = await getPublishedProjectSlugs();
-          
+
           // Fetch guides (blogs)
           const blogs = await getPublicBlogs();
           guideSlugs = (blogs || [])
             .filter((b: any) => b.status === "published")
             .map((b: any) => b.slug);
-            
         } catch (error) {
           console.error("Failed to fetch slugs for sitemap:", error);
         }

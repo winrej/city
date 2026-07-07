@@ -11,14 +11,9 @@ import {
   X,
   AlertTriangle,
   Eye,
-  EyeOff
+  EyeOff,
 } from "lucide-react";
-import {
-  getAdminFaqs,
-  createFaq,
-  updateFaq,
-  deleteFaq
-} from "../../lib/api/admin.functions";
+import { getAdminFaqs, createFaq, updateFaq, deleteFaq } from "../../lib/api/admin.functions";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/portal/faqs")({
@@ -67,8 +62,7 @@ function FaqFormModal({
 }) {
   const [form, setForm] = useState<FormState>(initial);
 
-  const set = (key: keyof FormState, value: any) =>
-    setForm((prev) => ({ ...prev, [key]: value }));
+  const set = (key: keyof FormState, value: any) => setForm((prev) => ({ ...prev, [key]: value }));
 
   return (
     <div className="portal-detail-overlay" onClick={onClose}>
@@ -79,9 +73,7 @@ function FaqFormModal({
       >
         {/* Header */}
         <div className="portal-detail-header">
-          <h2 className="portal-detail-name">
-            {mode === "create" ? "Add New FAQ" : "Edit FAQ"}
-          </h2>
+          <h2 className="portal-detail-name">{mode === "create" ? "Add New FAQ" : "Edit FAQ"}</h2>
           <button className="portal-detail-close" onClick={onClose}>
             ✕
           </button>
@@ -125,27 +117,33 @@ function FaqFormModal({
                 value={form.category}
                 onChange={(e) => set("category", e.target.value)}
               />
-              <div style={{ display: "flex", flexWrap: "wrap", gap: "0.35rem", marginTop: "0.4rem" }}>
-                {["Buying Process", "Legalities", "Payment Options", "OFW Investors", "DMCI Homes"].map(
-                  (c) => (
-                    <button
-                      type="button"
-                      key={c}
-                      onClick={() => set("category", c)}
-                      style={{
-                        fontSize: "10px",
-                        background: "rgba(255,255,255,0.06)",
-                        border: "1px solid rgba(255,255,255,0.12)",
-                        borderRadius: "4px",
-                        padding: "2px 6px",
-                        color: "var(--zinc-350)",
-                        cursor: "pointer",
-                      }}
-                    >
-                      {c}
-                    </button>
-                  )
-                )}
+              <div
+                style={{ display: "flex", flexWrap: "wrap", gap: "0.35rem", marginTop: "0.4rem" }}
+              >
+                {[
+                  "Buying Process",
+                  "Legalities",
+                  "Payment Options",
+                  "OFW Investors",
+                  "DMCI Homes",
+                ].map((c) => (
+                  <button
+                    type="button"
+                    key={c}
+                    onClick={() => set("category", c)}
+                    style={{
+                      fontSize: "10px",
+                      background: "rgba(255,255,255,0.06)",
+                      border: "1px solid rgba(255,255,255,0.12)",
+                      borderRadius: "4px",
+                      padding: "2px 6px",
+                      color: "var(--zinc-350)",
+                      cursor: "pointer",
+                    }}
+                  >
+                    {c}
+                  </button>
+                ))}
               </div>
             </div>
 
@@ -192,7 +190,12 @@ function FaqFormModal({
             <button
               className="portal-btn-primary"
               onClick={() => onSubmit(form)}
-              disabled={isSubmitting || !form.question.trim() || !form.answer.trim() || !form.category.trim()}
+              disabled={
+                isSubmitting ||
+                !form.question.trim() ||
+                !form.answer.trim() ||
+                !form.category.trim()
+              }
             >
               {isSubmitting ? "Saving..." : mode === "create" ? "Create FAQ" : "Save Changes"}
             </button>
@@ -282,9 +285,7 @@ function FaqsAdminPage() {
       qc.invalidateQueries({ queryKey: ["admin-faqs"] });
       qc.invalidateQueries({ queryKey: ["public-faqs"] });
       toast.success(
-        variables.status === "published"
-          ? "FAQ is now visible publicly"
-          : "FAQ is now hidden"
+        variables.status === "published" ? "FAQ is now visible publicly" : "FAQ is now hidden",
       );
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Toggle failed"),
@@ -438,9 +439,7 @@ function FaqsAdminPage() {
                     </span>
                   </td>
                   <td>
-                    <div style={{ fontWeight: 600, color: "var(--zinc-100)" }}>
-                      {faq.question}
-                    </div>
+                    <div style={{ fontWeight: 600, color: "var(--zinc-100)" }}>{faq.question}</div>
                     <div
                       style={{
                         fontSize: "12px",
@@ -604,8 +603,8 @@ function FaqsAdminPage() {
                     lineHeight: "1.4",
                   }}
                 >
-                  Are you sure you want to delete this FAQ? This action is permanent and cannot
-                  be undone. It will immediately be removed from the public website.
+                  Are you sure you want to delete this FAQ? This action is permanent and cannot be
+                  undone. It will immediately be removed from the public website.
                 </p>
               </div>
             </div>

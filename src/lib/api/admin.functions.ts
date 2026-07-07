@@ -925,8 +925,8 @@ export const getRelatedProjects = createServerFn({ method: "GET" })
         .filter(Boolean)
         .map((payload: any) => {
           const pm = payload.project_meta || {};
-          const heroImg = (payload.layout_flow || []).find((s: any) => s.type === "hero")
-            ?.payload?.hero_images?.[0];
+          const heroImg = (payload.layout_flow || []).find((s: any) => s.type === "hero")?.payload
+            ?.hero_images?.[0];
           const minPrice = (payload.units || [])[0]?.starting_price || pm.min_price;
           return {
             id: pm.slug,
@@ -1363,7 +1363,9 @@ export const createProperty = createServerFn({ method: "POST" })
           slug: slug,
           developer: data.developer,
           location_district: data.location,
-          city: data.city.includes(",") ? data.city.split(",").pop()?.trim() || data.city : data.city,
+          city: data.city.includes(",")
+            ? data.city.split(",").pop()?.trim() || data.city
+            : data.city,
           full_address: data.city,
           min_price: Math.round(data.price_min * 1000000),
           max_price: Math.round(data.price_min * 1000000 * 1.5),
@@ -1385,7 +1387,9 @@ export const createProperty = createServerFn({ method: "POST" })
             slug: slug,
             developer: data.developer,
             location_district: data.location,
-            city: data.city.includes(",") ? data.city.split(",").pop()?.trim() || data.city : data.city,
+            city: data.city.includes(",")
+              ? data.city.split(",").pop()?.trim() || data.city
+              : data.city,
             full_address: data.city,
             status: "draft",
             min_price: Math.round(data.price_min * 1000000),
@@ -1625,11 +1629,7 @@ export const getAdminBlogById = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     await requireAdminSession();
     const sb = await getServerClient();
-    const { data: post, error } = await sb
-      .from("blogs")
-      .select("*")
-      .eq("id", data.id)
-      .single();
+    const { data: post, error } = await sb.from("blogs").select("*").eq("id", data.id).single();
 
     if (error) throw new Error(error.message);
     return post;
@@ -1848,13 +1848,12 @@ export const deleteBuilding = createServerFn({ method: "POST" })
   });
 
 export const reorderBuildings = createServerFn({ method: "POST" })
-  .validator(
-    (d: unknown) =>
-      z
-        .object({
-          updates: z.array(z.object({ id: z.string().uuid(), display_order: z.number().int() })),
-        })
-        .parse(d),
+  .validator((d: unknown) =>
+    z
+      .object({
+        updates: z.array(z.object({ id: z.string().uuid(), display_order: z.number().int() })),
+      })
+      .parse(d),
   )
   .handler(async ({ data }) => {
     await requireAdminSession();

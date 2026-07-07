@@ -104,10 +104,14 @@ export function Nav() {
             background: open ? "transparent" : `rgba(255, 255, 255, ${activeBgOpacity})`,
             backdropFilter: open ? "none" : `saturate(160%) blur(${activeBlur}px)`,
             WebkitBackdropFilter: open ? "none" : `saturate(160%) blur(${activeBlur}px)`,
-            border: open ? "1px solid transparent" : `1px solid rgba(0, 0, 0, ${scrolled ? 0.07 : 0.04})`,
-            boxShadow: open ? "none" : (scrolled
-              ? "0 2px 24px rgba(0, 0, 0, 0.07)"
-              : "0 1px 12px rgba(0, 0, 0, 0.04)"),
+            border: open
+              ? "1px solid transparent"
+              : `1px solid rgba(0, 0, 0, ${scrolled ? 0.07 : 0.04})`,
+            boxShadow: open
+              ? "none"
+              : scrolled
+                ? "0 2px 24px rgba(0, 0, 0, 0.07)"
+                : "0 1px 12px rgba(0, 0, 0, 0.04)",
           }}
           aria-label="Primary"
         >
@@ -128,7 +132,9 @@ export function Nav() {
             {/* DMCI badge — all screen sizes, hide while scrolling */}
             <div
               className={`flex items-center gap-1.5 border-l border-black/10 pl-3 lg:pl-4 h-7 transition-all duration-[400ms] ${
-                collapsed ? "opacity-0 pointer-events-none -translate-x-2" : "opacity-100 translate-x-0"
+                collapsed
+                  ? "opacity-0 pointer-events-none -translate-x-2"
+                  : "opacity-100 translate-x-0"
               }`}
               style={{ transitionTimingFunction: "var(--ease-luxe)" }}
             >
@@ -138,7 +144,9 @@ export function Nav() {
                 className="h-4 lg:h-6 object-contain opacity-75"
               />
               <span className="hidden md:block text-[7.5px] lg:text-[8.5px] font-mono tracking-widest uppercase text-muted-foreground leading-tight">
-                Accredited<br />Partner
+                Accredited
+                <br />
+                Partner
               </span>
             </div>
           </div>
@@ -146,7 +154,9 @@ export function Nav() {
           {/* Center: Nav links — slide up + fade while scrolling */}
           <ul
             className={`hidden items-center gap-9 md:flex transition-all duration-[400ms] ${
-              collapsed ? "opacity-0 pointer-events-none -translate-y-1" : "opacity-100 translate-y-0"
+              collapsed
+                ? "opacity-0 pointer-events-none -translate-y-1"
+                : "opacity-100 translate-y-0"
             }`}
             style={{ transitionTimingFunction: "var(--ease-luxe)" }}
           >
@@ -195,7 +205,10 @@ export function Nav() {
                 More
                 <svg
                   className={`h-3 w-3 transition-transform duration-300 ${moreOpen ? "rotate-180" : ""}`}
-                  fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2.5}
                   aria-hidden="true"
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
@@ -215,9 +228,7 @@ export function Nav() {
               >
                 {/* Invisible bridge to prevent gap closing the dropdown */}
                 <div className="absolute -top-4 left-0 right-0 h-4" />
-                <div
-                  className="rounded-2xl border border-black/[0.07] bg-white/95 shadow-[0_8px_40px_rgba(0,0,0,0.12)] backdrop-blur-xl overflow-hidden"
-                >
+                <div className="rounded-2xl border border-black/[0.07] bg-white/95 shadow-[0_8px_40px_rgba(0,0,0,0.12)] backdrop-blur-xl overflow-hidden">
                   {/* Top accent */}
                   <div className="h-[2px] w-full bg-gradient-to-r from-[#1A56DB]/60 via-[#1A56DB] to-[#1A56DB]/60" />
                   <div className="p-2">
@@ -298,10 +309,22 @@ export function Nav() {
           }}
         >
           <ul className="flex flex-col">
-            {([
-              { to: "/properties", label: "Properties", num: "01", desc: "Browse curated DMCI condos and pre-selling units" },
-              { to: "/why-invest", label: "Why Invest", num: "02", desc: "Investment thesis, yield calculations, and market data" },
-            ] as const).map((l, i) => (
+            {(
+              [
+                {
+                  to: "/properties",
+                  label: "Properties",
+                  num: "01",
+                  desc: "Browse curated DMCI condos and pre-selling units",
+                },
+                {
+                  to: "/why-invest",
+                  label: "Why Invest",
+                  num: "02",
+                  desc: "Investment thesis, yield calculations, and market data",
+                },
+              ] as const
+            ).map((l, i) => (
               <li
                 key={l.to}
                 className="border-b border-black/5 transition-all duration-[350ms]"
@@ -319,7 +342,9 @@ export function Nav() {
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <span className="font-mono text-[10px] text-gold/80 tracking-[0.2em] font-bold">{l.num}</span>
+                      <span className="font-mono text-[10px] text-gold/80 tracking-[0.2em] font-bold">
+                        {l.num}
+                      </span>
                       <span className="font-display font-extrabold text-[22px] tracking-tight text-ink group-hover:text-primary transition-colors duration-300">
                         {l.label}
                       </span>
@@ -350,7 +375,9 @@ export function Nav() {
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <span className="font-mono text-[10px] text-gold/80 tracking-[0.2em] font-bold">03</span>
+                    <span className="font-mono text-[10px] text-gold/80 tracking-[0.2em] font-bold">
+                      03
+                    </span>
                     <span className="font-display font-extrabold text-[22px] tracking-tight text-ink group-hover:text-primary transition-colors duration-300">
                       More
                     </span>
@@ -379,7 +406,10 @@ export function Nav() {
                     <li key={ml.to}>
                       <Link
                         to={ml.to}
-                        onClick={() => { setOpen(false); setMoreExpanded(false); }}
+                        onClick={() => {
+                          setOpen(false);
+                          setMoreExpanded(false);
+                        }}
                         className="group flex items-center justify-between rounded-xl px-3 py-2.5 transition-all duration-300 hover:bg-black/[0.04]"
                         activeProps={{ className: "text-primary" }}
                       >
@@ -429,9 +459,7 @@ export function Nav() {
                       viewBox="0 0 24 24"
                       aria-hidden="true"
                     >
-                      <path
-                        d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"
-                      />
+                      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
                     </svg>
                   ),
                 },
@@ -489,7 +517,9 @@ export function Nav() {
 
               return (
                 <div className="flex flex-col items-center mb-6">
-                  <span className="text-[9.5px] font-mono tracking-[0.2em] uppercase text-muted-foreground/80 mb-3">Connect with us</span>
+                  <span className="text-[9.5px] font-mono tracking-[0.2em] uppercase text-muted-foreground/80 mb-3">
+                    Connect with us
+                  </span>
                   <div className="flex gap-2.5 justify-center">
                     {socialPlatforms.map((platform) => {
                       const rawUrl = socialSettings[platform.key];

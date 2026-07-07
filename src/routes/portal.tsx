@@ -69,7 +69,6 @@ const navItems: NavItem[] = [
   { label: "Activity", path: "/portal/activity", icon: Activity, active: false },
 ];
 
-
 function PortalLayout() {
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });

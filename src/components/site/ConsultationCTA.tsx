@@ -116,7 +116,12 @@ export function ConsultationCTA() {
                     "Easy remote coordination tailored for OFWs and busy professionals.",
                   ],
                 ].map(([title, desc], idx) => (
-                  <Reveal as="li" key={title} delay={300 + idx * 80} className="flex gap-4 items-start">
+                  <Reveal
+                    as="li"
+                    key={title}
+                    delay={300 + idx * 80}
+                    className="flex gap-4 items-start"
+                  >
                     <span className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#1A56DB]/20 border border-[#1A56DB]/35 text-primary">
                       <Check size={11} className="stroke-[3]" />
                     </span>
@@ -124,9 +129,7 @@ export function ConsultationCTA() {
                       <span className="text-[14.5px] font-bold text-white leading-snug">
                         {title}
                       </span>
-                      <span className="text-[13px] text-zinc-400 mt-1 leading-snug">
-                        {desc}
-                      </span>
+                      <span className="text-[13px] text-zinc-400 mt-1 leading-snug">{desc}</span>
                     </div>
                   </Reveal>
                 ))}
@@ -144,7 +147,9 @@ export function ConsultationCTA() {
                     className="h-8 object-contain brightness-0 invert opacity-75"
                   />
                   <div className="text-[9.5px] font-mono tracking-widest uppercase text-white/50 leading-tight">
-                    Accredited<br />Partner
+                    Accredited
+                    <br />
+                    Partner
                   </div>
                 </div>
                 <div className="h-6 w-px bg-white/10 hidden sm:block" />
@@ -186,7 +191,7 @@ export function ConsultationCTA() {
                           Quick Consultation
                         </h3>
                         <p className="text-[12.5px] text-zinc-400 mt-1 leading-normal">
-                          Fill out the details below. We reply within a few hours.
+                          We reply within a few hours.
                         </p>
                       </div>
 
@@ -280,19 +285,27 @@ export function ConsultationCTA() {
                         <label className="text-[10px] font-semibold uppercase tracking-widest text-zinc-400 px-1">
                           I'm a
                         </label>
-                        <div className="relative">
+                        <div className="relative group">
                           <select
                             {...register("role")}
-                            className="h-11 w-full rounded-full border border-white/10 bg-zinc-950 px-5 text-[14px] text-white focus:border-primary/50 focus:outline-none appearance-none cursor-pointer focus:ring-1 focus:ring-primary/40"
+                            className="h-11 w-full rounded-full border border-white/10 bg-white/[0.04] hover:bg-white/[0.06] hover:border-white/20 focus:bg-white/[0.06] transition-all duration-300 px-5 pr-12 text-[14px] text-white focus:border-primary/50 focus:outline-none appearance-none cursor-pointer focus:ring-1 focus:ring-primary/40"
                           >
-                            <option value="Professional in PH">Professional in PH</option>
-                            <option value="Investor">Investor</option>
-                            <option value="OFW">OFW</option>
-                            <option value="Just exploring">Just exploring</option>
+                            <option value="Professional in PH" className="bg-zinc-950 text-white">
+                              Professional in PH
+                            </option>
+                            <option value="Investor" className="bg-zinc-950 text-white">
+                              Investor
+                            </option>
+                            <option value="OFW" className="bg-zinc-950 text-white">
+                              OFW
+                            </option>
+                            <option value="Just exploring" className="bg-zinc-950 text-white">
+                              Just exploring
+                            </option>
                           </select>
                           <ChevronDown
                             size={14}
-                            className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none"
+                            className="absolute right-5 top-1/2 -translate-y-1/2 text-zinc-400 group-hover:text-zinc-200 transition-colors duration-300 pointer-events-none"
                           />
                         </div>
                       </div>

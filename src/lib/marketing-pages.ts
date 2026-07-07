@@ -49,12 +49,42 @@ export const GUIDES_PAGE_FALLBACK = {
   hero_description:
     "Editorial, plain-spoken guides for the decisions that matter. Released one at a time, each one revised until it earns the page.",
   guides: [
-    { number: "01", title: "First-time buyer", description: "What to know before you sign anything.", status: "Soon" },
-    { number: "02", title: "OFW property guide", description: "Buying from abroad, calmly and correctly.", status: "Soon" },
-    { number: "03", title: "Condo investment", description: "The five questions every investor should ask.", status: "Soon" },
-    { number: "04", title: "Property financing", description: "Loans, downpayments, and the math behind them.", status: "Soon" },
-    { number: "05", title: "DMCI buying process", description: "From reservation to turnover, step by step.", status: "Soon" },
-    { number: "06", title: "Metro Manila insights", description: "Submarket reads and where value is moving.", status: "Soon" },
+    {
+      number: "01",
+      title: "First-time buyer",
+      description: "What to know before you sign anything.",
+      status: "Soon",
+    },
+    {
+      number: "02",
+      title: "OFW property guide",
+      description: "Buying from abroad, calmly and correctly.",
+      status: "Soon",
+    },
+    {
+      number: "03",
+      title: "Condo investment",
+      description: "The five questions every investor should ask.",
+      status: "Soon",
+    },
+    {
+      number: "04",
+      title: "Property financing",
+      description: "Loans, downpayments, and the math behind them.",
+      status: "Soon",
+    },
+    {
+      number: "05",
+      title: "DMCI buying process",
+      description: "From reservation to turnover, step by step.",
+      status: "Soon",
+    },
+    {
+      number: "06",
+      title: "Metro Manila insights",
+      description: "Submarket reads and where value is moving.",
+      status: "Soon",
+    },
   ],
   subscribe_eyebrow: "Be the first",
   subscribe_title: "Get guides in your inbox.",
@@ -96,10 +126,24 @@ export const WHY_INVEST_PAGE_FALLBACK = {
   ],
   benefits_heading: "What ownership earns you over time.",
   benefits: [
-    { title: "Defensive cash flow", description: "Long-leased units in mature submarkets create stable, peso- and dollar-resilient yield." },
-    { title: "Capital growth", description: "Locations near new infrastructure historically lead in long-horizon appreciation." },
-    { title: "Inflation hedge", description: "Hard assets keep pace with - or outrun - rising cost of living." },
-    { title: "Generational asset", description: "Pass it on, refinance it, or leverage it as part of a wider portfolio." },
+    {
+      title: "Defensive cash flow",
+      description:
+        "Long-leased units in mature submarkets create stable, peso- and dollar-resilient yield.",
+    },
+    {
+      title: "Capital growth",
+      description:
+        "Locations near new infrastructure historically lead in long-horizon appreciation.",
+    },
+    {
+      title: "Inflation hedge",
+      description: "Hard assets keep pace with - or outrun - rising cost of living.",
+    },
+    {
+      title: "Generational asset",
+      description: "Pass it on, refinance it, or leverage it as part of a wider portfolio.",
+    },
   ],
   rental_strategies_heading: "Three ways your unit can earn.",
   rental_strategies_description:
@@ -135,10 +179,26 @@ export const WHY_INVEST_PAGE_FALLBACK = {
   faq_heading: "Honest answers.",
   faq_description: "If yours is not here, ask us directly.",
   faqs: [
-    { question: "Is now a good time to invest?", answer: "It depends entirely on your timeline and liquidity. There is no universal good time - only the right time for your situation." },
-    { question: "I'm an OFW. Can I buy from abroad?", answer: "Yes. We work with many OFW clients end-to-end remotely, from goal-setting to turnover." },
-    { question: "Do you charge for consultation?", answer: "No. The initial conversation is complimentary, and there is never pressure to transact." },
-    { question: "Do you only recommend DMCI?", answer: "No. We recommend what fits your goals. DMCI is often a strong fit, but it is never the only option." },
+    {
+      question: "Is now a good time to invest?",
+      answer:
+        "It depends entirely on your timeline and liquidity. There is no universal good time - only the right time for your situation.",
+    },
+    {
+      question: "I'm an OFW. Can I buy from abroad?",
+      answer:
+        "Yes. We work with many OFW clients end-to-end remotely, from goal-setting to turnover.",
+    },
+    {
+      question: "Do you charge for consultation?",
+      answer:
+        "No. The initial conversation is complimentary, and there is never pressure to transact.",
+    },
+    {
+      question: "Do you only recommend DMCI?",
+      answer:
+        "No. We recommend what fits your goals. DMCI is often a strong fit, but it is never the only option.",
+    },
   ],
 };
 
@@ -159,7 +219,10 @@ export const ABOUT_PAGE_FALLBACK = {
   values_heading: "How we work - and what we will not do.",
   values: [
     { title: "Clarity over hype", description: "We would rather be useful than impressive." },
-    { title: "Long-term first", description: "Decisions designed to age well - not to close this quarter." },
+    {
+      title: "Long-term first",
+      description: "Decisions designed to age well - not to close this quarter.",
+    },
     { title: "Quiet expertise", description: "We do the homework, then explain it plainly." },
     { title: "Respect for capital", description: "It is your money, your family, your call." },
   ],

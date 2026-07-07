@@ -132,8 +132,8 @@ export function PriceListMagnet({
               Get the {project.name} price list
             </h2>
             <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">
-              See the official starting prices and a sample computation — generated instantly.
-              Enter your details and it opens right here, ready to print or save as PDF.
+              See the official starting prices and a sample computation — generated instantly. Enter
+              your details and it opens right here, ready to print or save as PDF.
             </p>
 
             <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
