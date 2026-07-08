@@ -149,12 +149,31 @@ function FaqFormModal({
 
             <div className="portal-field">
               <label className="portal-field-label">Display Order</label>
-              <input
-                className="portal-input"
-                type="number"
-                value={form.display_order}
-                onChange={(e) => set("display_order", parseInt(e.target.value) || 0)}
-              />
+              <div style={{ display: "flex", gap: "0.25rem" }}>
+                <button
+                  type="button"
+                  className="portal-btn-secondary"
+                  style={{ padding: "0 0.5rem", minHeight: "36px", width: "36px" }}
+                  onClick={() => set("display_order", Math.max(0, form.display_order - 10))}
+                >
+                  -
+                </button>
+                <input
+                  className="portal-input"
+                  type="number"
+                  value={form.display_order}
+                  onChange={(e) => set("display_order", parseInt(e.target.value) || 0)}
+                  style={{ textAlign: "center" }}
+                />
+                <button
+                  type="button"
+                  className="portal-btn-secondary"
+                  style={{ padding: "0 0.5rem", minHeight: "36px", width: "36px" }}
+                  onClick={() => set("display_order", form.display_order + 10)}
+                >
+                  +
+                </button>
+              </div>
             </div>
           </div>
 
@@ -543,7 +562,10 @@ function FaqsAdminPage() {
       {showCreate && (
         <FaqFormModal
           mode="create"
-          initial={EMPTY_FORM}
+          initial={{
+            ...EMPTY_FORM,
+            display_order: Math.max(...faqs.map((f) => f.display_order), 0) + 10,
+          }}
           onClose={() => setShowCreate(false)}
           isSubmitting={createMut.isPending}
           onSubmit={(data) => createMut.mutate(data)}

@@ -33,6 +33,7 @@ import {
   deleteTestimonial,
 } from "../../lib/api/admin.functions";
 import { toast } from "sonner";
+import { MediaPicker } from "../../components/MediaPicker";
 import {
   ABOUT_PAGE_FALLBACK,
   GUIDES_PAGE_FALLBACK,
@@ -2388,48 +2389,23 @@ function HomepageEditorPage() {
                 </div>
               </div>
 
-              <div className="portal-field">
-                <label className="portal-field-label">
-                  Founder Photo Image URL (Leave blank to use default portrait)
-                </label>
-                <div className="portal-input-wrap">
-                  <ImageIcon size={16} className="portal-input-icon" />
-                  <input
-                    type="text"
-                    placeholder="https://example.com/founder.jpg"
-                    value={getVal("founder_image_url", "")}
-                    onChange={(e) => handleFieldChange("founder_image_url", e.target.value)}
-                    className="portal-input"
-                  />
-                </div>
-              </div>
+              <MediaPicker
+                label="Founder Photo Image URL"
+                aspectRatioLabel="Ratio 3:4"
+                value={getVal("founder_image_url", "")}
+                onChange={(val) => handleFieldChange("founder_image_url", val)}
+                description="Founder photo displayed in the founder section. Leave blank to use default portrait."
+                optional
+              />
 
-              <div className="portal-field">
-                <label className="portal-field-label">
-                  Supervising Broker Photo (Joy Lachica) — shown on About page
-                </label>
-                <div className="portal-input-wrap">
-                  <ImageIcon size={16} className="portal-input-icon" />
-                  <input
-                    type="text"
-                    placeholder="https://example.com/joy-lachica.jpg"
-                    value={getVal("broker_image_url", "")}
-                    onChange={(e) => handleFieldChange("broker_image_url", e.target.value)}
-                    className="portal-input"
-                  />
-                </div>
-                <span
-                  style={{
-                    fontSize: "0.7rem",
-                    color: "var(--zinc-500)",
-                    marginTop: "0.35rem",
-                    display: "block",
-                  }}
-                >
-                  Appears in the Licensed Broker Oversight card on the About page. Leave blank to
-                  show initials placeholder.
-                </span>
-              </div>
+              <MediaPicker
+                label="Supervising Broker Photo (Joy Lachica)"
+                aspectRatioLabel="Ratio 3:4"
+                value={getVal("broker_image_url", "")}
+                onChange={(val) => handleFieldChange("broker_image_url", val)}
+                description="Appears in the Licensed Broker Oversight card on the About page. Leave blank to show initials placeholder."
+                optional
+              />
 
               {/* ─── New: Cinematic Enhancements ─── */}
               <div
@@ -2923,12 +2899,12 @@ function HomepageEditorPage() {
                     {[1, 2, 3, 4].map((n) => (
                       <div
                         key={n}
-                        className="portal-field"
                         style={{
                           background: "rgba(255,255,255,0.02)",
                           padding: "1rem",
                           borderRadius: "8px",
                           border: "1px solid rgba(255,255,255,0.06)",
+                          marginBottom: "1rem",
                         }}
                       >
                         <div
@@ -2956,48 +2932,21 @@ function HomepageEditorPage() {
                           >
                             {n}
                           </span>
-                          <label className="portal-field-label" style={{ margin: 0 }}>
-                            Slide {n} Background Image URL
-                            {n === 1 ? " (Required for carousel)" : " (Optional)"}
-                          </label>
-                        </div>
-                        <div className="portal-input-wrap">
-                          <ImageIcon size={16} className="portal-input-icon" />
-                          <input
-                            type="text"
-                            placeholder={
-                              n === 1
-                                ? "https://example.com/hero-1.jpg"
-                                : `https://example.com/hero-${n}.jpg (leave blank to skip)`
-                            }
-                            value={getVal(`carousel_slide_${n}_url`, "")}
-                            onChange={(e) =>
-                              handleFieldChange(`carousel_slide_${n}_url`, e.target.value)
-                            }
-                            className="portal-input"
-                          />
-                        </div>
-                        {/* Thumbnail preview */}
-                        {getVal(`carousel_slide_${n}_url`, "") && (
-                          <div
-                            style={{
-                              marginTop: "0.5rem",
-                              height: "60px",
-                              borderRadius: "6px",
-                              overflow: "hidden",
-                              border: "1px solid rgba(255,255,255,0.1)",
-                            }}
+                          <span
+                            className="portal-field-label"
+                            style={{ margin: 0, fontWeight: 600 }}
                           >
-                            <img
-                              src={getVal(`carousel_slide_${n}_url`, "")}
-                              alt={`Slide ${n} preview`}
-                              style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                              onError={(e) => {
-                                (e.target as HTMLImageElement).style.display = "none";
-                              }}
-                            />
-                          </div>
-                        )}
+                            Slide {n} Background
+                          </span>
+                        </div>
+                        <MediaPicker
+                          label=""
+                          aspectRatioLabel="Ratio 16:9"
+                          value={getVal(`carousel_slide_${n}_url`, "")}
+                          onChange={(val) => handleFieldChange(`carousel_slide_${n}_url`, val)}
+                          optional={n > 1}
+                          description={`Carousel slide ${n} background image.`}
+                        />
                       </div>
                     ))}
 
@@ -3435,16 +3384,14 @@ function TestimonialsManager() {
               />
             </div>
 
-            <div className="portal-field">
-              <label className="portal-field-label">Client Avatar URL (Optional)</label>
-              <input
-                type="text"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                placeholder="https://example.com/avatar.jpg"
-                className="portal-input"
-              />
-            </div>
+            <MediaPicker
+              label="Client Avatar URL"
+              aspectRatioLabel="Ratio 1:1"
+              value={imageUrl}
+              onChange={(val) => setImageUrl(val)}
+              description="Testimonial author avatar picture."
+              optional
+            />
 
             <div className="portal-grid-2col">
               <div className="portal-field">

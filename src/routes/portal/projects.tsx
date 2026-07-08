@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect, useMemo } from "react";
 import {
@@ -46,7 +46,10 @@ import {
   deleteBuilding,
   reorderBuildings,
 } from "../../lib/api/admin.functions";
+import { DMCI_CATALOG, type DmciCatalogEntry } from "@/data/dmciCatalog";
+import { buildDmciDraftScaffold } from "@/lib/projectTemplate";
 import { toast } from "sonner";
+import { MediaPicker } from "../../components/MediaPicker";
 
 export const Route = createFileRoute("/portal/projects")({
   component: ProjectsPage,
@@ -62,176 +65,6 @@ type TabType =
   | "publish"
   | "preview"
   | "raw";
-
-/** Reusable Cloudinary-aware image URL input with live preview & error detection */
-function CloudinaryImageField({
-  label,
-  value,
-  onChange,
-  aspectRatioLabel,
-  description,
-  className = "portal-input",
-  optional = false,
-}: {
-  label: string;
-  value: string;
-  onChange: (val: string) => void;
-  aspectRatioLabel: string;
-  description?: string;
-  className?: string;
-  optional?: boolean;
-}) {
-  const [imageError, setImageError] = useState(false);
-  const isCloudinary = value ? value.includes("res.cloudinary.com") : false;
-
-  return (
-    <div className="portal-field">
-      <label
-        className="portal-field-label"
-        style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
-      >
-        <span>
-          {label}{" "}
-          {optional && (
-            <span style={{ color: "var(--zinc-500)", fontWeight: 400, fontSize: "11px" }}>
-              (Optional)
-            </span>
-          )}
-        </span>
-        <span
-          style={{
-            fontSize: "10px",
-            padding: "2px 6px",
-            borderRadius: "4px",
-            background: "rgba(255,255,255,0.05)",
-            border: "1px solid rgba(255,255,255,0.1)",
-            color: "var(--zinc-400)",
-            fontFamily: "monospace",
-          }}
-        >
-          {aspectRatioLabel}
-        </span>
-      </label>
-
-      <div style={{ position: "relative" }}>
-        <input
-          type="text"
-          className={className}
-          style={{ paddingRight: value ? "8rem" : undefined }}
-          placeholder="https://res.cloudinary.com/..."
-          value={value}
-          onChange={(e) => {
-            setImageError(false);
-            onChange(e.target.value);
-          }}
-        />
-        {value && (
-          <div
-            style={{
-              position: "absolute",
-              right: "10px",
-              top: "50%",
-              transform: "translateY(-50%)",
-              pointerEvents: "none",
-            }}
-          >
-            {isCloudinary ? (
-              <span
-                style={{
-                  fontSize: "10px",
-                  color: "oklch(0.65 0.18 145)",
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.04em",
-                }}
-              >
-                Cloudinary ✓
-              </span>
-            ) : (
-              <span
-                style={{
-                  fontSize: "10px",
-                  color: "oklch(0.74 0.137 79)",
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.04em",
-                }}
-              >
-                External
-              </span>
-            )}
-          </div>
-        )}
-      </div>
-
-      <p
-        style={{
-          fontSize: "11px",
-          color: "var(--zinc-400)",
-          marginTop: "0.25rem",
-          marginBottom: 0,
-        }}
-      >
-        💡{" "}
-        {description ||
-          "Paste a direct Cloudinary image URL (starts with https://res.cloudinary.com/…)"}
-      </p>
-
-      {value && (
-        <div
-          style={{
-            marginTop: "0.5rem",
-            padding: "0.5rem 0.65rem",
-            background: "rgba(255,255,255,0.02)",
-            border: "1px solid rgba(255,255,255,0.06)",
-            borderRadius: "8px",
-            display: "flex",
-            alignItems: "center",
-            gap: "0.75rem",
-          }}
-        >
-          <div
-            style={{
-              width: "60px",
-              height: "44px",
-              background: "rgba(0,0,0,0.3)",
-              border: "1px solid rgba(255,255,255,0.08)",
-              borderRadius: "5px",
-              overflow: "hidden",
-              flexShrink: 0,
-            }}
-          >
-            <img
-              src={value}
-              alt="Preview"
-              style={{ width: "100%", height: "100%", objectFit: "cover" }}
-              onLoad={() => setImageError(false)}
-              onError={() => setImageError(true)}
-            />
-          </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            {imageError ? (
-              <p style={{ fontSize: "12px", color: "#f87171", fontWeight: 600, margin: 0 }}>
-                ⚠️ Could not load image. Check the URL is a valid, publicly accessible link.
-              </p>
-            ) : (
-              <p
-                style={{
-                  fontSize: "11.5px",
-                  color: "oklch(0.65 0.18 145)",
-                  fontWeight: 600,
-                  margin: 0,
-                }}
-              >
-                ✓ Image preview loaded
-              </p>
-            )}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
 
 function ProjectsPage() {
   const qc = useQueryClient();
@@ -255,7 +88,14 @@ function ProjectsPage() {
     min_price: 4500000,
     max_price: 13500000,
     location_district: "",
+    // Carried only client-side to build the scaffold (not sent as-is).
+    beds: "",
+    listing_status: "",
   });
+
+  // DMCI catalog picker state.
+  const [dmciQuery, setDmciQuery] = useState("");
+  const [dmciOpen, setDmciOpen] = useState(false);
 
   // Fetch admin projects list
   const {
@@ -340,10 +180,36 @@ function ProjectsPage() {
     return (properties as any[]).filter((p) => !p.is_deleted && !existingProjectSlugs.has(p.slug));
   }, [properties, existingProjectSlugs]);
 
+  // DMCI catalog entries not yet added as projects, filtered by the picker query.
+  const filteredCatalog = useMemo(() => {
+    const q = dmciQuery.trim().toLowerCase();
+    return DMCI_CATALOG.filter((e) => !existingProjectSlugs.has(e.slug)).filter(
+      (e) => !q || e.name.toLowerCase().includes(q) || e.location.toLowerCase().includes(q),
+    );
+  }, [dmciQuery, existingProjectSlugs]);
+
+  const applyDmciEntry = (e: DmciCatalogEntry) => {
+    setNewProj({
+      title: e.name,
+      slug: e.slug,
+      developer: "DMCI Homes",
+      city: e.location,
+      full_address: e.location,
+      min_price: e.price_min,
+      max_price: e.price_max,
+      location_district: e.location,
+      beds: e.beds,
+      listing_status: e.status,
+    });
+    setDmciQuery(e.name);
+    setDmciOpen(false);
+  };
+
   const createMutation = useMutation({
     mutationFn: (vars: Parameters<typeof createProject>[0]) => createProject(vars),
     onSuccess: (res) => {
       qc.invalidateQueries({ queryKey: ["admin-projects"] });
+      qc.invalidateQueries({ queryKey: ["admin-properties"] });
       setShowCreateModal(false);
       setNewProj({
         title: "",
@@ -354,8 +220,19 @@ function ProjectsPage() {
         min_price: 4500000,
         max_price: 13500000,
         location_district: "",
+        beds: "",
+        listing_status: "",
       });
-      toast.success("Project created successfully");
+      setDmciQuery("");
+      setDmciOpen(false);
+
+      if (res && "propWarning" in res && res.propWarning) {
+        // Project created but catalog sync failed — surface it visibly
+        toast.warning(`Project created, but Property Catalog entry failed: ${res.propWarning}`);
+      } else {
+        toast.success("Project created ✓ — also added to Property Catalog (hidden)");
+      }
+
       // Open editor for new project
       if (res && "id" in res) {
         const matching = projects?.find((p: any) => p.id === res.id);
@@ -928,6 +805,99 @@ function ProjectsPage() {
               className="portal-detail-body"
               style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
             >
+              {/* DMCI catalog quick-add */}
+              <div
+                className="portal-field"
+                style={{
+                  background: "rgba(80,140,255,0.06)",
+                  padding: "0.75rem",
+                  borderRadius: "8px",
+                  border: "1px solid rgba(80,140,255,0.18)",
+                  position: "relative",
+                }}
+              >
+                <label
+                  className="portal-field-label"
+                  style={{ color: "var(--portal-accent)", fontWeight: "bold" }}
+                >
+                  ⚡ Quick-add a DMCI project
+                </label>
+                <input
+                  type="text"
+                  placeholder={`Search ${DMCI_CATALOG.length} DMCI projects by name or city…`}
+                  value={dmciQuery}
+                  onChange={(e) => {
+                    setDmciQuery(e.target.value);
+                    setDmciOpen(true);
+                  }}
+                  onFocus={() => setDmciOpen(true)}
+                  className="portal-input"
+                />
+                {dmciOpen && filteredCatalog.length > 0 && (
+                  <div
+                    onMouseDown={(e) => e.preventDefault()}
+                    style={{
+                      position: "absolute",
+                      zIndex: 20,
+                      left: "0.75rem",
+                      right: "0.75rem",
+                      top: "100%",
+                      marginTop: "2px",
+                      maxHeight: "240px",
+                      overflowY: "auto",
+                      background: "var(--portal-surface, #1a1a1a)",
+                      border: "1px solid rgba(255,255,255,0.12)",
+                      borderRadius: "8px",
+                      boxShadow: "0 12px 32px rgba(0,0,0,0.5)",
+                    }}
+                  >
+                    {filteredCatalog.slice(0, 60).map((e) => (
+                      <button
+                        key={e.slug}
+                        type="button"
+                        onClick={() => applyDmciEntry(e)}
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          gap: "0.75rem",
+                          width: "100%",
+                          textAlign: "left",
+                          padding: "0.5rem 0.75rem",
+                          background: "transparent",
+                          border: "none",
+                          borderBottom: "1px solid rgba(255,255,255,0.05)",
+                          color: "var(--portal-text, #eee)",
+                          cursor: "pointer",
+                          fontSize: "13px",
+                        }}
+                      >
+                        <span style={{ fontWeight: 600 }}>{e.name}</span>
+                        <span
+                          style={{
+                            color: "var(--zinc-500)",
+                            fontSize: "11px",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {e.location} · {e.status}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <span
+                  style={{
+                    fontSize: "11px",
+                    color: "var(--zinc-500)",
+                    marginTop: "0.25rem",
+                    display: "block",
+                  }}
+                >
+                  Pick a project to auto-fill everything below. A standard DMCI page (14 sections +
+                  unit types) is scaffolded with placeholder content you can edit, then publish.
+                </span>
+              </div>
+
               {unlinkedProperties.length > 0 && (
                 <div
                   className="portal-field"
@@ -960,6 +930,8 @@ function ProjectsPage() {
                             min_price: Math.round(p.price_min * 1000000),
                             max_price: Math.round(p.price_min * 1000000 * 1.5),
                             location_district: p.location,
+                            beds: p.beds || "",
+                            listing_status: p.status || "",
                           });
                         }
                       }}
@@ -1101,7 +1073,25 @@ function ProjectsPage() {
 
               <div className="portal-detail-footer" style={{ marginTop: "1rem" }}>
                 <button
-                  onClick={() => createMutation.mutate({ data: newProj })}
+                  onClick={() => {
+                    const { beds, listing_status, ...projectFields } = newProj;
+                    const scaffold = buildDmciDraftScaffold({
+                      title: newProj.title,
+                      location: newProj.city,
+                      minPrice: newProj.min_price,
+                      maxPrice: newProj.max_price,
+                      status: listing_status,
+                      beds,
+                    });
+                    createMutation.mutate({
+                      data: {
+                        ...projectFields,
+                        listing_status,
+                        layout_flow: scaffold.layout_flow,
+                        units: scaffold.units,
+                      },
+                    });
+                  }}
                   disabled={
                     createMutation.isPending || !newProj.title || !newProj.slug || !newProj.city
                   }
@@ -1143,7 +1133,7 @@ const SECTION_TYPES = [
   { key: "related", name: "Related Projects Feed" },
 ];
 
-function ProjectEditor({ projectId, slug, projectTitle, onBack }: EditorProps) {
+export function ProjectEditor({ projectId, slug, projectTitle, onBack }: EditorProps) {
   const [activeTab, setActiveTab] = useState<TabType>("general");
   const [draft, setDraft] = useState<any>(null);
   const [dirty, setDirty] = useState(false);
@@ -1153,6 +1143,29 @@ function ProjectEditor({ projectId, slug, projectTitle, onBack }: EditorProps) {
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [publishSuccess, setPublishSuccess] = useState(false);
   const [previewKey, setPreviewKey] = useState(0);
+
+  useEffect(() => {
+    const originalTitle = document.title;
+    const titleText = draft?.project_meta?.title || projectTitle;
+    document.title = `Editing: ${titleText} | CityQlo Admin`;
+    return () => {
+      document.title = originalTitle;
+    };
+  }, [draft?.project_meta?.title, projectTitle]);
+
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (dirty) {
+        e.preventDefault();
+        e.returnValue = "You have unsaved changes. Are you sure you want to leave?";
+        return e.returnValue;
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [dirty]);
 
   // Fetch current active draft payload
   const {
@@ -1391,11 +1404,65 @@ function ProjectEditor({ projectId, slug, projectTitle, onBack }: EditorProps) {
 
   return (
     <div className="portal-page">
+      {/* Breadcrumbs */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "0.4rem",
+          fontSize: "11px",
+          fontFamily: "var(--font-mono, monospace)",
+          color: "var(--portal-text-muted, #777)",
+          marginBottom: "0.75rem",
+          paddingLeft: "0.25rem",
+        }}
+      >
+        <span>Portal</span>
+        <span>/</span>
+        <button
+          onClick={onBack}
+          style={{
+            background: "none",
+            border: "none",
+            color: "inherit",
+            cursor: "pointer",
+            padding: 0,
+            font: "inherit",
+            textDecoration: "underline",
+          }}
+        >
+          Project Pages
+        </button>
+        <span>/</span>
+        <span style={{ color: "var(--portal-text, #eee)" }}>
+          {draft?.project_meta?.title || projectTitle}
+        </span>
+        <span>/</span>
+        <span style={{ color: "var(--portal-accent, #3B82F6)", fontWeight: 600 }}>
+          {activeTab === "general" && "General Info"}
+          {activeTab === "gallery" && "Media Gallery"}
+          {activeTab === "pricing" && "Pricing & Units"}
+          {activeTab === "buildings" && "Buildings"}
+          {activeTab === "sections" && "Page Layout Canvas"}
+          {activeTab === "publish" && "Publish Settings"}
+        </span>
+      </div>
+
       {/* Editor Header */}
       <div className="portal-page-header">
         <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-          <button onClick={onBack} className="portal-btn-secondary" style={{ padding: "0.5rem" }}>
-            <ArrowLeft size={16} />
+          <button
+            onClick={onBack}
+            className="portal-btn-secondary"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "0.4rem",
+              padding: "0.5rem 0.75rem",
+            }}
+          >
+            <ArrowLeft size={14} />
+            <span>Back</span>
           </button>
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
@@ -1890,12 +1957,101 @@ function ProjectEditor({ projectId, slug, projectTitle, onBack }: EditorProps) {
               </div>
 
               <div className="portal-field">
-                <label className="portal-field-label">Turnover Target Date</label>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginBottom: "0.25rem",
+                  }}
+                >
+                  <label className="portal-field-label" style={{ margin: 0 }}>
+                    Turnover Target Date
+                  </label>
+                  <span style={{ fontSize: "10px", color: "var(--zinc-500)" }}>
+                    Supports YYYY-MM-DD or custom text
+                  </span>
+                </div>
+                <div style={{ display: "flex", gap: "0.25rem" }}>
+                  <input
+                    type={
+                      /^\d{4}-\d{2}-\d{2}$/.test(draft.project_meta.turnover || "")
+                        ? "date"
+                        : "text"
+                    }
+                    placeholder="Select date or type custom range (e.g. 2027-2028)"
+                    value={draft.project_meta.turnover || ""}
+                    onChange={(e) => updateMeta("turnover", e.target.value)}
+                    className="portal-input"
+                    style={{ flex: 1 }}
+                  />
+                  <button
+                    type="button"
+                    className="portal-btn-secondary"
+                    style={{
+                      fontSize: "11px",
+                      padding: "0 0.75rem",
+                      minHeight: "36px",
+                      whiteSpace: "nowrap",
+                    }}
+                    onClick={() => {
+                      const cur = draft.project_meta.turnover || "";
+                      const todayStr = new Date().toISOString().split("T")[0];
+                      if (/^\d{4}-\d{2}-\d{2}$/.test(cur)) {
+                        updateMeta("turnover", ""); // Switch to custom text input
+                      } else {
+                        updateMeta("turnover", todayStr); // Switch to date picker calendar
+                      }
+                    }}
+                  >
+                    {/^\d{4}-\d{2}-\d{2}$/.test(draft.project_meta.turnover || "")
+                      ? "Manual Text"
+                      : "Date Calendar"}
+                  </button>
+                </div>
+              </div>
+
+              <div className="portal-grid-3col border-t border-[var(--portal-border)] pt-4 mt-4">
+                <div className="portal-field">
+                  <label className="portal-field-label">Beds Count (Filter)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={draft.project_meta.beds ?? 1}
+                    onChange={(e) => updateMeta("beds", parseInt(e.target.value) || 0)}
+                    className="portal-input"
+                  />
+                </div>
+                <div className="portal-field">
+                  <label className="portal-field-label">Baths Count (Filter)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.5"
+                    value={draft.project_meta.baths ?? 1}
+                    onChange={(e) => updateMeta("baths", parseFloat(e.target.value) || 0)}
+                    className="portal-input"
+                  />
+                </div>
+                <div className="portal-field">
+                  <label className="portal-field-label">Livable Area Size (e.g. 58.5 sq.m.)</label>
+                  <input
+                    type="text"
+                    placeholder="e.g., 58.5 sq.m."
+                    value={draft.project_meta.area || ""}
+                    onChange={(e) => updateMeta("area", e.target.value)}
+                    className="portal-input"
+                  />
+                </div>
+              </div>
+
+              <div className="portal-field">
+                <label className="portal-field-label">Promo Tag / Ribbon Badge</label>
                 <input
                   type="text"
-                  placeholder="e.g., 2027-2028"
-                  value={draft.project_meta.turnover || ""}
-                  onChange={(e) => updateMeta("turnover", e.target.value)}
+                  placeholder="e.g., Featured Development, Limited Promo Offers..."
+                  value={draft.project_meta.promo_badge || ""}
+                  onChange={(e) => updateMeta("promo_badge", e.target.value)}
                   className="portal-input"
                 />
               </div>
@@ -1945,9 +2101,19 @@ function ProjectEditor({ projectId, slug, projectTitle, onBack }: EditorProps) {
                 <div className="portal-card-title">Gallery &amp; Images</div>
               </div>
               <p className="text-[11px] text-zinc-400 mt-1 mb-4 leading-relaxed">
-                Manage the hero carousel here, and review every image used across this project in
-                one place.
+                Manage the listing cover and hero carousel images.
               </p>
+
+              {/* Property Catalog Cover Image */}
+              <MediaPicker
+                label="Listing Card Cover Image (Ratio 4:3)"
+                aspectRatioLabel="Ratio 4:3"
+                value={draft.project_meta.image_url || ""}
+                onChange={(val) => updateMeta("image_url", val)}
+                description="The primary cover image shown on the search catalog card (Facades or exterior views recommended)."
+              />
+
+              <div className="border-t border-[var(--portal-border)] pt-4 mt-4" />
 
               {/* Hero carousel images */}
               {(() => {
@@ -1979,85 +2145,14 @@ function ProjectEditor({ projectId, slug, projectTitle, onBack }: EditorProps) {
                   );
                 }
                 return (
-                  <div className="portal-field">
-                    <label className="portal-field-label">Hero Carousel Images</label>
-                    <textarea
-                      rows={4}
-                      className="portal-input"
-                      style={{ resize: "vertical", fontFamily: "monospace", fontSize: "12px" }}
-                      placeholder={`Paste one Cloudinary URL per line:\nhttps://res.cloudinary.com/.../banner1.jpg`}
-                      value={heroImages.join("\n")}
-                      onChange={(e) => {
-                        const urls = e.target.value
-                          .split(/[,\n]/)
-                          .map((s) => s.trim())
-                          .filter(Boolean);
-                        updateSectionField("hero", "hero_images", urls);
-                      }}
-                    />
-                    <p
-                      style={{
-                        fontSize: "11px",
-                        color: "var(--zinc-400)",
-                        marginTop: "0.25rem",
-                        marginBottom: 0,
-                      }}
-                    >
-                      💡 One image URL per line. Shown in the hero banner slideshow (16:9 landscape
-                      recommended).
-                    </p>
-                    {heroImages.length > 0 && (
-                      <div
-                        style={{
-                          display: "flex",
-                          gap: "0.5rem",
-                          flexWrap: "wrap",
-                          marginTop: "0.75rem",
-                        }}
-                      >
-                        {heroImages.map((url, index) => (
-                          <div
-                            key={index}
-                            style={{
-                              position: "relative",
-                              width: "96px",
-                              height: "60px",
-                              borderRadius: "6px",
-                              overflow: "hidden",
-                              border: "1px solid rgba(255,255,255,0.1)",
-                              background: "rgba(0,0,0,0.2)",
-                            }}
-                          >
-                            <img
-                              src={url}
-                              alt={`Slide ${index + 1}`}
-                              style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                              onError={(e) => {
-                                (e.currentTarget as HTMLImageElement).style.outline =
-                                  "2px solid #f87171";
-                                (e.currentTarget as HTMLImageElement).style.outlineOffset = "-2px";
-                              }}
-                            />
-                            <span
-                              style={{
-                                position: "absolute",
-                                bottom: "3px",
-                                right: "4px",
-                                fontSize: "9px",
-                                fontWeight: 700,
-                                color: "white",
-                                background: "rgba(0,0,0,0.6)",
-                                padding: "1px 4px",
-                                borderRadius: "3px",
-                              }}
-                            >
-                              {index + 1}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                  <MediaPicker
+                    multiple
+                    label="Hero Carousel Images"
+                    aspectRatioLabel="Ratio 16:9"
+                    values={heroImages}
+                    onMultipleChange={(urls) => updateSectionField("hero", "hero_images", urls)}
+                    description="Draggable thumbnails. Shown in the hero banner slideshow (16:9 landscape recommended)."
+                  />
                 );
               })()}
 
@@ -2263,8 +2358,104 @@ function ProjectEditor({ projectId, slug, projectTitle, onBack }: EditorProps) {
           {activeTab === "publish" && (
             <div className="portal-card portal-settings-fields">
               <div className="portal-card-header">
-                <div className="portal-card-title">Publish</div>
+                <div className="portal-card-title">Showcase &amp; Visibility</div>
               </div>
+
+              {/* Visibility checkboxes */}
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "0.75rem",
+                  marginBottom: "1.5rem",
+                  padding: "1rem",
+                  background: "rgba(255,255,255,0.02)",
+                  border: "1px solid rgba(255,255,255,0.05)",
+                  borderRadius: "8px",
+                }}
+              >
+                <label
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.6rem",
+                    cursor: "pointer",
+                    fontSize: "13px",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={Boolean(draft.project_meta.is_active)}
+                    onChange={(e) => updateMeta("is_active", e.target.checked)}
+                  />
+                  <span>
+                    <strong>Active Visibility</strong> (visible publicly to visitors on the website
+                    search grid)
+                  </span>
+                </label>
+
+                <label
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.6rem",
+                    cursor: "pointer",
+                    fontSize: "13px",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={Boolean(draft.project_meta.is_featured)}
+                    onChange={(e) => updateMeta("is_featured", e.target.checked)}
+                  />
+                  <span>
+                    <strong>Featured Listing</strong> (display inside the primary homepage showcase
+                    rows)
+                  </span>
+                </label>
+
+                <label
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.6rem",
+                    cursor: "pointer",
+                    fontSize: "13px",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={Boolean(draft.project_meta.is_spotlight)}
+                    onChange={(e) => updateMeta("is_spotlight", e.target.checked)}
+                  />
+                  <span style={{ color: "oklch(0.78 0.18 75)", fontWeight: 700 }}>
+                    ★ Spotlight Selection (premium banner on homepage showcase slider)
+                  </span>
+                </label>
+
+                <div className="portal-grid-2col border-t border-[var(--portal-border)] pt-3 mt-2">
+                  <div className="portal-field">
+                    <label className="portal-field-label">Display Priority Order</label>
+                    <input
+                      type="number"
+                      value={draft.project_meta.display_order || 0}
+                      onChange={(e) => updateMeta("display_order", parseInt(e.target.value) || 0)}
+                      className="portal-input"
+                    />
+                  </div>
+                  <div className="portal-field">
+                    <label className="portal-field-label">Featured Rank (Home Sorting)</label>
+                    <input
+                      type="number"
+                      value={draft.project_meta.featured_rank || 0}
+                      onChange={(e) => updateMeta("featured_rank", parseInt(e.target.value) || 0)}
+                      className="portal-input"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="border-t border-[var(--portal-border)] pt-4 mt-4" />
 
               {/* Status row */}
               <div
@@ -2759,8 +2950,7 @@ function ProjectEditor({ projectId, slug, projectTitle, onBack }: EditorProps) {
                           />
                         </div>
                         <div className="portal-field">
-                          <label className="portal-field-label">Building Image URL</label>
-                          <CloudinaryImageField
+                          <MediaPicker
                             label="Building Cover Photo"
                             aspectRatioLabel="Ratio 4:3"
                             value={bld.image_url || ""}
@@ -2934,8 +3124,7 @@ function ProjectEditor({ projectId, slug, projectTitle, onBack }: EditorProps) {
                           />
                         </div>
                         <div className="portal-field">
-                          <label className="portal-field-label">Unit Image URL</label>
-                          <CloudinaryImageField
+                          <MediaPicker
                             label="Unit Interior Photo"
                             aspectRatioLabel="Ratio 4:3"
                             value={unit.image_url || ""}
@@ -3135,7 +3324,7 @@ function SectionEditorBlock({ section, onChange }: SectionBlockProps) {
               />
             </div>
           </div>
-          <CloudinaryImageField
+          <MediaPicker
             label="Property Logo Image"
             aspectRatioLabel="Any ratio"
             value={getVal("logo_url") || ""}
@@ -3143,109 +3332,14 @@ function SectionEditorBlock({ section, onChange }: SectionBlockProps) {
             description="Logo image displayed in the hero section header. Use a transparent PNG on Cloudinary for best results."
             optional
           />
-          <div className="portal-field">
-            <label
-              className="portal-field-label"
-              style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
-            >
-              <span>Hero Carousel Images</span>
-              <span
-                style={{
-                  fontSize: "10px",
-                  padding: "2px 6px",
-                  borderRadius: "4px",
-                  background: "rgba(255,255,255,0.05)",
-                  border: "1px solid rgba(255,255,255,0.1)",
-                  color: "var(--zinc-400)",
-                  fontFamily: "monospace",
-                }}
-              >
-                Ratio 16:9
-              </span>
-            </label>
-            <textarea
-              rows={3}
-              className="portal-input"
-              style={{ resize: "vertical", fontFamily: "monospace", fontSize: "12px" }}
-              placeholder={`Paste one Cloudinary URL per line, or separate with commas:\nhttps://res.cloudinary.com/.../banner1.jpg\nhttps://res.cloudinary.com/.../banner2.jpg`}
-              value={getVal("hero_images", []).join("\n")}
-              onChange={(e) => {
-                const urls = e.target.value
-                  .split(/[,\n]/)
-                  .map((s) => s.trim())
-                  .filter(Boolean);
-                handleFieldChange("hero_images", urls);
-              }}
-            />
-            <p
-              style={{
-                fontSize: "11px",
-                color: "var(--zinc-400)",
-                marginTop: "0.25rem",
-                marginBottom: 0,
-              }}
-            >
-              💡 Paste one Cloudinary image URL per line. These are the photos shown in the homepage
-              hero banner slideshow. Recommended: 16:9 wide landscape photos.
-            </p>
-            {getVal("hero_images", []).length > 0 && (
-              <div style={{ marginTop: "0.75rem" }}>
-                <span
-                  style={{
-                    fontSize: "10px",
-                    color: "var(--zinc-400)",
-                    display: "block",
-                    marginBottom: "0.5rem",
-                    fontWeight: 600,
-                  }}
-                >
-                  Hero Images Preview ({getVal("hero_images", []).length} image
-                  {getVal("hero_images", []).length !== 1 ? "s" : ""}):
-                </span>
-                <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
-                  {getVal("hero_images", []).map((url: string, index: number) => (
-                    <div
-                      key={index}
-                      style={{
-                        position: "relative",
-                        width: "96px",
-                        height: "60px",
-                        borderRadius: "6px",
-                        overflow: "hidden",
-                        border: "1px solid rgba(255,255,255,0.1)",
-                        background: "rgba(0,0,0,0.2)",
-                      }}
-                    >
-                      <img
-                        src={url}
-                        alt={`Slide ${index + 1}`}
-                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).style.outline = "2px solid #f87171";
-                          (e.target as HTMLImageElement).style.outlineOffset = "-2px";
-                        }}
-                      />
-                      <span
-                        style={{
-                          position: "absolute",
-                          bottom: "3px",
-                          right: "4px",
-                          fontSize: "9px",
-                          fontWeight: 700,
-                          color: "white",
-                          background: "rgba(0,0,0,0.6)",
-                          padding: "1px 4px",
-                          borderRadius: "3px",
-                        }}
-                      >
-                        {index + 1}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
+          <MediaPicker
+            multiple
+            label="Hero Carousel Images"
+            aspectRatioLabel="Ratio 16:9"
+            values={getVal("hero_images", [])}
+            onMultipleChange={(urls) => handleFieldChange("hero_images", urls)}
+            description="Recommended: 16:9 wide landscape photos."
+          />
         </div>
       )}
 
@@ -3743,12 +3837,12 @@ function SectionEditorBlock({ section, onChange }: SectionBlockProps) {
             </div>
           </div>
 
-          <CloudinaryImageField
+          <MediaPicker
             label="Map Graphic Image"
             aspectRatioLabel="Ratio 16:9"
             value={getVal("map_image_url") || ""}
             onChange={(val) => handleFieldChange("map_image_url", val)}
-            description="A visual map or aerial photo of the project location. Upload to Cloudinary and paste the URL here."
+            description="A visual map or aerial photo of the project location."
             optional
           />
 
@@ -4073,19 +4167,16 @@ function SectionEditorBlock({ section, onChange }: SectionBlockProps) {
                       </div>
                     </div>
                     <div className="portal-field">
-                      <label className="portal-field-label text-[10px]">
-                        Image link (paste your Cloudinary URL here)
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="https://res.cloudinary.com/.../your-photo.jpg"
+                      <MediaPicker
+                        label="Gallery Image"
+                        aspectRatioLabel="Ratio 4:3"
                         value={ph.src || ""}
-                        onChange={(e) => {
+                        onChange={(val) => {
                           const next = [...payload.photos];
-                          next[i] = { ...next[i], src: e.target.value, thumb: e.target.value };
+                          next[i] = { ...next[i], src: val, thumb: val };
                           handleFieldChange("photos", next);
                         }}
-                        className="portal-input font-mono text-[11px]"
+                        description="Select the image for this gallery item."
                       />
                     </div>
                   </div>
@@ -4201,19 +4292,17 @@ function SectionEditorBlock({ section, onChange }: SectionBlockProps) {
                       </div>
                     </div>
                     <div className="portal-field">
-                      <label className="portal-field-label text-[10px]">
-                        Thumbnail image link (Cloudinary URL)
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="https://res.cloudinary.com/.../thumbnail.jpg"
+                      <MediaPicker
+                        label="Thumbnail Image"
+                        aspectRatioLabel="Ratio 16:9"
                         value={vd.thumb || ""}
-                        onChange={(e) => {
+                        onChange={(val) => {
                           const next = [...payload.videos];
-                          next[i] = { ...next[i], thumb: e.target.value };
+                          next[i] = { ...next[i], thumb: val };
                           handleFieldChange("videos", next);
                         }}
-                        className="portal-input font-mono text-[11px]"
+                        description="Cover photo shown before the video starts playing."
+                        optional
                       />
                     </div>
                     <div className="portal-field">
@@ -4605,8 +4694,7 @@ function validateDraft(draft: any): string[] {
     issues.push("A Hero section is required.");
   } else {
     if (!hero.payload?.tagline?.trim()) issues.push("Hero tagline is required.");
-    if (!(hero.payload?.hero_images?.length > 0))
-      issues.push("Hero needs at least one carousel image.");
+    // Hero carousel images are optional — you can publish without them and add images later.
   }
 
   if ((draft.units || []).length === 0)

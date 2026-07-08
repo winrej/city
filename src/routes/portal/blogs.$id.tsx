@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { getAdminBlogById, createBlog, updateBlog } from "../../lib/api/admin.functions";
 import { toast } from "sonner";
+import { MediaPicker } from "../../components/MediaPicker";
 
 export const Route = createFileRoute("/portal/blogs/$id")({
   component: BlogEditor,
@@ -142,6 +143,61 @@ function BlogEditor() {
   const [slugLocked, setSlugLocked] = useState(!isNew);
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
 
+  const [isDirty, setIsDirty] = useState(false);
+  const [autoSaveStatus, setAutoSaveStatus] = useState<"idle" | "saving" | "saved" | "error">(
+    "idle",
+  );
+
+  // Page close unsaved warning
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isDirty) {
+        e.preventDefault();
+        e.returnValue = "You have unsaved changes. Are you sure you want to leave?";
+        return e.returnValue;
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [isDirty]);
+
+  // Auto-calculate read time: ~200 words per minute
+  useEffect(() => {
+    const text = form.content || "";
+    const words = text.trim().split(/\s+/).filter(Boolean).length;
+    const calcReadTime = Math.max(1, Math.ceil(words / 200));
+    if (calcReadTime !== form.read_time) {
+      setForm((f) => ({ ...f, read_time: calcReadTime }));
+    }
+  }, [form.content]);
+
+  // Debounced auto-save
+  useEffect(() => {
+    if (!isDirty || isNew) return;
+    if (!form.title.trim() || !form.slug.trim()) return;
+
+    setAutoSaveStatus("saving");
+    const timer = setTimeout(() => {
+      const payload = { ...form };
+      updateBlog({ data: { id, ...payload } as any })
+        .then(() => {
+          qc.invalidateQueries({ queryKey: ["admin-blogs"] });
+          qc.invalidateQueries({ queryKey: ["admin-blog", id] });
+          setIsDirty(false);
+          setAutoSaveStatus("saved");
+          setTimeout(() => setAutoSaveStatus("idle"), 2000);
+        })
+        .catch((err) => {
+          setAutoSaveStatus("error");
+          console.error("Auto-save failed:", err);
+        });
+    }, 4000);
+
+    return () => clearTimeout(timer);
+  }, [form, isDirty, isNew, id]);
+
   // Load existing post
   const { data: blogData, isLoading } = useQuery({
     queryKey: ["admin-blog", id],
@@ -162,6 +218,7 @@ function BlogEditor() {
         tags: blogData.tags ?? [],
         read_time: blogData.read_time ?? 5,
       });
+      setIsDirty(false);
     }
   }, [blogData]);
 
@@ -175,6 +232,7 @@ function BlogEditor() {
   const set = useCallback(<K extends keyof FormState>(key: K, value: FormState[K]) => {
     setForm((f) => ({ ...f, [key]: value }));
     setErrors((e) => ({ ...e, [key]: undefined }));
+    setIsDirty(true);
   }, []);
 
   const validate = (): boolean => {
@@ -203,6 +261,7 @@ function BlogEditor() {
     onSuccess: (data: any) => {
       qc.invalidateQueries({ queryKey: ["admin-blogs"] });
       qc.invalidateQueries({ queryKey: ["admin-blog", id] });
+      setIsDirty(false);
       toast.success(isNew ? "Article created!" : "Article saved.");
       if (isNew && data?.id) {
         navigate({ to: "/portal/blogs/$id", params: { id: data.id } });
@@ -305,6 +364,26 @@ function BlogEditor() {
           >
             {form.status}
           </span>
+
+          {autoSaveStatus !== "idle" && (
+            <span
+              style={{
+                fontSize: "11px",
+                fontFamily: "var(--font-mono, monospace)",
+                color:
+                  autoSaveStatus === "saving"
+                    ? "var(--portal-accent)"
+                    : autoSaveStatus === "saved"
+                      ? "oklch(0.65 0.18 145)"
+                      : "oklch(0.65 0.2 25)",
+                marginRight: "0.5rem",
+              }}
+            >
+              {autoSaveStatus === "saving" && "Auto-saving..."}
+              {autoSaveStatus === "saved" && "Auto-saved"}
+              {autoSaveStatus === "error" && "Auto-save failed"}
+            </span>
+          )}
 
           {/* Toggle preview */}
           <button
@@ -664,54 +743,13 @@ function BlogEditor() {
 
           {/* Cover image */}
           <div className="portal-card" style={{ padding: "1.25rem" }}>
-            <label
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "6px",
-                fontSize: "0.7rem",
-                fontWeight: 700,
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
-                color: "var(--portal-text-muted)",
-                marginBottom: "0.5rem",
-              }}
-            >
-              <ImageIcon size={12} /> Cover Image URL
-            </label>
-            <input
-              id="blog-cover-image-input"
-              type="url"
+            <MediaPicker
+              label="Cover Image"
+              aspectRatioLabel="Ratio 16:9"
               value={form.cover_image_url}
-              onChange={(e) => set("cover_image_url", e.target.value)}
-              placeholder="https://…"
-              style={{
-                width: "100%",
-                background: "var(--portal-bg)",
-                border: `1px solid ${errors.cover_image_url ? "oklch(0.6 0.18 25)" : "var(--portal-border)"}`,
-                borderRadius: "6px",
-                padding: "0.4rem 0.6rem",
-                fontSize: "0.8rem",
-                color: "var(--portal-text)",
-                outline: "none",
-              }}
+              onChange={(val) => set("cover_image_url", val)}
+              description="Featured cover photo shown on blog indexes."
             />
-            {form.cover_image_url && !errors.cover_image_url && (
-              <img
-                src={form.cover_image_url}
-                alt="cover preview"
-                style={{
-                  marginTop: "0.75rem",
-                  width: "100%",
-                  aspectRatio: "4/3",
-                  objectFit: "cover",
-                  borderRadius: "8px",
-                }}
-                onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).style.display = "none";
-                }}
-              />
-            )}
             {errors.cover_image_url && (
               <p
                 style={{

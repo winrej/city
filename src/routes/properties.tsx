@@ -15,6 +15,8 @@ import {
   ChevronLeft,
   Eye,
   FileText,
+  Check,
+  Trash2,
 } from "lucide-react";
 import { Reveal } from "@/components/site/Reveal";
 import { BreadcrumbJsonLd } from "@/components/site/BreadcrumbJsonLd";
@@ -116,11 +118,13 @@ function PropertyCard({
   property,
   onShare,
   onCompare,
+  isCompared,
   idx,
 }: {
   property: Property;
   onShare: (property: Property) => void;
   onCompare: (property: Property) => void;
+  isCompared: boolean;
   idx: number;
 }) {
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -256,9 +260,17 @@ function PropertyCard({
           <div className="flex gap-4">
             <button
               onClick={() => onCompare(property)}
-              className="text-muted-foreground hover:text-ink transition-colors cursor-pointer"
+              className={`transition-colors cursor-pointer flex items-center gap-1.5 ${
+                isCompared ? "text-[#3B82F6] font-bold" : "text-muted-foreground hover:text-ink"
+              }`}
             >
-              Compare
+              {isCompared ? (
+                <>
+                  <Check className="h-3.5 w-3.5 stroke-[3px]" /> Compared
+                </>
+              ) : (
+                "Compare"
+              )}
             </button>
             <button
               onClick={() => onShare(property)}
@@ -330,6 +342,8 @@ function Properties() {
   const [selectedPriceRange, setSelectedPriceRange] = useState<string | null>(null);
 
   const [activeShareProperty, setActiveShareProperty] = useState<Property | null>(null);
+  const [compareProperties, setCompareProperties] = useState<Property[]>([]);
+  const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
 
   // Scroll and mobile states
@@ -359,6 +373,112 @@ function Properties() {
     activeFilterLabels.length > 0 ? activeFilterLabels.join(" · ") : "Filters";
 
   const activeFiltersCount = activeFilterLabels.length;
+
+  const rows = useMemo(() => {
+    return [
+      {
+        label: "Developer",
+        value: (prop: Property) =>
+          /dmci/i.test(prop.developer ?? "") ? (
+            <img
+              src="/dmci-homes-seeklogo.png"
+              alt="DMCI Homes"
+              className="h-4 object-contain opacity-70 mx-auto"
+            />
+          ) : (
+            <span className="font-mono text-[10px] tracking-wider uppercase text-[#3B82F6] font-bold">
+              {prop.developer}
+            </span>
+          ),
+      },
+      {
+        label: "Pricing",
+        value: (prop: Property) => (
+          <div>
+            <p className="font-bold text-ink text-[13.5px]">{prop.price_display}</p>
+            {prop.price_max_display && (
+              <p className="text-[10px] text-muted-foreground mt-0.5">
+                Up to {prop.price_max_display}
+              </p>
+            )}
+          </div>
+        ),
+      },
+      {
+        label: "District / City",
+        value: (prop: Property) => (
+          <div>
+            <p className="font-semibold text-ink text-[12.5px]">{prop.location}</p>
+            <p className="text-[10.5px] text-muted-foreground mt-0.5">{prop.city}</p>
+          </div>
+        ),
+      },
+      {
+        label: "Status",
+        value: (prop: Property) => (
+          <span
+            className={`inline-block px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${
+              /ready|rfo/i.test(prop.status ?? "")
+                ? "bg-green-500/10 text-green-600 border border-green-500/20"
+                : "bg-blue-500/10 text-[#3B82F6] border border-[#3B82F6]/20"
+            }`}
+          >
+            {prop.status}
+          </span>
+        ),
+      },
+      {
+        label: "Units Available",
+        value: (prop: Property) => {
+          const units =
+            Array.isArray(prop.unit_types) && prop.unit_types.length > 0
+              ? prop.unit_types
+              : prop.beds >= 1
+                ? Array.from({ length: prop.beds }, (_, i) => `${i + 1}BR`)
+                : ["Studio"];
+          return (
+            <div className="flex flex-wrap gap-1 justify-center max-w-[150px] mx-auto">
+              {units.map((unit) => (
+                <span
+                  key={unit}
+                  className="px-1.5 py-0.5 rounded bg-[#3B82F6]/5 text-[#3B82F6] text-[9.5px] font-bold border border-[#3B82F6]/10"
+                >
+                  {unit}
+                </span>
+              ))}
+            </div>
+          );
+        },
+      },
+      {
+        label: "Configurations",
+        value: (prop: Property) => (
+          <p className="font-mono text-[10.5px] text-ink font-semibold">
+            {prop.beds} BR · {prop.baths} BA · {prop.area}
+          </p>
+        ),
+      },
+      {
+        label: "Highlights",
+        value: (prop: Property) => {
+          const highlights: string[] = Array.isArray(prop.highlights) ? prop.highlights : [];
+          return (
+            <ul className="text-left text-[11px] space-y-1 max-w-[180px] mx-auto">
+              {highlights.slice(0, 3).map((h, i) => (
+                <li
+                  key={i}
+                  className="flex items-start gap-1.5 text-muted-foreground leading-normal"
+                >
+                  <span className="h-1 w-1 rounded-full bg-[#3B82F6] mt-2 shrink-0" />
+                  <span className="line-clamp-2">{h}</span>
+                </li>
+              ))}
+            </ul>
+          );
+        },
+      },
+    ];
+  }, []);
 
   const residencesRef = useRef<HTMLDivElement | null>(null);
   const { focus } = Route.useSearch();
@@ -490,9 +610,22 @@ function Properties() {
     }
   };
 
-  // Placeholder — comparison feature not wired up yet
   const handleCompare = (property: Property) => {
-    toast.info(`Compare coming soon — ${property.name}`);
+    setCompareProperties((prev) => {
+      const exists = prev.some((p) => p.id === property.id);
+      if (exists) {
+        toast.success(`Removed ${property.name} from comparison`);
+        return prev.filter((p) => p.id !== property.id);
+      }
+      if (prev.length >= 3) {
+        toast.warning("Limit reached", {
+          description: "You can compare up to 3 properties at a time.",
+        });
+        return prev;
+      }
+      toast.success(`Added ${property.name} to comparison`);
+      return [...prev, property];
+    });
   };
 
   const handleDownloadGuide = () => {
@@ -980,6 +1113,7 @@ function Properties() {
                   property={property}
                   onShare={handleShare}
                   onCompare={handleCompare}
+                  isCompared={compareProperties.some((p) => p.id === property.id)}
                   idx={idx}
                 />
               ))}
@@ -1311,6 +1445,207 @@ function Properties() {
                 >
                   Copy link
                 </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* FLOATING COMPARE BAR */}
+      {compareProperties.length > 0 && (
+        <div
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-2xl bg-white/95 border border-border/40 backdrop-blur-md rounded-2xl md:rounded-full py-3.5 px-4 md:px-6 shadow-lift z-40 flex flex-col sm:flex-row items-center justify-between gap-4 transition-all duration-300 animate-in fade-in slide-in-from-bottom-5"
+          style={{
+            boxShadow: "0 20px 50px -12px rgba(10, 12, 20, 0.12), 0 0 0 1px rgba(10, 12, 20, 0.04)",
+          }}
+        >
+          <div className="flex items-center gap-3">
+            <div className="bg-[#3B82F6]/10 text-[#3B82F6] px-2.5 py-1 rounded-full text-[10px] font-bold font-mono uppercase tracking-widest shrink-0">
+              {compareProperties.length} / 3 Selected
+            </div>
+
+            {/* Tiny Thumbnails */}
+            <div className="flex items-center -space-x-2.5 overflow-hidden">
+              {compareProperties.map((prop, idx) => (
+                <div
+                  key={prop.id}
+                  className="relative h-9 w-9 md:h-10 md:w-10 rounded-full border-2 border-white overflow-hidden bg-surface shadow-sm group cursor-pointer shrink-0"
+                  onClick={() => handleCompare(prop)}
+                  title={`Remove ${prop.name}`}
+                >
+                  <img
+                    src={resolvePropertyImage(prop, idx)}
+                    alt={prop.name}
+                    className="h-full w-full object-cover group-hover:scale-110 transition-transform"
+                  />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                    <X size={10} className="text-white" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
+            <button
+              onClick={() => {
+                setCompareProperties([]);
+                toast.success("Comparison cleared");
+              }}
+              className="text-muted-foreground hover:text-ink text-[10px] font-bold uppercase tracking-widest cursor-pointer transition-colors px-2 py-1"
+            >
+              Clear All
+            </button>
+
+            <button
+              disabled={compareProperties.length < 2}
+              onClick={() => setIsCompareModalOpen(true)}
+              className={`px-6 py-2.5 rounded-full text-[11px] font-bold uppercase tracking-widest transition-all cursor-pointer ${
+                compareProperties.length >= 2
+                  ? "bg-[#3B82F6] hover:bg-[#2563EB] text-white shadow-sm hover:scale-[1.02] hover:-translate-y-0.5"
+                  : "bg-muted text-muted-foreground cursor-not-allowed"
+              }`}
+            >
+              {compareProperties.length >= 2 ? "Compare Now" : "Add 1 More"}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* COMPARISON MODAL */}
+      {isCompareModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6"
+          style={{
+            background: "rgba(10,12,20,0.75)",
+            backdropFilter: "blur(18px)",
+            WebkitBackdropFilter: "blur(18px)",
+          }}
+          onClick={() => setIsCompareModalOpen(false)}
+        >
+          <div
+            className="bg-white w-full max-w-5xl h-[85vh] md:h-[80vh] rounded-[2rem] shadow-lift border border-border/30 overflow-hidden flex flex-col relative animate-in zoom-in-95 duration-300"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="p-6 md:p-8 border-b border-border/40 flex justify-between items-start shrink-0">
+              <div>
+                <p className="font-mono text-[9px] tracking-[0.25em] uppercase text-[#3B82F6] font-bold">
+                  CityQlo Discovery
+                </p>
+                <h2 className="font-display font-extrabold text-[24px] md:text-[30px] tracking-tight text-ink mt-1">
+                  Compare Residences
+                </h2>
+              </div>
+              <button
+                onClick={() => setIsCompareModalOpen(false)}
+                className="w-10 h-10 rounded-full bg-surface border border-border/40 flex items-center justify-center text-ink hover:bg-ink hover:text-white transition-all cursor-pointer"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            {/* Scrollable specs matrix */}
+            <div className="flex-1 overflow-y-auto p-6 md:p-8">
+              <div className="w-full overflow-x-auto">
+                <div style={{ minWidth: isMobile ? "680px" : "100%" }}>
+                  {/* Grid header with images */}
+                  <div
+                    className="grid border-b border-border/40 pb-6 items-end"
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: isMobile
+                        ? `110px repeat(${compareProperties.length}, 200px)`
+                        : `150px repeat(${compareProperties.length}, 1fr)`,
+                    }}
+                  >
+                    <div className="text-left font-mono text-[10px] uppercase tracking-widest text-muted-foreground font-semibold pb-2">
+                      Project Specs
+                    </div>
+                    {compareProperties.map((prop, idx) => (
+                      <div
+                        key={prop.id}
+                        className="px-4 relative text-center flex flex-col items-center"
+                      >
+                        <button
+                          onClick={() => handleCompare(prop)}
+                          className="absolute -top-2 right-2 z-10 w-6 h-6 bg-ink/90 text-white rounded-full flex items-center justify-center hover:bg-destructive hover:scale-105 transition-all cursor-pointer"
+                          title="Remove from comparison"
+                        >
+                          <X size={12} />
+                        </button>
+
+                        <div className="h-24 w-full md:h-28 rounded-xl overflow-hidden bg-surface border border-border/20 shadow-sm mb-3">
+                          <img
+                            src={resolvePropertyImage(prop, idx)}
+                            alt={prop.name}
+                            className="h-full w-full object-cover"
+                          />
+                        </div>
+
+                        <h3 className="font-bold text-ink text-[14px] md:text-[16px] tracking-tight leading-snug line-clamp-1">
+                          {prop.name}
+                        </h3>
+                        <p className="text-[11px] text-muted-foreground mt-0.5">{prop.city}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Specification Rows */}
+                  {rows.map((row, rIdx) => (
+                    <div
+                      key={row.label}
+                      className={`grid border-b border-border/20 py-4 items-center transition-colors hover:bg-surface/30 ${
+                        rIdx % 2 === 0 ? "bg-surface/10" : ""
+                      }`}
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: isMobile
+                          ? `110px repeat(${compareProperties.length}, 200px)`
+                          : `150px repeat(${compareProperties.length}, 1fr)`,
+                      }}
+                    >
+                      <div className="text-left font-mono text-[9px] md:text-[10px] uppercase tracking-widest text-muted-foreground font-bold px-2">
+                        {row.label}
+                      </div>
+                      {compareProperties.map((prop) => (
+                        <div key={prop.id} className="text-center px-4">
+                          {row.value(prop)}
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+
+                  {/* Actions Row */}
+                  <div
+                    className="grid py-6 items-center"
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: isMobile
+                        ? `110px repeat(${compareProperties.length}, 200px)`
+                        : `150px repeat(${compareProperties.length}, 1fr)`,
+                    }}
+                  >
+                    <div />
+                    {compareProperties.map((prop) => (
+                      <div key={prop.id} className="px-4">
+                        <Link
+                          to="/projects/$slug"
+                          params={{ slug: prop.slug || prop.id }}
+                          className="w-full text-center py-2.5 rounded-full bg-ink text-white font-semibold text-[11px] uppercase tracking-widest hover:bg-[#3B82F6] transition-all hover:-translate-y-0.5 shadow-sm block cursor-pointer"
+                        >
+                          View Details
+                        </Link>
+                        <Link
+                          to="/contact"
+                          className="w-full text-center py-2 mt-2 rounded-full border border-border text-ink hover:bg-surface font-semibold text-[11px] uppercase tracking-widest transition-all block cursor-pointer"
+                        >
+                          Consultation
+                        </Link>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
           </div>

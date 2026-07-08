@@ -967,6 +967,42 @@ export const saveProjectDraft = createServerFn({ method: "POST" })
     );
 
     if (error) throw new Error(error.message);
+
+    // Sync metadata back to properties table
+    const snapshot = data.draftSnapshot as any;
+    const meta = snapshot.project_meta || {};
+
+    await sb
+      .from("properties")
+      .update({
+        name: meta.title || "",
+        slug: meta.slug || "",
+        developer: meta.developer || "DMCI Homes",
+        city: meta.city || "",
+        location: meta.location_district || "",
+        price_display:
+          meta.price_display ||
+          (meta.min_price ? `₱${(Number(meta.min_price) / 1000000).toFixed(1)}M` : ""),
+        price_min: meta.min_price ? Number(meta.min_price) / 1000000 : 0,
+        price_max: meta.max_price ? Number(meta.max_price) / 1000000 : 0,
+        price_max_display:
+          meta.price_max_display ||
+          (meta.max_price ? `₱${(Number(meta.max_price) / 1000000).toFixed(1)}M` : ""),
+        status: meta.listing_status || "Pre-selling",
+        beds: Number(meta.beds) || 1,
+        baths: Number(meta.baths) || 1,
+        area: meta.area || "",
+        image_url: meta.image_url || null,
+        is_featured: Boolean(meta.is_featured),
+        is_active: Boolean(meta.is_active),
+        promo_badge: meta.promo_badge || null,
+        is_spotlight: Boolean(meta.is_spotlight),
+        featured_rank: Number(meta.featured_rank) || 0,
+        display_order: Number(meta.display_order) || 0,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", data.projectId);
+
     return { success: true };
   });
 
@@ -1033,6 +1069,39 @@ export const publishProject = createServerFn({ method: "POST" })
       .eq("id", data.projectId);
 
     if (projError) throw new Error(projError.message);
+
+    // Sync metadata back to properties table
+    await sb
+      .from("properties")
+      .update({
+        name: meta.title || "",
+        slug: meta.slug || "",
+        developer: meta.developer || "DMCI Homes",
+        city: meta.city || "",
+        location: meta.location_district || "",
+        price_display:
+          meta.price_display ||
+          (meta.min_price ? `₱${(Number(meta.min_price) / 1000000).toFixed(1)}M` : ""),
+        price_min: meta.min_price ? Number(meta.min_price) / 1000000 : 0,
+        price_max: meta.max_price ? Number(meta.max_price) / 1000000 : 0,
+        price_max_display:
+          meta.price_max_display ||
+          (meta.max_price ? `₱${(Number(meta.max_price) / 1000000).toFixed(1)}M` : ""),
+        status: meta.listing_status || "Pre-selling",
+        beds: Number(meta.beds) || 1,
+        baths: Number(meta.baths) || 1,
+        area: meta.area || "",
+        image_url: meta.image_url || null,
+        is_featured: Boolean(meta.is_featured),
+        // Publishing always makes the property visible — the admin can hide it later if needed
+        is_active: true,
+        promo_badge: meta.promo_badge || null,
+        is_spotlight: Boolean(meta.is_spotlight),
+        featured_rank: Number(meta.featured_rank) || 0,
+        display_order: Number(meta.display_order) || 0,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", data.projectId);
 
     // Upsert precompiled read model
     const { error: rmError } = await sb.from("project_read_models").upsert(
@@ -1137,17 +1206,29 @@ export const createProject = createServerFn({ method: "POST" })
       min_price: z.number(),
       max_price: z.number(),
       location_district: z.string().optional(),
+      // Optional scaffold: a prebuilt section layout + unit list (e.g. the DMCI
+      // template). When provided, the new project's draft is fully populated and
+      // immediately previewable instead of starting blank.
+      layout_flow: z.array(z.any()).optional(),
+      units: z.array(z.any()).optional(),
+      // Optional listing status carried into project_meta (e.g. "Pre-selling").
+      listing_status: z.string().optional(),
+      // Optional beds from DMCI catalog
+      beds: z.union([z.string(), z.number()]).optional(),
     }),
   )
   .handler(async ({ data }) => {
     const { session } = await requireAdminSession();
     const sb = await getServerClient();
 
+    // Scaffold fields are stored in the draft snapshot only, not the projects row.
+    const { layout_flow, units, listing_status, beds, ...projectRow } = data;
+
     // 1. Insert into projects
     const { data: proj, error } = await sb
       .from("projects")
       .insert({
-        ...data,
+        ...projectRow,
         location_district: data.location_district || data.city,
         status: "draft",
       })
@@ -1156,7 +1237,8 @@ export const createProject = createServerFn({ method: "POST" })
 
     if (error) throw new Error(error.message);
 
-    // 2. Initialize draft workspace with empty snapshot structure
+    // 2. Initialize draft workspace — populated from the scaffold when supplied,
+    //    otherwise an empty structure (back-compatible with the old behavior).
     const initialSnapshot = {
       api_version: "1.2",
       schema_version: "2026-06",
@@ -1166,15 +1248,16 @@ export const createProject = createServerFn({ method: "POST" })
         title: data.title,
         slug: data.slug,
         developer: data.developer,
-        location_district: data.city,
+        location_district: data.location_district || data.city,
         city: data.city,
         full_address: data.full_address,
         status: "draft",
+        listing_status: listing_status ?? "",
         min_price: data.min_price,
         max_price: data.max_price,
       },
-      layout_flow: [],
-      units: [],
+      layout_flow: layout_flow ?? [],
+      units: units ?? [],
       buildings: [],
       landmarks: [],
     };
@@ -1186,7 +1269,71 @@ export const createProject = createServerFn({ method: "POST" })
     });
 
     if (draftError) throw new Error(draftError.message);
-    return { id: proj.id };
+
+    // 3. Auto-create a matching properties catalog row with the SAME UUID so the
+    //    property is immediately visible in Property Catalog without a separate step.
+    let propWarning: string | null = null;
+    try {
+      // Check if a property with this id already exists (e.g. created via Property Catalog)
+      const { data: existing } = await sb
+        .from("properties")
+        .select("id")
+        .eq("id", proj.id)
+        .maybeSingle();
+
+      if (!existing) {
+        const priceMinMil = data.min_price / 1_000_000;
+        const priceMaxMil = data.max_price / 1_000_000;
+        const propStatus =
+          listing_status === "RFO" || listing_status === "Pre-selling"
+            ? (listing_status as "RFO" | "Pre-selling")
+            : "Pre-selling";
+        const bedsNum = typeof beds === "string" ? parseInt(beds, 10) || 1 : (beds ?? 1);
+        const cityPart = data.city.includes(",")
+          ? data.city.split(",").pop()?.trim() || data.city
+          : data.city;
+
+        // Ensure the slug is unique in the properties table (may differ from project slug)
+        const safeSlug = await uniquePropertySlug(sb, data.slug);
+
+        const { error: propError } = await sb.from("properties").insert({
+          id: proj.id, // same UUID — enforces 1:1 link
+          name: data.title,
+          slug: safeSlug,
+          developer: data.developer,
+          city: cityPart,
+          location: data.location_district || data.city,
+          price_display: `₱${priceMinMil.toFixed(1)}M${priceMaxMil > priceMinMil ? ` – ₱${priceMaxMil.toFixed(1)}M` : ""}`,
+          price_min: priceMinMil,
+          price_max: priceMaxMil,
+          price_max_display: priceMaxMil > priceMinMil ? `₱${priceMaxMil.toFixed(1)}M` : "",
+          status: propStatus,
+          beds: bedsNum,
+          baths: 1,
+          area: "TBD",
+          unit_types: JSON.stringify([]),
+          highlights: JSON.stringify([]),
+          description: "",
+          is_active: false, // hidden until the admin explicitly activates it
+          is_featured: false,
+          is_spotlight: false,
+          is_deleted: false,
+          display_order: 0,
+          featured_rank: 0,
+          updated_at: new Date().toISOString(),
+        });
+
+        if (propError) {
+          propWarning = `Property Catalog entry could not be created: ${propError.message}`;
+          console.error("Auto-create properties row failed:", propError.message);
+        }
+      }
+    } catch (e) {
+      propWarning = `Property Catalog sync error: ${e instanceof Error ? e.message : String(e)}`;
+      console.error("Auto-create properties check failed:", e);
+    }
+
+    return { id: proj.id, propWarning };
   });
 
 export const deleteProject = createServerFn({ method: "POST" })
@@ -1354,11 +1501,12 @@ export const createProperty = createServerFn({ method: "POST" })
 
     if (error) throw new Error(error.message);
 
-    // Auto-create matching Project stub & draft workspace
+    // Auto-create matching Project stub & draft workspace with MATCHING UUID
     if (autoCreateProject) {
       const { data: proj, error: projError } = await sb
         .from("projects")
         .insert({
+          id: inserted.id, // Enforce matching UUID
           title: data.name,
           slug: slug,
           developer: data.developer,
@@ -1426,6 +1574,20 @@ export const updateProperty = createServerFn({ method: "POST" })
     const { id, highlights, ...rest } = data;
     const sb = await getServerClient();
 
+    // 1. Fetch current property to get the old slug for reference
+    const { data: oldProperty, error: fetchError } = await sb
+      .from("properties")
+      .select("id, slug")
+      .eq("id", id)
+      .single();
+
+    if (fetchError || !oldProperty) {
+      throw new Error("Property not found or could not be loaded");
+    }
+
+    const oldSlug = oldProperty.slug;
+
+    // 2. Perform property update
     const updatePayload: Record<string, any> = {
       ...rest,
       updated_at: new Date().toISOString(),
@@ -1442,6 +1604,120 @@ export const updateProperty = createServerFn({ method: "POST" })
       .single();
 
     if (error) throw new Error(error.message);
+
+    // 3. Find and update the matching project
+    // Try by ID first, then fallback to slug (for existing properties)
+    let projectToUpdate = null;
+    const { data: projById } = await sb.from("projects").select("id").eq("id", id).maybeSingle();
+    if (projById) {
+      projectToUpdate = projById;
+    } else {
+      const { data: projBySlug } = await sb
+        .from("projects")
+        .select("id")
+        .eq("slug", oldSlug)
+        .maybeSingle();
+      if (projBySlug) {
+        projectToUpdate = projBySlug;
+      }
+    }
+
+    if (projectToUpdate) {
+      const projectUpdates: Record<string, any> = {
+        updated_at: new Date().toISOString(),
+      };
+      if (rest.name !== undefined) projectUpdates.title = rest.name;
+      if (rest.slug !== undefined) projectUpdates.slug = rest.slug;
+      if (rest.developer !== undefined) projectUpdates.developer = rest.developer;
+      if (rest.location !== undefined) projectUpdates.location_district = rest.location;
+      if (rest.city !== undefined) {
+        projectUpdates.city = rest.city.includes(",")
+          ? rest.city.split(",").pop()?.trim() || rest.city
+          : rest.city;
+        projectUpdates.full_address = rest.city;
+      }
+      if (rest.price_min !== undefined) {
+        projectUpdates.min_price = Math.round(rest.price_min * 1000000);
+      }
+      if (rest.price_max !== undefined) {
+        projectUpdates.max_price = Math.round(rest.price_max * 1000000);
+      }
+
+      await sb.from("projects").update(projectUpdates).eq("id", projectToUpdate.id);
+
+      // Also sync draft workspace meta
+      const { data: draft } = await sb
+        .from("project_draft_workspaces")
+        .select("draft_snapshot")
+        .eq("project_id", projectToUpdate.id)
+        .maybeSingle();
+
+      if (draft && draft.draft_snapshot) {
+        const snapshot = { ...(draft.draft_snapshot as any) };
+        if (!snapshot.project_meta) snapshot.project_meta = {};
+
+        if (rest.name !== undefined) snapshot.project_meta.title = rest.name;
+        if (rest.slug !== undefined) snapshot.project_meta.slug = rest.slug;
+        if (rest.developer !== undefined) snapshot.project_meta.developer = rest.developer;
+        if (rest.location !== undefined) snapshot.project_meta.location_district = rest.location;
+        if (rest.city !== undefined) {
+          snapshot.project_meta.city = rest.city.includes(",")
+            ? rest.city.split(",").pop()?.trim() || rest.city
+            : rest.city;
+          snapshot.project_meta.full_address = rest.city;
+        }
+        if (rest.price_min !== undefined) {
+          snapshot.project_meta.min_price = Math.round(rest.price_min * 1000000);
+        }
+        if (rest.price_max !== undefined) {
+          snapshot.project_meta.max_price = Math.round(rest.price_max * 1000000);
+        }
+
+        await sb
+          .from("project_draft_workspaces")
+          .update({ draft_snapshot: snapshot, updated_at: new Date().toISOString() })
+          .eq("project_id", projectToUpdate.id);
+      }
+
+      // Also sync read model if it exists
+      const { data: rm } = await sb
+        .from("project_read_models")
+        .select("content_payload")
+        .eq("project_id", projectToUpdate.id)
+        .maybeSingle();
+
+      if (rm && rm.content_payload) {
+        const payload = { ...(rm.content_payload as any) };
+        if (!payload.project_meta) payload.project_meta = {};
+
+        if (rest.name !== undefined) payload.project_meta.title = rest.name;
+        if (rest.slug !== undefined) payload.project_meta.slug = rest.slug;
+        if (rest.developer !== undefined) payload.project_meta.developer = rest.developer;
+        if (rest.location !== undefined) payload.project_meta.location_district = rest.location;
+        if (rest.city !== undefined) {
+          payload.project_meta.city = rest.city.includes(",")
+            ? rest.city.split(",").pop()?.trim() || rest.city
+            : rest.city;
+          payload.project_meta.full_address = rest.city;
+        }
+        if (rest.price_min !== undefined) {
+          payload.project_meta.min_price = Math.round(rest.price_min * 1000000);
+        }
+        if (rest.price_max !== undefined) {
+          payload.project_meta.max_price = Math.round(rest.price_max * 1000000);
+        }
+
+        await sb
+          .from("project_read_models")
+          .update({
+            slug: rest.slug || oldSlug,
+            content_payload: payload,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("project_id", projectToUpdate.id);
+      }
+    }
+
     return updated;
   });
 
@@ -1453,12 +1729,55 @@ export const deleteProperty = createServerFn({ method: "POST" })
     await requireAdminSession();
 
     const sb = await getServerClient();
+
+    // 1. Fetch slug of property to find matching legacy project
+    const { data: prop } = await sb
+      .from("properties")
+      .select("slug")
+      .eq("id", data.id)
+      .maybeSingle();
+
+    // 2. Soft-delete property listing
     const { error } = await sb
       .from("properties")
       .update({ is_deleted: true, updated_at: new Date().toISOString() })
       .eq("id", data.id);
 
     if (error) throw new Error(error.message);
+
+    // 3. Find and archive/delete corresponding project
+    if (prop) {
+      let projectIdToArchive = null;
+      const { data: projById } = await sb
+        .from("projects")
+        .select("id")
+        .eq("id", data.id)
+        .maybeSingle();
+      if (projById) {
+        projectIdToArchive = projById.id;
+      } else {
+        const { data: projBySlug } = await sb
+          .from("projects")
+          .select("id")
+          .eq("slug", prop.slug)
+          .maybeSingle();
+        if (projBySlug) {
+          projectIdToArchive = projBySlug.id;
+        }
+      }
+
+      if (projectIdToArchive) {
+        // Soft delete the project by setting status to archived
+        await sb
+          .from("projects")
+          .update({ status: "archived", updated_at: new Date().toISOString() })
+          .eq("id", projectIdToArchive);
+
+        // Delete project from pre-compiled cache projection to hide it immediately
+        await sb.from("project_read_models").delete().eq("project_id", projectIdToArchive);
+      }
+    }
+
     return { success: true };
   });
 
@@ -1865,3 +2184,27 @@ export const reorderBuildings = createServerFn({ method: "POST" })
     );
     return { success: true };
   });
+
+// ─── Purge all soft-deleted properties (permanent hard delete) ────────────────
+
+export const purgeDeletedProperties = createServerFn({ method: "POST" }).handler(async () => {
+  await requireAdminSession();
+  const sb = await getServerClient();
+
+  // Fetch ids of all soft-deleted rows first so we can cascade-clean related tables
+  const { data: deleted, error: fetchError } = await sb
+    .from("properties")
+    .select("id")
+    .eq("is_deleted", true);
+
+  if (fetchError) throw new Error(fetchError.message);
+  if (!deleted || deleted.length === 0) return { purged: 0 };
+
+  const ids = deleted.map((r) => r.id);
+
+  // Hard-delete the property rows
+  const { error } = await sb.from("properties").delete().in("id", ids);
+  if (error) throw new Error(error.message);
+
+  return { purged: ids.length };
+});

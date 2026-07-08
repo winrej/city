@@ -16,6 +16,7 @@ import { Reveal } from "@/components/site/Reveal";
 import { ConsultationCTA } from "@/components/site/ConsultationCTA";
 import { BreadcrumbJsonLd } from "@/components/site/BreadcrumbJsonLd";
 import { VirtualTourSection } from "@/components/site/VirtualTourSection";
+import { DocSidebar, MobileTocBar, type TocGroup } from "@/components/site/SectionNav";
 // TODO: replace with a real Sonora Garden Residences hero image when available.
 import heroImg from "@/assets/tower-exterior.jpg";
 
@@ -381,23 +382,43 @@ function StructuredData() {
 /* Page                                                                */
 /* ------------------------------------------------------------------ */
 
-const TOC = [
-  { id: "overview", label: "What is Sonora Garden Residences?" },
-  { id: "location", label: "Location & accessibility" },
-  { id: "towers", label: "The three towers" },
-  { id: "units", label: "Unit types & floor areas" },
-  { id: "price", label: "Price list & computation" },
-  { id: "financing", label: "Financing options" },
-  { id: "amenities", label: "Amenities" },
-  { id: "tour", label: "Virtual tour (360°)" },
-  { id: "who", label: "Who it's for" },
-  { id: "investment", label: "Investment potential" },
-  { id: "developer", label: "Why DMCI Homes" },
-  { id: "pros-cons", label: "Pros & cons" },
-  { id: "how-to-buy", label: "How to buy" },
-  { id: "checklist", label: "Before you buy: checklist" },
-  { id: "comparison", label: "How it compares" },
-  { id: "faq", label: "FAQ" },
+const TOC_GROUPS: TocGroup[] = [
+  {
+    label: "Overview",
+    items: [
+      { id: "overview", label: "What is Sonora Garden Residences?" },
+      { id: "developer", label: "Why DMCI Homes" },
+    ],
+  },
+  {
+    label: "Pricing & Layouts",
+    items: [
+      { id: "units", label: "Unit types & floor areas" },
+      { id: "price", label: "Price list & computation" },
+      { id: "financing", label: "Financing options" },
+    ],
+  },
+  {
+    label: "Amenities & Location",
+    items: [
+      { id: "location", label: "Location & accessibility" },
+      { id: "towers", label: "The three towers" },
+      { id: "amenities", label: "Amenities" },
+      { id: "tour", label: "Virtual tour (360°)" },
+    ],
+  },
+  {
+    label: "Buyer Guide",
+    items: [
+      { id: "who", label: "Who it's for" },
+      { id: "investment", label: "Investment potential" },
+      { id: "pros-cons", label: "Pros & cons" },
+      { id: "how-to-buy", label: "How to buy" },
+      { id: "checklist", label: "Before you buy: checklist" },
+      { id: "comparison", label: "How it compares" },
+      { id: "faq", label: "FAQ" },
+    ],
+  },
 ];
 
 function SonoraPillarPage() {
@@ -503,663 +524,649 @@ function SonoraPillarPage() {
         </div>
       </section>
 
-      {/* ===================== TOC ===================== */}
-      <section className="px-4 pt-12">
-        <div className="container-prose">
-          <Reveal>
-            <nav aria-label="On this page" className="rounded-2xl border border-hairline p-6">
-              <p className="eyebrow mb-4">On this page</p>
-              <ol className="grid gap-x-6 gap-y-2 sm:grid-cols-2">
-                {TOC.map((t, i) => (
-                  <li key={t.id}>
-                    <a
-                      href={`#${t.id}`}
-                      className="group flex items-baseline gap-2 text-[14px] text-muted-foreground transition-colors hover:text-ink"
-                    >
-                      <span className="text-[11px] font-mono text-primary">
-                        {String(i + 1).padStart(2, "0")}
-                      </span>
-                      <span className="group-hover:underline">{t.label}</span>
-                    </a>
-                  </li>
-                ))}
-              </ol>
-            </nav>
-          </Reveal>
-        </div>
-      </section>
+      {/* ===================== TOC (mobile) ===================== */}
+      <MobileTocBar groups={TOC_GROUPS} />
 
       {/* ===================== BODY ===================== */}
-      <article className="px-4 py-16 md:py-24">
-        <div className="container-prose space-y-20">
-          {/* Overview */}
-          <Section
-            id="overview"
-            eyebrow="Sonora Garden Residences Overview"
-            title="Sonora Garden Residences by DMCI Homes & Robinsons Land"
-          >
-            <p>
-              Sonora Garden Residences is a resort-inspired, high-rise condominium community
-              developed as a joint venture between <strong>DMCI Homes</strong> — one of the
-              Philippines' most trusted developers and builders — and{" "}
-              <strong>Robinsons Land Corporation</strong>, the property arm of the Gokongwei group.
-              The collaboration pairs DMCI's signature lush, low-density "Lumiventt" design
-              philosophy with Robinsons Land's retail ecosystem, anchored by the adjacent Robinsons
-              Place Las Piñas mall.
-            </p>
-            <p>
-              Set on roughly <strong>14,492 square meters</strong> along the busy Alabang–Zapote
-              corridor, the masterplan is organized around landscaped garden atriums and
-              resort-style common areas rather than a single dense slab. The result is a community
-              that feels like a vacation property you can live in year-round — pools, a roof garden,
-              and breathable shared spaces woven between the towers.
-            </p>
-            <p>
-              The development comprises three towers — <strong>Cadence</strong>,{" "}
-              <strong>Stellan</strong>, and <strong>Liran</strong> — offering one-, two-, and
-              three-bedroom units. The flagship Cadence tower is already complete and offered as{" "}
-              <strong>Ready for Occupancy (RFO)</strong>, meaning buyers can move in or begin
-              earning rental income without the multi-year wait typical of pre-selling projects.
-            </p>
-            <p>
-              For Filipino professionals, growing families, and overseas Filipino workers (OFWs) who
-              want a quality home in the South of Metro Manila — close to malls, schools, and the
-              Cavite gateway — Sonora positions itself as a rare blend of resort lifestyle, ready
-              inventory, and accessible pricing.
-            </p>
-          </Section>
-
-          {/* Location */}
-          <Section
-            id="location"
-            eyebrow="Las Piñas Location"
-            title="Location & Accessibility of Sonora Garden Residences along Alabang–Zapote Road"
-          >
-            <p>
-              Yes — for South-Metro living, the location is one of Sonora's strongest selling
-              points. The community sits directly on <strong>Alabang–Zapote Road</strong> in{" "}
-              <strong>Talon Uno, Las Piñas City</strong>, and connects straight into{" "}
-              <strong>Robinsons Place Las Piñas</strong>. That means a full mall — supermarket,
-              cinemas, restaurants, banks, and clinics — is effectively part of your address,
-              reachable on foot and under cover.
-            </p>
-            <p>The address places residents within a short drive of several key destinations:</p>
-            <ul className="my-4 space-y-2">
-              <li>
-                <strong>NAIA (airport):</strong> roughly 15–20 minutes by car, traffic permitting —
-                a major plus for OFWs and frequent travelers.
-              </li>
-              <li>
-                <strong>Alabang &amp; Filinvest City:</strong> a quick hop along Alabang–Zapote for
-                offices, hospitals (Asian Hospital), and Festival Mall.
-              </li>
-              <li>
-                <strong>Parañaque &amp; the Bay Area:</strong> accessible via the Manila–Cavite
-                Expressway (CAVITEX) and Coastal Road.
-              </li>
-              <li>
-                <strong>Cavite:</strong> Sonora is a natural gateway home for buyers working in
-                Metro Manila but rooted in the south.
-              </li>
-              <li>
-                <strong>Schools:</strong> proximity to established Las Piñas and Parañaque campuses
-                makes it practical for families.
-              </li>
-            </ul>
-            <p>
-              Crucially, the area is on the upswing. The <strong>LRT-1 Cavite Extension</strong> —
-              which extends the light rail line from Pasay through Parañaque and Las Piñas toward
-              Cavite — is set to dramatically improve public-transport access along this corridor, a
-              structural tailwind for both convenience and long-term property values. The one honest
-              caveat: like much of Metro Manila, Alabang–Zapote Road carries real rush-hour traffic,
-              so commuters to Makati or BGC should test the drive before committing.
-            </p>
-          </Section>
-
-          {/* Towers */}
-          <Section
-            id="towers"
-            eyebrow="Towers & Layout"
-            title="Towers of Sonora Garden Residences: Cadence, Stellan & Liran"
-          >
-            <p>
-              Sonora Garden Residences is composed of three distinct towers, each with its own
-              character but sharing the same gated, amenity-rich grounds. Together they form a mix
-              of high-rise and mid-rise living on a single resort masterplan.
-            </p>
-            <div className="my-6 space-y-4">
-              {TOWERS.map((t) => (
-                <div key={t.name} className="rounded-xl border border-hairline p-5">
-                  <div className="flex flex-wrap items-baseline justify-between gap-2">
-                    <h3 className="text-[18px] font-bold text-ink">{t.name}</h3>
-                    <span className="text-[12px] font-semibold text-primary">{t.storeys}</span>
-                  </div>
-                  <p className="mt-1 text-[13px] font-medium text-emerald-600">{t.status}</p>
-                  <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">{t.note}</p>
-                </div>
-              ))}
-            </div>
-            <p>
-              Because <strong>Cadence is already RFO</strong>, it is the focus for buyers who want
-              to move in or lease out immediately. Stellan and Liran extend the community in later
-              phases — useful to know if you are choosing between a ready unit today and a
-              future-phase unit.
-            </p>
-          </Section>
-
-          {/* Units */}
-          <Section
-            id="units"
-            eyebrow="Sonora Floor Plans"
-            title="Sonora Garden Residences Unit Layouts & Floor Plans"
-          >
-            <p>
-              Sonora offers one-, two-, and three-bedroom configurations, and the cuts are notably
-              generous for the price segment — every unit comes with a <strong>balcony</strong>, and
-              the development is marketed around larger doors, windows, and living areas than the
-              typical mass-market condo.
-            </p>
-            <div className="my-6 overflow-x-auto">
-              <table className="w-full border-collapse text-left text-[14px]">
-                <thead>
-                  <tr className="border-b border-ink/15">
-                    <th className="py-3 pr-4 font-semibold text-ink">Unit type</th>
-                    <th className="py-3 pr-4 font-semibold text-ink">Approx. floor area</th>
-                    <th className="py-3 pr-4 font-semibold text-ink">Price guide</th>
-                    <th className="py-3 font-semibold text-ink">Ideal for</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {UNITS.map((u) => (
-                    <tr key={u.type} className="border-b border-hairline align-top">
-                      <td className="py-3 pr-4 font-semibold text-ink">{u.type}</td>
-                      <td className="py-3 pr-4 text-muted-foreground">{u.area}</td>
-                      <td className="py-3 pr-4 text-muted-foreground">{u.from}</td>
-                      <td className="py-3 text-muted-foreground">{u.ideal}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <p className="text-[13px] italic text-muted-foreground">
-              Floor areas and prices are indicative as of June 2026 and vary by tower, floor level,
-              and view. Exact unit dimensions and the official price list are confirmed per release
-              — request the current sheet for the unit you have in mind.
-            </p>
-          </Section>
-
-          {/* Price */}
-          <Section
-            id="price"
-            eyebrow="DMCI Price Guide"
-            title="Sonora Garden Residences Price List & Computations (2026)"
-          >
-            <p>
-              As of <strong>June 2026</strong>, units at Sonora Garden Residences range from roughly{" "}
-              <strong>₱4.55 million to ₱11.2 million</strong>, depending on unit type, floor level,
-              and tower. Entry-level one-bedroom units begin around <strong>₱4.55M</strong>, with
-              sample monthly plans starting near <strong>₱22,000+ per month</strong> under DMCI's
-              spread-out payment scheme.
-            </p>
-            <div className="my-6 overflow-x-auto">
-              <table className="w-full border-collapse text-left text-[14px]">
-                <thead>
-                  <tr className="border-b border-ink/15">
-                    <th className="py-3 pr-4 font-semibold text-ink">Item</th>
-                    <th className="py-3 font-semibold text-ink">Indicative figure</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[
-                    ["Price range", "₱4.55M – ₱11.2M"],
-                    ["Starting price (1BR)", "≈ ₱4,556,000"],
-                    ["Sample monthly start", "≈ ₱22,000+ / month"],
-                    ["Reservation fee", "Confirmed per current promo"],
-                    ["Down payment", "Spread across the payment term"],
-                    ["Balance options", "Bank / in-house / Pag-IBIG / cash"],
-                  ].map(([k, v]) => (
-                    <tr key={k} className="border-b border-hairline">
-                      <td className="py-3 pr-4 font-semibold text-ink">{k}</td>
-                      <td className="py-3 text-muted-foreground">{v}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <p>
-              The headline advantage of DMCI's terms is the <strong>spread-out down payment</strong>
-              : instead of producing a large lump sum upfront, the down payment is amortized across
-              the term, making a resort-grade unit attainable on a professional's or OFW's monthly
-              budget. The remaining balance can then be settled through bank financing, in-house
-              financing, Pag-IBIG, or spot cash.
-            </p>
-            <div className="my-6 rounded-xl border border-primary/30 bg-primary/5 p-5">
-              <p className="text-[14px] text-ink">
-                <strong>Want an exact computation?</strong> Developer pricing updates with each
-                release and promo. Tell us your preferred unit and term, and we'll send a
-                personalized Sonora computation —{" "}
-                <a href="#lead" className="font-semibold text-primary underline">
-                  request it here
-                </a>
-                .
+      <div className="px-4 py-16 md:py-24">
+        <div className="container-prose grid grid-cols-1 gap-x-10 md:grid-cols-[200px_minmax(0,1fr)] xl:grid-cols-[264px_minmax(0,1fr)] xl:gap-x-12">
+          <aside className="hidden md:block">
+            <DocSidebar groups={TOC_GROUPS} contentId="doc-content" />
+          </aside>
+          <article id="doc-content" className="min-w-0 space-y-20 md:max-w-[46rem]">
+            {/* Overview */}
+            <Section
+              id="overview"
+              eyebrow="Sonora Garden Residences Overview"
+              title="Sonora Garden Residences by DMCI Homes & Robinsons Land"
+            >
+              <p>
+                Sonora Garden Residences is a resort-inspired, high-rise condominium community
+                developed as a joint venture between <strong>DMCI Homes</strong> — one of the
+                Philippines' most trusted developers and builders — and{" "}
+                <strong>Robinsons Land Corporation</strong>, the property arm of the Gokongwei
+                group. The collaboration pairs DMCI's signature lush, low-density "Lumiventt" design
+                philosophy with Robinsons Land's retail ecosystem, anchored by the adjacent
+                Robinsons Place Las Piñas mall.
               </p>
-            </div>
-          </Section>
+              <p>
+                Set on roughly <strong>14,492 square meters</strong> along the busy Alabang–Zapote
+                corridor, the masterplan is organized around landscaped garden atriums and
+                resort-style common areas rather than a single dense slab. The result is a community
+                that feels like a vacation property you can live in year-round — pools, a roof
+                garden, and breathable shared spaces woven between the towers.
+              </p>
+              <p>
+                The development comprises three towers — <strong>Cadence</strong>,{" "}
+                <strong>Stellan</strong>, and <strong>Liran</strong> — offering one-, two-, and
+                three-bedroom units. The flagship Cadence tower is already complete and offered as{" "}
+                <strong>Ready for Occupancy (RFO)</strong>, meaning buyers can move in or begin
+                earning rental income without the multi-year wait typical of pre-selling projects.
+              </p>
+              <p>
+                For Filipino professionals, growing families, and overseas Filipino workers (OFWs)
+                who want a quality home in the South of Metro Manila — close to malls, schools, and
+                the Cavite gateway — Sonora positions itself as a rare blend of resort lifestyle,
+                ready inventory, and accessible pricing.
+              </p>
+            </Section>
 
-          {/* Financing */}
-          <Section
-            id="financing"
-            eyebrow="Financing Guide"
-            title="Financing Options for Sonora Garden Residences: Bank, Pag-IBIG & In-House"
-          >
-            <p>
-              Most buyers settle the <strong>down payment</strong> in monthly installments spread
-              across the payment term, then choose how to cover the remaining{" "}
-              <strong>balance</strong>. There are four common routes, each with different
-              trade-offs:
-            </p>
-            <ul className="my-4 space-y-3">
-              <li>
-                <strong>Bank financing:</strong> the most common option for the balance. Banks
-                typically finance up to 80% of the unit value over 5–20 years. Rates are fixed for
-                an initial period, then repriced. Best for buyers with documented, stable income who
-                want the longest amortization and lowest monthly outlay.
-              </li>
-              <li>
-                <strong>In-house financing:</strong> arranged directly with the developer. Easier to
-                qualify for and faster to approve, but usually carries higher interest and a shorter
-                term than a bank. A practical bridge for self-employed buyers or those still
-                building bank-ready documents.
-              </li>
-              <li>
-                <strong>Pag-IBIG (HDMF):</strong> for eligible members, the Pag-IBIG housing loan
-                can offer competitive, socialized rates over terms up to 30 years. Loan ceilings and
-                qualification depend on your contributions and income.
-              </li>
-              <li>
-                <strong>Spot / deferred cash:</strong> paying in full (or over a short deferred
-                period) typically unlocks the largest discounts. Ideal for cash-rich buyers and OFWs
-                consolidating savings.
-              </li>
-            </ul>
-            <p>
-              The right structure depends on your income documentation, how long you plan to hold
-              the unit, and your appetite for interest cost versus monthly cash flow. We can model
-              each option side by side against your target Sonora unit so you can see the true
-              monthly cost before you commit.
-            </p>
-          </Section>
+            {/* Location */}
+            <Section
+              id="location"
+              eyebrow="Las Piñas Location"
+              title="Location & Accessibility of Sonora Garden Residences along Alabang–Zapote Road"
+            >
+              <p>
+                Yes — for South-Metro living, the location is one of Sonora's strongest selling
+                points. The community sits directly on <strong>Alabang–Zapote Road</strong> in{" "}
+                <strong>Talon Uno, Las Piñas City</strong>, and connects straight into{" "}
+                <strong>Robinsons Place Las Piñas</strong>. That means a full mall — supermarket,
+                cinemas, restaurants, banks, and clinics — is effectively part of your address,
+                reachable on foot and under cover.
+              </p>
+              <p>The address places residents within a short drive of several key destinations:</p>
+              <ul className="my-4 space-y-2">
+                <li>
+                  <strong>NAIA (airport):</strong> roughly 15–20 minutes by car, traffic permitting
+                  — a major plus for OFWs and frequent travelers.
+                </li>
+                <li>
+                  <strong>Alabang &amp; Filinvest City:</strong> a quick hop along Alabang–Zapote
+                  for offices, hospitals (Asian Hospital), and Festival Mall.
+                </li>
+                <li>
+                  <strong>Parañaque &amp; the Bay Area:</strong> accessible via the Manila–Cavite
+                  Expressway (CAVITEX) and Coastal Road.
+                </li>
+                <li>
+                  <strong>Cavite:</strong> Sonora is a natural gateway home for buyers working in
+                  Metro Manila but rooted in the south.
+                </li>
+                <li>
+                  <strong>Schools:</strong> proximity to established Las Piñas and Parañaque
+                  campuses makes it practical for families.
+                </li>
+              </ul>
+              <p>
+                Crucially, the area is on the upswing. The <strong>LRT-1 Cavite Extension</strong> —
+                which extends the light rail line from Pasay through Parañaque and Las Piñas toward
+                Cavite — is set to dramatically improve public-transport access along this corridor,
+                a structural tailwind for both convenience and long-term property values. The one
+                honest caveat: like much of Metro Manila, Alabang–Zapote Road carries real rush-hour
+                traffic, so commuters to Makati or BGC should test the drive before committing.
+              </p>
+            </Section>
 
-          {/* Amenities */}
-          <Section
-            id="amenities"
-            eyebrow="Resort Living Amenities"
-            title="Resort-Style Amenities at Sonora Garden Residences Las Piñas"
-          >
-            <p>
-              Amenities are where Sonora earns its "resort living" name. Rather than a single token
-              pool, the community offers a full cluster of leisure, fitness, family, and convenience
-              facilities spread across landscaped grounds and an elevated roof garden.
-            </p>
-            <div className="my-6 grid gap-5 sm:grid-cols-2">
-              {AMENITY_GROUPS.map((g) => (
-                <div key={g.group} className="rounded-xl border border-hairline p-5">
-                  <h3 className="text-[13px] font-bold uppercase tracking-[0.1em] text-primary">
-                    {g.group}
+            {/* Towers */}
+            <Section
+              id="towers"
+              eyebrow="Towers & Layout"
+              title="Towers of Sonora Garden Residences: Cadence, Stellan & Liran"
+            >
+              <p>
+                Sonora Garden Residences is composed of three distinct towers, each with its own
+                character but sharing the same gated, amenity-rich grounds. Together they form a mix
+                of high-rise and mid-rise living on a single resort masterplan.
+              </p>
+              <div className="my-6 space-y-4">
+                {TOWERS.map((t) => (
+                  <div key={t.name} className="rounded-xl border border-hairline p-5">
+                    <div className="flex flex-wrap items-baseline justify-between gap-2">
+                      <h3 className="text-[18px] font-bold text-ink">{t.name}</h3>
+                      <span className="text-[12px] font-semibold text-primary">{t.storeys}</span>
+                    </div>
+                    <p className="mt-1 text-[13px] font-medium text-emerald-600">{t.status}</p>
+                    <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">
+                      {t.note}
+                    </p>
+                  </div>
+                ))}
+              </div>
+              <p>
+                Because <strong>Cadence is already RFO</strong>, it is the focus for buyers who want
+                to move in or lease out immediately. Stellan and Liran extend the community in later
+                phases — useful to know if you are choosing between a ready unit today and a
+                future-phase unit.
+              </p>
+            </Section>
+
+            {/* Units */}
+            <Section
+              id="units"
+              eyebrow="Sonora Floor Plans"
+              title="Sonora Garden Residences Unit Layouts & Floor Plans"
+            >
+              <p>
+                Sonora offers one-, two-, and three-bedroom configurations, and the cuts are notably
+                generous for the price segment — every unit comes with a <strong>balcony</strong>,
+                and the development is marketed around larger doors, windows, and living areas than
+                the typical mass-market condo.
+              </p>
+              <div className="my-6 overflow-x-auto">
+                <table className="w-full border-collapse text-left text-[14px]">
+                  <thead>
+                    <tr className="border-b border-ink/15">
+                      <th className="py-3 pr-4 font-semibold text-ink">Unit type</th>
+                      <th className="py-3 pr-4 font-semibold text-ink">Approx. floor area</th>
+                      <th className="py-3 pr-4 font-semibold text-ink">Price guide</th>
+                      <th className="py-3 font-semibold text-ink">Ideal for</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {UNITS.map((u) => (
+                      <tr key={u.type} className="border-b border-hairline align-top">
+                        <td className="py-3 pr-4 font-semibold text-ink">{u.type}</td>
+                        <td className="py-3 pr-4 text-muted-foreground">{u.area}</td>
+                        <td className="py-3 pr-4 text-muted-foreground">{u.from}</td>
+                        <td className="py-3 text-muted-foreground">{u.ideal}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <p className="text-[13px] italic text-muted-foreground">
+                Floor areas and prices are indicative as of June 2026 and vary by tower, floor
+                level, and view. Exact unit dimensions and the official price list are confirmed per
+                release — request the current sheet for the unit you have in mind.
+              </p>
+            </Section>
+
+            {/* Price */}
+            <Section
+              id="price"
+              eyebrow="DMCI Price Guide"
+              title="Sonora Garden Residences Price List & Computations (2026)"
+            >
+              <p>
+                As of <strong>June 2026</strong>, units at Sonora Garden Residences range from
+                roughly <strong>₱4.55 million to ₱11.2 million</strong>, depending on unit type,
+                floor level, and tower. Entry-level one-bedroom units begin around{" "}
+                <strong>₱4.55M</strong>, with sample monthly plans starting near{" "}
+                <strong>₱22,000+ per month</strong> under DMCI's spread-out payment scheme.
+              </p>
+              <div className="my-6 overflow-x-auto">
+                <table className="w-full border-collapse text-left text-[14px]">
+                  <thead>
+                    <tr className="border-b border-ink/15">
+                      <th className="py-3 pr-4 font-semibold text-ink">Item</th>
+                      <th className="py-3 font-semibold text-ink">Indicative figure</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      ["Price range", "₱4.55M – ₱11.2M"],
+                      ["Starting price (1BR)", "≈ ₱4,556,000"],
+                      ["Sample monthly start", "≈ ₱22,000+ / month"],
+                      ["Reservation fee", "Confirmed per current promo"],
+                      ["Down payment", "Spread across the payment term"],
+                      ["Balance options", "Bank / in-house / Pag-IBIG / cash"],
+                    ].map(([k, v]) => (
+                      <tr key={k} className="border-b border-hairline">
+                        <td className="py-3 pr-4 font-semibold text-ink">{k}</td>
+                        <td className="py-3 text-muted-foreground">{v}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <p>
+                The headline advantage of DMCI's terms is the{" "}
+                <strong>spread-out down payment</strong>: instead of producing a large lump sum
+                upfront, the down payment is amortized across the term, making a resort-grade unit
+                attainable on a professional's or OFW's monthly budget. The remaining balance can
+                then be settled through bank financing, in-house financing, Pag-IBIG, or spot cash.
+              </p>
+              <div className="my-6 rounded-xl border border-primary/30 bg-primary/5 p-5">
+                <p className="text-[14px] text-ink">
+                  <strong>Want an exact computation?</strong> Developer pricing updates with each
+                  release and promo. Tell us your preferred unit and term, and we'll send a
+                  personalized Sonora computation —{" "}
+                  <a href="#lead" className="font-semibold text-primary underline">
+                    request it here
+                  </a>
+                  .
+                </p>
+              </div>
+            </Section>
+
+            {/* Financing */}
+            <Section
+              id="financing"
+              eyebrow="Financing Guide"
+              title="Financing Options for Sonora Garden Residences: Bank, Pag-IBIG & In-House"
+            >
+              <p>
+                Most buyers settle the <strong>down payment</strong> in monthly installments spread
+                across the payment term, then choose how to cover the remaining{" "}
+                <strong>balance</strong>. There are four common routes, each with different
+                trade-offs:
+              </p>
+              <ul className="my-4 space-y-3">
+                <li>
+                  <strong>Bank financing:</strong> the most common option for the balance. Banks
+                  typically finance up to 80% of the unit value over 5–20 years. Rates are fixed for
+                  an initial period, then repriced. Best for buyers with documented, stable income
+                  who want the longest amortization and lowest monthly outlay.
+                </li>
+                <li>
+                  <strong>In-house financing:</strong> arranged directly with the developer. Easier
+                  to qualify for and faster to approve, but usually carries higher interest and a
+                  shorter term than a bank. A practical bridge for self-employed buyers or those
+                  still building bank-ready documents.
+                </li>
+                <li>
+                  <strong>Pag-IBIG (HDMF):</strong> for eligible members, the Pag-IBIG housing loan
+                  can offer competitive, socialized rates over terms up to 30 years. Loan ceilings
+                  and qualification depend on your contributions and income.
+                </li>
+                <li>
+                  <strong>Spot / deferred cash:</strong> paying in full (or over a short deferred
+                  period) typically unlocks the largest discounts. Ideal for cash-rich buyers and
+                  OFWs consolidating savings.
+                </li>
+              </ul>
+              <p>
+                The right structure depends on your income documentation, how long you plan to hold
+                the unit, and your appetite for interest cost versus monthly cash flow. We can model
+                each option side by side against your target Sonora unit so you can see the true
+                monthly cost before you commit.
+              </p>
+            </Section>
+
+            {/* Amenities */}
+            <Section
+              id="amenities"
+              eyebrow="Resort Living Amenities"
+              title="Resort-Style Amenities at Sonora Garden Residences Las Piñas"
+            >
+              <p>
+                Amenities are where Sonora earns its "resort living" name. Rather than a single
+                token pool, the community offers a full cluster of leisure, fitness, family, and
+                convenience facilities spread across landscaped grounds and an elevated roof garden.
+              </p>
+              <div className="my-6 grid gap-5 sm:grid-cols-2">
+                {AMENITY_GROUPS.map((g) => (
+                  <div key={g.group} className="rounded-xl border border-hairline p-5">
+                    <h3 className="text-[13px] font-bold uppercase tracking-[0.1em] text-primary">
+                      {g.group}
+                    </h3>
+                    <ul className="mt-3 space-y-1.5">
+                      {g.items.map((item) => (
+                        <li
+                          key={item}
+                          className="flex items-start gap-2 text-[14px] text-muted-foreground"
+                        >
+                          <CheckCircle2 size={15} className="mt-0.5 shrink-0 text-emerald-500" />
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+              <p>
+                Behind the leisure facilities sit the practical systems DMCI is known for:{" "}
+                <strong>12 dual-core high-speed elevators</strong>, integrated WiFi and fiber-optic
+                readiness, standby power for both units and common areas, a card-operated laundry
+                station, an on-site convenience store and water station, and round-the-clock
+                security with CCTV — all maintained by DMCI Homes Property Management Corporation.
+              </p>
+            </Section>
+
+            {/* Virtual tour */}
+            <VirtualTourSection />
+
+            {/* Who */}
+            <Section
+              id="who"
+              eyebrow="Target Demographics"
+              title="Is Sonora Garden Residences the Right Las Piñas Condo for You?"
+            >
+              <p>Sonora suits several distinct buyer profiles particularly well:</p>
+              <ul className="my-4 space-y-3">
+                <li>
+                  <strong>South-Metro professionals &amp; upgraders</strong> who work in Las Piñas,
+                  Parañaque, Alabang, or the Bay Area and want a resort-grade home without paying
+                  Makati or BGC prices.
+                </li>
+                <li>
+                  <strong>Growing families</strong> needing two- or three-bedroom space near malls,
+                  schools, and hospitals, with pools and play areas on-site.
+                </li>
+                <li>
+                  <strong>OFWs and overseas investors</strong> who want a tangible, peso-resilient
+                  asset back home — purchasable remotely and rentable to a deep pool of South-Metro
+                  tenants.
+                </li>
+                <li>
+                  <strong>First-time investors</strong> drawn to RFO inventory: a unit that can be
+                  leased out immediately rather than waiting years for turnover.
+                </li>
+              </ul>
+              <p>
+                It is a weaker fit for buyers who need to be inside the Makati/BGC/Ortigas CBDs
+                daily and are unwilling to commute along Alabang–Zapote — for them, a CBD-adjacent
+                development may justify its premium.
+              </p>
+            </Section>
+
+            {/* Investment */}
+            <Section
+              id="investment"
+              eyebrow="Investment Potential"
+              title="Sonora Garden Residences Investment Potential & Expected Rental Yields"
+            >
+              <p>
+                On balance, Sonora has a credible investment case grounded in three forces: location
+                demand, ready inventory, and infrastructure momentum.
+              </p>
+              <p>
+                <strong>Demand:</strong> Las Piñas sits at the heart of a dense, growing South-Metro
+                population and serves as a gateway for Cavite-based workers. A unit directly linked
+                to a major mall, in an RFO building, addresses the most rentable segment of the
+                market — tenants who want convenience now, not in three years.
+              </p>
+              <p>
+                <strong>Developer scale:</strong> DMCI Homes has publicly framed Sonora as a
+                flagship project for the south, with reported revenue targets in the ₱13-billion
+                range — a signal of the developer's confidence in sustained absorption along this
+                corridor.
+              </p>
+              <p>
+                <strong>Infrastructure:</strong> the LRT-1 Cavite Extension and broader road and
+                transit upgrades across the southern corridor are the kind of public investment that
+                historically lifts nearby residential values and rental demand over time.
+              </p>
+              <p>
+                As always, treat projections with discipline: confirm the current price, association
+                dues, and realistic rental comparables for your specific unit before assuming a
+                yield. We're happy to share live rental data for the area.
+              </p>
+            </Section>
+
+            {/* Developer */}
+            <Section
+              id="developer"
+              eyebrow="Trusted Builders"
+              title="Why Invest in DMCI Homes & Robinsons Land Joint Ventures"
+            >
+              <p>
+                DMCI Homes is the residential arm of <strong>DMCI Holdings</strong>, a publicly
+                listed engineering and construction conglomerate with decades of building
+                experience. Unlike many developers that outsource construction, DMCI builds its own
+                projects — a vertical integration that underpins its reputation for solid,
+                well-finished structures.
+              </p>
+              <p>
+                The brand is best known for its{" "}
+                <strong>resort-inspired, low-density communities</strong> and its{" "}
+                <strong>Lumiventt design technology</strong>, which channels natural light and
+                cross-ventilation through garden atriums and breezeways — the same DNA visible in
+                Sonora's roof garden and landscaped commons. After turnover, units are maintained by{" "}
+                <strong>DMCI Homes Property Management Corporation</strong>, giving owners a single
+                accountable party for security, upkeep, and common-area service.
+              </p>
+              <p>
+                For a buyer, that track record translates into lower execution risk: a higher
+                likelihood that the building is delivered as promised, holds up over time, and is
+                managed well enough to protect resale and rental value.
+              </p>
+            </Section>
+
+            {/* Pros & cons */}
+            <Section
+              id="pros-cons"
+              eyebrow="Honest Buying Review"
+              title="Pros & Cons of Buying a Unit in Sonora Garden Residences"
+            >
+              <div className="my-6 grid gap-6 md:grid-cols-2">
+                <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-5">
+                  <h3 className="flex items-center gap-2 text-[15px] font-bold text-emerald-700">
+                    <CheckCircle2 size={18} /> Strengths
                   </h3>
-                  <ul className="mt-3 space-y-1.5">
-                    {g.items.map((item) => (
-                      <li
-                        key={item}
-                        className="flex items-start gap-2 text-[14px] text-muted-foreground"
-                      >
+                  <ul className="mt-4 space-y-2.5">
+                    {PROS.map((p) => (
+                      <li key={p} className="flex items-start gap-2 text-[14px] text-ink/80">
                         <CheckCircle2 size={15} className="mt-0.5 shrink-0 text-emerald-500" />
-                        {item}
+                        {p}
                       </li>
                     ))}
                   </ul>
                 </div>
-              ))}
-            </div>
-            <p>
-              Behind the leisure facilities sit the practical systems DMCI is known for:{" "}
-              <strong>12 dual-core high-speed elevators</strong>, integrated WiFi and fiber-optic
-              readiness, standby power for both units and common areas, a card-operated laundry
-              station, an on-site convenience store and water station, and round-the-clock security
-              with CCTV — all maintained by DMCI Homes Property Management Corporation.
-            </p>
-          </Section>
-
-          {/* Virtual tour */}
-          <VirtualTourSection />
-
-          {/* Who */}
-          <Section
-            id="who"
-            eyebrow="Target Demographics"
-            title="Is Sonora Garden Residences the Right Las Piñas Condo for You?"
-          >
-            <p>Sonora suits several distinct buyer profiles particularly well:</p>
-            <ul className="my-4 space-y-3">
-              <li>
-                <strong>South-Metro professionals &amp; upgraders</strong> who work in Las Piñas,
-                Parañaque, Alabang, or the Bay Area and want a resort-grade home without paying
-                Makati or BGC prices.
-              </li>
-              <li>
-                <strong>Growing families</strong> needing two- or three-bedroom space near malls,
-                schools, and hospitals, with pools and play areas on-site.
-              </li>
-              <li>
-                <strong>OFWs and overseas investors</strong> who want a tangible, peso-resilient
-                asset back home — purchasable remotely and rentable to a deep pool of South-Metro
-                tenants.
-              </li>
-              <li>
-                <strong>First-time investors</strong> drawn to RFO inventory: a unit that can be
-                leased out immediately rather than waiting years for turnover.
-              </li>
-            </ul>
-            <p>
-              It is a weaker fit for buyers who need to be inside the Makati/BGC/Ortigas CBDs daily
-              and are unwilling to commute along Alabang–Zapote — for them, a CBD-adjacent
-              development may justify its premium.
-            </p>
-          </Section>
-
-          {/* Investment */}
-          <Section
-            id="investment"
-            eyebrow="Investment Potential"
-            title="Sonora Garden Residences Investment Potential & Expected Rental Yields"
-          >
-            <p>
-              On balance, Sonora has a credible investment case grounded in three forces: location
-              demand, ready inventory, and infrastructure momentum.
-            </p>
-            <p>
-              <strong>Demand:</strong> Las Piñas sits at the heart of a dense, growing South-Metro
-              population and serves as a gateway for Cavite-based workers. A unit directly linked to
-              a major mall, in an RFO building, addresses the most rentable segment of the market —
-              tenants who want convenience now, not in three years.
-            </p>
-            <p>
-              <strong>Developer scale:</strong> DMCI Homes has publicly framed Sonora as a flagship
-              project for the south, with reported revenue targets in the ₱13-billion range — a
-              signal of the developer's confidence in sustained absorption along this corridor.
-            </p>
-            <p>
-              <strong>Infrastructure:</strong> the LRT-1 Cavite Extension and broader road and
-              transit upgrades across the southern corridor are the kind of public investment that
-              historically lifts nearby residential values and rental demand over time.
-            </p>
-            <p>
-              As always, treat projections with discipline: confirm the current price, association
-              dues, and realistic rental comparables for your specific unit before assuming a yield.
-              We're happy to share live rental data for the area.
-            </p>
-          </Section>
-
-          {/* Developer */}
-          <Section
-            id="developer"
-            eyebrow="Trusted Builders"
-            title="Why Invest in DMCI Homes & Robinsons Land Joint Ventures"
-          >
-            <p>
-              DMCI Homes is the residential arm of <strong>DMCI Holdings</strong>, a publicly listed
-              engineering and construction conglomerate with decades of building experience. Unlike
-              many developers that outsource construction, DMCI builds its own projects — a vertical
-              integration that underpins its reputation for solid, well-finished structures.
-            </p>
-            <p>
-              The brand is best known for its{" "}
-              <strong>resort-inspired, low-density communities</strong> and its{" "}
-              <strong>Lumiventt design technology</strong>, which channels natural light and
-              cross-ventilation through garden atriums and breezeways — the same DNA visible in
-              Sonora's roof garden and landscaped commons. After turnover, units are maintained by{" "}
-              <strong>DMCI Homes Property Management Corporation</strong>, giving owners a single
-              accountable party for security, upkeep, and common-area service.
-            </p>
-            <p>
-              For a buyer, that track record translates into lower execution risk: a higher
-              likelihood that the building is delivered as promised, holds up over time, and is
-              managed well enough to protect resale and rental value.
-            </p>
-          </Section>
-
-          {/* Pros & cons */}
-          <Section
-            id="pros-cons"
-            eyebrow="Honest Buying Review"
-            title="Pros & Cons of Buying a Unit in Sonora Garden Residences"
-          >
-            <div className="my-6 grid gap-6 md:grid-cols-2">
-              <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-5">
-                <h3 className="flex items-center gap-2 text-[15px] font-bold text-emerald-700">
-                  <CheckCircle2 size={18} /> Strengths
-                </h3>
-                <ul className="mt-4 space-y-2.5">
-                  {PROS.map((p) => (
-                    <li key={p} className="flex items-start gap-2 text-[14px] text-ink/80">
-                      <CheckCircle2 size={15} className="mt-0.5 shrink-0 text-emerald-500" />
-                      {p}
-                    </li>
-                  ))}
-                </ul>
+                <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-5">
+                  <h3 className="flex items-center gap-2 text-[15px] font-bold text-amber-700">
+                    <AlertCircle size={18} /> Things to weigh
+                  </h3>
+                  <ul className="mt-4 space-y-2.5">
+                    {CONS.map((c) => (
+                      <li key={c} className="flex items-start gap-2 text-[14px] text-ink/80">
+                        <AlertCircle size={15} className="mt-0.5 shrink-0 text-amber-500" />
+                        {c}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
-              <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-5">
-                <h3 className="flex items-center gap-2 text-[15px] font-bold text-amber-700">
-                  <AlertCircle size={18} /> Things to weigh
-                </h3>
-                <ul className="mt-4 space-y-2.5">
-                  {CONS.map((c) => (
-                    <li key={c} className="flex items-start gap-2 text-[14px] text-ink/80">
-                      <AlertCircle size={15} className="mt-0.5 shrink-0 text-amber-500" />
-                      {c}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </Section>
+            </Section>
 
-          {/* How to buy */}
-          <Section
-            id="how-to-buy"
-            eyebrow="Buying Process"
-            title="Step-by-Step Buying Process for Sonora Garden Residences"
-          >
-            <p>
-              Buying at Sonora Garden Residences follows DMCI's standard, OFW-friendly process.
-              Here's the path from shortlist to keys:
-            </p>
-            <ol className="my-6 space-y-4">
-              {BUY_STEPS.map((s, i) => (
-                <li key={s.step} className="flex gap-4">
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-[13px] font-bold text-primary-foreground">
-                    {i + 1}
-                  </span>
-                  <div>
-                    <h3 className="text-[15px] font-bold text-ink">{s.step}</h3>
-                    <p className="mt-1 text-[14px] leading-relaxed text-muted-foreground">
-                      {s.detail}
-                    </p>
-                  </div>
-                </li>
-              ))}
-            </ol>
-            <p>
-              A CityQlo advisor can handle the legwork on your behalf — sending the live price list,
-              reserving your unit, and preparing the document checklist — including fully remote
-              transactions for OFWs.
-            </p>
-          </Section>
-
-          {/* Checklist */}
-          <Section
-            id="checklist"
-            eyebrow="Due Diligence Checklist"
-            title="Buyer's Due Diligence Checklist for Sonora Garden Residences"
-          >
-            <p>
-              A resort-grade unit is still a major financial commitment. Before you reserve, work
-              through this short due-diligence checklist — it protects your money and sets honest
-              expectations:
-            </p>
-            <ul className="my-4 space-y-3">
-              <li>
-                <strong>Confirm the live price &amp; promo.</strong> Developer pricing and discounts
-                change per release. Get the current official price list for your exact unit, floor,
-                and tower in writing.
-              </li>
-              <li>
-                <strong>Ask about association dues.</strong> Monthly condo dues fund security,
-                amenities, and upkeep — budget for them on top of your amortization.
-              </li>
-              <li>
-                <strong>Check the turnover status.</strong> Cadence is RFO; verify availability,
-                acceptance condition, and timeline for the specific unit you want.
-              </li>
-              <li>
-                <strong>Test your commute.</strong> Drive Alabang–Zapote Road at the time you'd
-                actually travel, not at midday — it's the single biggest lifestyle variable.
-              </li>
-              <li>
-                <strong>Validate rental comparables.</strong> If you're buying to lease, confirm
-                realistic rents and vacancy for similar Las Piñas units before assuming a yield.
-              </li>
-              <li>
-                <strong>Review the contract carefully.</strong> Read the Contract to Sell, payment
-                schedule, and penalties; for OFWs, prepare your SPA early.
-              </li>
-              <li>
-                <strong>Prepare your financing path.</strong> Pre-qualify with a bank or Pag-IBIG so
-                the balance option is settled before the down-payment term ends.
-              </li>
-            </ul>
-            <p>
-              If any of these are unclear, ask before you pay the reservation fee — a good advisor
-              will welcome the questions and give you straight answers.
-            </p>
-          </Section>
-
-          {/* Comparison */}
-          <Section
-            id="comparison"
-            eyebrow="Property Comparison"
-            title="How Sonora Garden Residences Compares to Other South Metro Condos"
-          >
-            <p>
-              Generic listing sites show you a unit; they rarely tell you how it stacks up. Here's
-              an honest comparison of Sonora against a typical Metro Manila condo offering:
-            </p>
-            <div className="my-6 overflow-x-auto">
-              <table className="w-full border-collapse text-left text-[14px]">
-                <thead>
-                  <tr className="border-b border-ink/15">
-                    <th className="py-3 pr-4 font-semibold text-ink">Factor</th>
-                    <th className="py-3 pr-4 font-semibold text-primary">
-                      Sonora Garden Residences
-                    </th>
-                    <th className="py-3 font-semibold text-ink">Typical condo</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {COMPARISON.map((c) => (
-                    <tr key={c.factor} className="border-b border-hairline align-top">
-                      <td className="py-3 pr-4 font-semibold text-ink">{c.factor}</td>
-                      <td className="py-3 pr-4 text-ink/80">{c.sonora}</td>
-                      <td className="py-3 text-muted-foreground">{c.typical}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <p>
-              For a deeper look at why Philippine condos can make sense as a long-term asset, read
-              our{" "}
-              <Link to="/why-invest" className="font-semibold text-primary underline">
-                guide to investing in Philippine property
-              </Link>
-              , or browse{" "}
-              <Link
-                to="/properties"
-                search={{} as never}
-                className="font-semibold text-primary underline"
-              >
-                other DMCI developments
-              </Link>{" "}
-              we cover.
-            </p>
-          </Section>
-
-          {/* FAQ */}
-          <Section
-            id="faq"
-            eyebrow="Frequently Asked Questions"
-            title="Sonora Garden Residences Frequently Asked Questions (FAQ)"
-          >
-            <div className="mt-6 divide-y divide-hairline border-y border-hairline">
-              {FAQS.map((f, i) => {
-                const isOpen = openFaq === i;
-                return (
-                  <div key={f.q}>
-                    <button
-                      onClick={() => setOpenFaq(isOpen ? null : i)}
-                      className="flex w-full items-center justify-between gap-4 py-5 text-left"
-                      aria-expanded={isOpen}
-                    >
-                      <span className="text-[16px] font-semibold text-ink">{f.q}</span>
-                      <ChevronDown
-                        size={18}
-                        className={`shrink-0 text-primary transition-transform duration-300 ${
-                          isOpen ? "rotate-180" : ""
-                        }`}
-                      />
-                    </button>
-                    {isOpen && (
-                      <p className="pb-5 text-[15px] leading-relaxed text-muted-foreground">
-                        {f.a}
+            {/* How to buy */}
+            <Section
+              id="how-to-buy"
+              eyebrow="Buying Process"
+              title="Step-by-Step Buying Process for Sonora Garden Residences"
+            >
+              <p>
+                Buying at Sonora Garden Residences follows DMCI's standard, OFW-friendly process.
+                Here's the path from shortlist to keys:
+              </p>
+              <ol className="my-6 space-y-4">
+                {BUY_STEPS.map((s, i) => (
+                  <li key={s.step} className="flex gap-4">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-[13px] font-bold text-primary-foreground">
+                      {i + 1}
+                    </span>
+                    <div>
+                      <h3 className="text-[15px] font-bold text-ink">{s.step}</h3>
+                      <p className="mt-1 text-[14px] leading-relaxed text-muted-foreground">
+                        {s.detail}
                       </p>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </Section>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+              <p>
+                A CityQlo advisor can handle the legwork on your behalf — sending the live price
+                list, reserving your unit, and preparing the document checklist — including fully
+                remote transactions for OFWs.
+              </p>
+            </Section>
 
-          {/* Closing internal-link block */}
-          <Reveal>
-            <div className="rounded-2xl border border-hairline bg-secondary/40 p-6 md:p-8">
-              <p className="eyebrow mb-3">Keep exploring</p>
-              <p className="text-[15px] leading-relaxed text-muted-foreground">
-                See the live unit inventory and book a viewing on the{" "}
-                <Link
-                  to="/projects/$slug"
-                  params={{ slug: "sonora-garden-residences" }}
-                  className="font-semibold text-primary underline"
-                >
-                  Sonora Garden Residences project page
+            {/* Checklist */}
+            <Section
+              id="checklist"
+              eyebrow="Due Diligence Checklist"
+              title="Buyer's Due Diligence Checklist for Sonora Garden Residences"
+            >
+              <p>
+                A resort-grade unit is still a major financial commitment. Before you reserve, work
+                through this short due-diligence checklist — it protects your money and sets honest
+                expectations:
+              </p>
+              <ul className="my-4 space-y-3">
+                <li>
+                  <strong>Confirm the live price &amp; promo.</strong> Developer pricing and
+                  discounts change per release. Get the current official price list for your exact
+                  unit, floor, and tower in writing.
+                </li>
+                <li>
+                  <strong>Ask about association dues.</strong> Monthly condo dues fund security,
+                  amenities, and upkeep — budget for them on top of your amortization.
+                </li>
+                <li>
+                  <strong>Check the turnover status.</strong> Cadence is RFO; verify availability,
+                  acceptance condition, and timeline for the specific unit you want.
+                </li>
+                <li>
+                  <strong>Test your commute.</strong> Drive Alabang–Zapote Road at the time you'd
+                  actually travel, not at midday — it's the single biggest lifestyle variable.
+                </li>
+                <li>
+                  <strong>Validate rental comparables.</strong> If you're buying to lease, confirm
+                  realistic rents and vacancy for similar Las Piñas units before assuming a yield.
+                </li>
+                <li>
+                  <strong>Review the contract carefully.</strong> Read the Contract to Sell, payment
+                  schedule, and penalties; for OFWs, prepare your SPA early.
+                </li>
+                <li>
+                  <strong>Prepare your financing path.</strong> Pre-qualify with a bank or Pag-IBIG
+                  so the balance option is settled before the down-payment term ends.
+                </li>
+              </ul>
+              <p>
+                If any of these are unclear, ask before you pay the reservation fee — a good advisor
+                will welcome the questions and give you straight answers.
+              </p>
+            </Section>
+
+            {/* Comparison */}
+            <Section
+              id="comparison"
+              eyebrow="Property Comparison"
+              title="How Sonora Garden Residences Compares to Other South Metro Condos"
+            >
+              <p>
+                Generic listing sites show you a unit; they rarely tell you how it stacks up. Here's
+                an honest comparison of Sonora against a typical Metro Manila condo offering:
+              </p>
+              <div className="my-6 overflow-x-auto">
+                <table className="w-full border-collapse text-left text-[14px]">
+                  <thead>
+                    <tr className="border-b border-ink/15">
+                      <th className="py-3 pr-4 font-semibold text-ink">Factor</th>
+                      <th className="py-3 pr-4 font-semibold text-primary">
+                        Sonora Garden Residences
+                      </th>
+                      <th className="py-3 font-semibold text-ink">Typical condo</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {COMPARISON.map((c) => (
+                      <tr key={c.factor} className="border-b border-hairline align-top">
+                        <td className="py-3 pr-4 font-semibold text-ink">{c.factor}</td>
+                        <td className="py-3 pr-4 text-ink/80">{c.sonora}</td>
+                        <td className="py-3 text-muted-foreground">{c.typical}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <p>
+                For a deeper look at why Philippine condos can make sense as a long-term asset, read
+                our{" "}
+                <Link to="/why-invest" className="font-semibold text-primary underline">
+                  guide to investing in Philippine property
                 </Link>
-                , compare{" "}
+                , or browse{" "}
                 <Link
                   to="/properties"
                   search={{} as never}
                   className="font-semibold text-primary underline"
                 >
-                  other DMCI developments in the Philippines
-                </Link>
-                , or read more{" "}
-                <Link to="/guides" className="font-semibold text-primary underline">
-                  buyer guides
-                </Link>
-                .
+                  other DMCI developments
+                </Link>{" "}
+                we cover.
               </p>
-            </div>
-          </Reveal>
+            </Section>
+
+            {/* FAQ */}
+            <Section
+              id="faq"
+              eyebrow="Frequently Asked Questions"
+              title="Sonora Garden Residences Frequently Asked Questions (FAQ)"
+            >
+              <div className="mt-6 divide-y divide-hairline border-y border-hairline">
+                {FAQS.map((f, i) => {
+                  const isOpen = openFaq === i;
+                  return (
+                    <div key={f.q}>
+                      <button
+                        onClick={() => setOpenFaq(isOpen ? null : i)}
+                        className="flex w-full items-center justify-between gap-4 py-5 text-left"
+                        aria-expanded={isOpen}
+                      >
+                        <span className="text-[16px] font-semibold text-ink">{f.q}</span>
+                        <ChevronDown
+                          size={18}
+                          className={`shrink-0 text-primary transition-transform duration-300 ${
+                            isOpen ? "rotate-180" : ""
+                          }`}
+                        />
+                      </button>
+                      {isOpen && (
+                        <p className="pb-5 text-[15px] leading-relaxed text-muted-foreground">
+                          {f.a}
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </Section>
+
+            {/* Closing internal-link block */}
+            <Reveal>
+              <div className="rounded-2xl border border-hairline bg-secondary/40 p-6 md:p-8">
+                <p className="eyebrow mb-3">Keep exploring</p>
+                <p className="text-[15px] leading-relaxed text-muted-foreground">
+                  See the live unit inventory and book a viewing on the{" "}
+                  <Link
+                    to="/projects/$slug"
+                    params={{ slug: "sonora-garden-residences" }}
+                    className="font-semibold text-primary underline"
+                  >
+                    Sonora Garden Residences project page
+                  </Link>
+                  , compare{" "}
+                  <Link
+                    to="/properties"
+                    search={{} as never}
+                    className="font-semibold text-primary underline"
+                  >
+                    other DMCI developments in the Philippines
+                  </Link>
+                  , or read more{" "}
+                  <Link to="/guides" className="font-semibold text-primary underline">
+                    buyer guides
+                  </Link>
+                  .
+                </p>
+              </div>
+            </Reveal>
+          </article>
         </div>
-      </article>
+      </div>
 
       {/* ===================== LEAD CAPTURE ===================== */}
       <div id="lead">

@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { getSiteSettings, updateSiteSettings } from "../../lib/api/admin.functions";
 import { toast } from "sonner";
+import { MediaPicker } from "../../components/MediaPicker";
 
 export const Route = createFileRoute("/portal/settings")({
   component: SettingsPage,
@@ -357,6 +358,43 @@ function SettingsPage() {
     onError: (e) => toast.error(e instanceof Error ? e.message : "Save failed"),
   });
 
+  const [autoSaveStatus, setAutoSaveStatus] = useState<"idle" | "saving" | "saved" | "error">(
+    "idle",
+  );
+
+  useEffect(() => {
+    if (!dirty) return;
+
+    setAutoSaveStatus("saving");
+    const timer = setTimeout(async () => {
+      try {
+        const base = settingsRows ?? {};
+        const merged = { ...base };
+        for (const section of Object.keys(draft) as SettingsSection[]) {
+          merged[section] = { ...(base[section] ?? {}), ...(draft[section] ?? {}) };
+        }
+        for (const section of Object.keys(merged) as SettingsSection[]) {
+          await updateSiteSettings({
+            data: {
+              key: section,
+              value: merged[section],
+            },
+          });
+        }
+        qc.invalidateQueries({ queryKey: ["portal-settings"] });
+        setDraft({});
+        setDirty(false);
+        setAutoSaveStatus("saved");
+        setTimeout(() => setAutoSaveStatus("idle"), 2000);
+      } catch (err) {
+        setAutoSaveStatus("error");
+        console.error("Settings auto-save failed:", err);
+      }
+    }, 4000);
+
+    return () => clearTimeout(timer);
+  }, [draft, dirty, settingsRows]);
+
   const ActiveIcon = SECTIONS.find((s) => s.key === activeSection)?.icon ?? Settings2;
 
   // Resolved OG preview values
@@ -377,17 +415,37 @@ function SettingsPage() {
           <h1 className="portal-page-title">Settings</h1>
           <p className="portal-page-desc">Manage site-wide configurations</p>
         </div>
-        {dirty && (
-          <button
-            onClick={() => saveMutation.mutate()}
-            disabled={saveMutation.isPending}
-            className="portal-btn-primary"
-            id="settings-save-btn"
-          >
-            <Save size={15} />
-            {saveMutation.isPending ? "Saving…" : "Save Changes"}
-          </button>
-        )}
+        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+          {autoSaveStatus !== "idle" && (
+            <span
+              style={{
+                fontSize: "11px",
+                fontFamily: "var(--font-mono, monospace)",
+                color:
+                  autoSaveStatus === "saving"
+                    ? "var(--portal-accent)"
+                    : autoSaveStatus === "saved"
+                      ? "oklch(0.65 0.18 145)"
+                      : "oklch(0.65 0.2 25)",
+              }}
+            >
+              {autoSaveStatus === "saving" && "Auto-saving..."}
+              {autoSaveStatus === "saved" && "Auto-saved"}
+              {autoSaveStatus === "error" && "Auto-save failed"}
+            </span>
+          )}
+          {dirty && (
+            <button
+              onClick={() => saveMutation.mutate()}
+              disabled={saveMutation.isPending}
+              className="portal-btn-primary"
+              id="settings-save-btn"
+            >
+              <Save size={15} />
+              {saveMutation.isPending ? "Saving…" : "Save Changes"}
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="portal-settings-layout">
@@ -427,63 +485,73 @@ function SettingsPage() {
                       <div className="skeleton portal-field-skeleton" />
                     </div>
                   ))
-                : FIELDS[activeSection].map((f) => (
-                    <div key={f.key} className="portal-field">
-                      <div className="flex items-center justify-between gap-3">
-                        <label
-                          htmlFor={`setting-${activeSection}-${f.key}`}
-                          className="portal-field-label"
-                        >
-                          {f.label}
-                        </label>
-                        {f.maxLength && (
-                          <CharCount
+                : FIELDS[activeSection].map((f) => {
+                    if (f.key === "og_image_url") {
+                      return (
+                        <MediaPicker
+                          key={f.key}
+                          label={f.label}
+                          aspectRatioLabel="Ratio 16:9"
+                          value={getValue(activeSection, f.key)}
+                          onChange={(val) => handleChange(activeSection, f.key, val)}
+                          description={f.hint}
+                          optional
+                        />
+                      );
+                    }
+                    return (
+                      <div key={f.key} className="portal-field">
+                        <div className="flex items-center justify-between gap-3">
+                          <label
+                            htmlFor={`setting-${activeSection}-${f.key}`}
+                            className="portal-field-label"
+                          >
+                            {f.label}
+                          </label>
+                          {f.maxLength && (
+                            <CharCount
+                              value={getValue(activeSection, f.key)}
+                              max={f.maxLength}
+                              ideal={
+                                f.key === "meta_title"
+                                  ? [50, 60]
+                                  : f.key === "meta_description"
+                                    ? [140, 160]
+                                    : undefined
+                              }
+                            />
+                          )}
+                        </div>
+
+                        {f.textarea ? (
+                          <textarea
+                            id={`setting-${activeSection}-${f.key}`}
+                            placeholder={f.placeholder}
                             value={getValue(activeSection, f.key)}
-                            max={f.maxLength}
-                            ideal={
-                              f.key === "meta_title"
-                                ? [50, 60]
-                                : f.key === "meta_description"
-                                  ? [140, 160]
-                                  : undefined
-                            }
+                            onChange={(e) => handleChange(activeSection, f.key, e.target.value)}
+                            rows={3}
+                            className="portal-input resize-none"
+                            style={{ height: "auto", minHeight: "80px" }}
+                          />
+                        ) : (
+                          <input
+                            id={`setting-${activeSection}-${f.key}`}
+                            type={f.type ?? "text"}
+                            placeholder={f.placeholder}
+                            value={getValue(activeSection, f.key)}
+                            onChange={(e) => handleChange(activeSection, f.key, e.target.value)}
+                            className="portal-input"
                           />
                         )}
+
+                        {f.hint && (
+                          <p className="mt-1 text-[11px] leading-relaxed text-slate-400">
+                            {f.hint}
+                          </p>
+                        )}
                       </div>
-
-                      {f.textarea ? (
-                        <textarea
-                          id={`setting-${activeSection}-${f.key}`}
-                          placeholder={f.placeholder}
-                          value={getValue(activeSection, f.key)}
-                          onChange={(e) => handleChange(activeSection, f.key, e.target.value)}
-                          rows={3}
-                          className="portal-input resize-none"
-                          style={{ height: "auto", minHeight: "80px" }}
-                        />
-                      ) : (
-                        <input
-                          id={`setting-${activeSection}-${f.key}`}
-                          type={f.type ?? "text"}
-                          placeholder={f.placeholder}
-                          value={getValue(activeSection, f.key)}
-                          onChange={(e) => handleChange(activeSection, f.key, e.target.value)}
-                          className="portal-input"
-                        />
-                      )}
-
-                      {/* Image status badge for og_image_url */}
-                      {f.key === "og_image_url" && (
-                        <div className="mt-1.5">
-                          <ImageStatusBadge url={getValue(activeSection, f.key)} />
-                        </div>
-                      )}
-
-                      {f.hint && (
-                        <p className="mt-1 text-[11px] leading-relaxed text-slate-400">{f.hint}</p>
-                      )}
-                    </div>
-                  ))}
+                    );
+                  })}
             </div>
           </div>
 

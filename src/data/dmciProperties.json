@@ -1,0 +1,776 @@
+[
+  {
+    "name": "Kalea Heights",
+    "slug": "kalea-heights",
+    "location": "Cebu City",
+    "status": "Pre-selling",
+    "price_min": 5613000,
+    "price_max": 13426000,
+    "beds": "1BR, 2BR, 3BR"
+  },
+  {
+    "name": "One Delta Terraces",
+    "slug": "one-delta-terraces",
+    "location": "Quezon City",
+    "status": "Pre-selling",
+    "price_min": 6953000,
+    "price_max": 22147000,
+    "beds": "STUDIO, 2BR, 3BR"
+  },
+  {
+    "name": "Moncello Crest",
+    "slug": "moncello-crest",
+    "location": "Tuba, Benguet",
+    "status": "Pre-selling",
+    "price_min": 7950000,
+    "price_max": 18270000,
+    "beds": "STUDIO, 1BR, 2BR"
+  },
+  {
+    "name": "Alea Residences",
+    "slug": "alea-residences",
+    "location": "Bacoor",
+    "status": "Ready for Occupancy",
+    "price_min": 6115000,
+    "price_max": 9872000,
+    "beds": "2BR, 3BR"
+  },
+  {
+    "name": "Bristle Ridge",
+    "slug": "bristle-ridge",
+    "location": "Baguio City",
+    "status": "Ready for Occupancy",
+    "price_min": 5010000,
+    "price_max": 14008000,
+    "beds": "1BR, 2BR, 3BR"
+  },
+  {
+    "name": "Outlook Ridge Residences",
+    "slug": "outlook-ridge-residences",
+    "location": "Baguio City",
+    "status": "Ready for Occupancy",
+    "price_min": 3746000,
+    "price_max": 11592000,
+    "beds": "STUDIO, 2BR"
+  },
+  {
+    "name": "Willow Park Homes",
+    "slug": "willow-park-homes",
+    "location": "Cabuyao, Laguna",
+    "status": "Ready for Occupancy",
+    "price_min": 1544000,
+    "price_max": 9402000,
+    "beds": "H&L, LOT"
+  },
+  {
+    "name": "The Calinea Tower",
+    "slug": "the-calinea-tower",
+    "location": "Caloocan",
+    "status": "Pre-selling",
+    "price_min": 5379000,
+    "price_max": 24601000,
+    "beds": "STUDIO, 1BR, 2BR, 3BR, LOFT"
+  },
+  {
+    "name": "Villa Alegre Homes",
+    "slug": "villa-alegre",
+    "location": "Carmona",
+    "status": "Ready for Occupancy",
+    "price_min": 1495700,
+    "price_max": 9514900,
+    "beds": "H&L, LOT"
+  },
+  {
+    "name": "Woodland Hills",
+    "slug": "woodland-hills",
+    "location": "Carmona",
+    "status": "Ready for Occupancy",
+    "price_min": 634200,
+    "price_max": 10990000,
+    "beds": "H&L, LOT"
+  },
+  {
+    "name": "Verdon Parc",
+    "slug": "verdon-parc",
+    "location": "Davao City",
+    "status": "Ready for Occupancy",
+    "price_min": 4182000,
+    "price_max": 9552000,
+    "beds": "1BR, 2BR"
+  },
+  {
+    "name": "Maricielo Villas",
+    "slug": "maricielo-villas",
+    "location": "Las Piñas",
+    "status": "Ready for Occupancy",
+    "price_min": 4841000,
+    "price_max": 7817000,
+    "beds": "2BR, 3BR"
+  },
+  {
+    "name": "Ohana Place",
+    "slug": "ohana-place",
+    "location": "Las Piñas",
+    "status": "Ready for Occupancy",
+    "price_min": 3013000,
+    "price_max": 8685000,
+    "beds": "STUDIO, 2BR, 3BR"
+  },
+  {
+    "name": "Sonora Garden Residences",
+    "slug": "sonora-garden-residences",
+    "location": "Las Piñas",
+    "status": "Ready for Occupancy",
+    "price_min": 4556000,
+    "price_max": 11208000,
+    "beds": "1BR, 2BR, 3BR"
+  },
+  {
+    "name": "Brio Tower",
+    "slug": "brio-tower",
+    "location": "Makati",
+    "status": "Ready for Occupancy",
+    "price_min": 5855000,
+    "price_max": 15818000,
+    "beds": "1BR, 2BR, 3BR"
+  },
+  {
+    "name": "Fortis Residences",
+    "slug": "fortis-residences",
+    "location": "Makati",
+    "status": "Pre-selling",
+    "price_min": 14251000,
+    "price_max": 39762000,
+    "beds": "1BR, 2BR, 3BR"
+  },
+  {
+    "name": "Alta Vista de Boracay",
+    "slug": "alta-vista-de-boracay",
+    "location": "Malay",
+    "status": "Ready for Occupancy",
+    "price_min": 5597000,
+    "price_max": 9426000,
+    "beds": "STUDIO, LOFT"
+  },
+  {
+    "name": "Dansalan Gardens Condominiums",
+    "slug": "dansalan-gardens-condominiums",
+    "location": "Mandaluyong",
+    "status": "Ready for Occupancy",
+    "price_min": 5555000,
+    "price_max": 20623000,
+    "beds": "1BR, 2BR, 3BR"
+  },
+  {
+    "name": "Flair Towers",
+    "slug": "flair-towers",
+    "location": "Mandaluyong",
+    "status": "Ready for Occupancy",
+    "price_min": 5435000,
+    "price_max": 14171000,
+    "beds": "STUDIO, 1BR, 2BR, 3BR"
+  },
+  {
+    "name": "Kai Garden Residences",
+    "slug": "kai-garden-residences",
+    "location": "Mandaluyong",
+    "status": "Ready for Occupancy",
+    "price_min": 5472000,
+    "price_max": 14834000,
+    "beds": "1BR, 2BR, 3BR"
+  },
+  {
+    "name": "Sage Residences",
+    "slug": "sage-residences",
+    "location": "Mandaluyong",
+    "status": "Pre-selling",
+    "price_min": 6513000,
+    "price_max": 16077000,
+    "beds": "STUDIO, 1BR, 2BR, 3BR"
+  },
+  {
+    "name": "Tivoli Garden Residences",
+    "slug": "tivoli-garden-residences",
+    "location": "Mandaluyong",
+    "status": "Ready for Occupancy",
+    "price_min": 5378000,
+    "price_max": 16260000,
+    "beds": "STUDIO, 1BR, 2BR, 3BR"
+  },
+  {
+    "name": "Illumina Residences Manila",
+    "slug": "illumina-residences-manila",
+    "location": "Manila",
+    "status": "Ready for Occupancy",
+    "price_min": 3476000,
+    "price_max": 10308000,
+    "beds": "STUDIO, 2BR, 3BR"
+  },
+  {
+    "name": "Sorrel Residences",
+    "slug": "sorrel-residences",
+    "location": "Manila",
+    "status": "Ready for Occupancy",
+    "price_min": 4376000,
+    "price_max": 8712000,
+    "beds": "STUDIO, 1BR, 2BR, 3BR"
+  },
+  {
+    "name": "The Camden Place",
+    "slug": "the-camden-place",
+    "location": "Manila",
+    "status": "Pre-selling",
+    "price_min": 5143800,
+    "price_max": 9918800,
+    "beds": "STUDIO, 1BR, 2BR"
+  },
+  {
+    "name": "Torre De Manila",
+    "slug": "torre-de-manila",
+    "location": "Manila",
+    "status": "Ready for Occupancy",
+    "price_min": 6339000,
+    "price_max": 14144000,
+    "beds": "1BR, 2BR, 3BR"
+  },
+  {
+    "name": "Rhapsody Residences",
+    "slug": "rhapsody-residences",
+    "location": "Muntinlupa",
+    "status": "Ready for Occupancy",
+    "price_min": 4196000,
+    "price_max": 11066000,
+    "beds": "2BR, 3BR"
+  },
+  {
+    "name": "Arista Place",
+    "slug": "arista-place",
+    "location": "Parañaque",
+    "status": "Ready for Occupancy",
+    "price_min": 5032000,
+    "price_max": 8570000,
+    "beds": "2BR"
+  },
+  {
+    "name": "Asteria Residences",
+    "slug": "asteria-residences",
+    "location": "Parañaque",
+    "status": "Ready for Occupancy",
+    "price_min": 5696000,
+    "price_max": 9736000,
+    "beds": "2BR, 3BR"
+  },
+  {
+    "name": "Calathea Place",
+    "slug": "calathea-place",
+    "location": "Parañaque",
+    "status": "Ready for Occupancy",
+    "price_min": 4232000,
+    "price_max": 5527000,
+    "beds": "1BR, 2BR"
+  },
+  {
+    "name": "Oak Harbor Residences",
+    "slug": "oak-harbor-residences",
+    "location": "Parañaque",
+    "status": "Ready for Occupancy",
+    "price_min": 12788000,
+    "price_max": 57288000,
+    "beds": "1BR, 2BR, 3BR, LOFT"
+  },
+  {
+    "name": "Palm Grove",
+    "slug": "palm-grove",
+    "location": "Parañaque",
+    "status": "Ready for Occupancy",
+    "price_min": 4442000,
+    "price_max": 10948000,
+    "beds": "2BR, 3BR, H&L"
+  },
+  {
+    "name": "Raya Garden Condominiums",
+    "slug": "raya-garden-condominiums",
+    "location": "Parañaque",
+    "status": "Ready for Occupancy",
+    "price_min": 4011000,
+    "price_max": 8880000,
+    "beds": "STUDIO, 2BR, 3BR"
+  },
+  {
+    "name": "Siena Park Residences",
+    "slug": "siena-park-residences",
+    "location": "Parañaque",
+    "status": "Ready for Occupancy",
+    "price_min": 5156000,
+    "price_max": 8601000,
+    "beds": "2BR, 3BR"
+  },
+  {
+    "name": "The Atherton",
+    "slug": "the-atherton",
+    "location": "Parañaque",
+    "status": "Ready for Occupancy",
+    "price_min": 4237000,
+    "price_max": 8374000,
+    "beds": "1BR, 2BR"
+  },
+  {
+    "name": "Anissa Heights",
+    "slug": "anissa-heights",
+    "location": "Pasay",
+    "status": "Pre-selling",
+    "price_min": 3098600,
+    "price_max": 3600000,
+    "beds": "STUDIO, 1BR"
+  },
+  {
+    "name": "Fairway Terraces",
+    "slug": "fairway-terraces",
+    "location": "Pasay",
+    "status": "Ready for Occupancy",
+    "price_min": 5417800,
+    "price_max": 12443430,
+    "beds": "1BR, 2BR, 3BR"
+  },
+  {
+    "name": "La Verti Residences",
+    "slug": "la-verti-residences",
+    "location": "Pasay",
+    "status": "Ready for Occupancy",
+    "price_min": 4796000,
+    "price_max": 11508000,
+    "beds": "STUDIO, 1BR, 2BR, 3BR"
+  },
+  {
+    "name": "The Aston Place",
+    "slug": "the-aston-place",
+    "location": "Pasay",
+    "status": "Ready for Occupancy",
+    "price_min": 6391000,
+    "price_max": 14429000,
+    "beds": "1BR, 2BR, 3BR"
+  },
+  {
+    "name": "Allegra Garden Place",
+    "slug": "allegra-garden-place",
+    "location": "Pasig",
+    "status": "Pre-selling",
+    "price_min": 4958000,
+    "price_max": 13889000,
+    "beds": "STUDIO, 1BR, 2BR, 3BR"
+  },
+  {
+    "name": "Brixton Place",
+    "slug": "brixton-place",
+    "location": "Pasig",
+    "status": "Ready for Occupancy",
+    "price_min": 6321000,
+    "price_max": 15671000,
+    "beds": "1BR, 2BR, 3BR"
+  },
+  {
+    "name": "East Ortigas Mansions",
+    "slug": "east-ortigas-mansions",
+    "location": "Pasig",
+    "status": "Ready for Occupancy",
+    "price_min": 4191000,
+    "price_max": 12929000,
+    "beds": "1BR, 2BR, 3BR, 4BR"
+  },
+  {
+    "name": "East Raya Gardens",
+    "slug": "east-raya-gardens",
+    "location": "Pasig",
+    "status": "Ready for Occupancy",
+    "price_min": 4932000,
+    "price_max": 9341000,
+    "beds": "2BR, 3BR"
+  },
+  {
+    "name": "Fairlane Residences",
+    "slug": "fairlane-residences",
+    "location": "Pasig",
+    "status": "Ready for Occupancy",
+    "price_min": 9585000,
+    "price_max": 17280000,
+    "beds": "2BR, 3BR"
+  },
+  {
+    "name": "Levina Place",
+    "slug": "levina-place",
+    "location": "Pasig",
+    "status": "Ready for Occupancy",
+    "price_min": 5142000,
+    "price_max": 8708000,
+    "beds": "1BR, 2BR, 3BR"
+  },
+  {
+    "name": "Lumiere Residences",
+    "slug": "lumiere-residences",
+    "location": "Pasig",
+    "status": "Ready for Occupancy",
+    "price_min": 5111000,
+    "price_max": 14266000,
+    "beds": "1BR, 2BR, 3BR"
+  },
+  {
+    "name": "Mayfield Park Residences",
+    "slug": "mayfield-park-residences",
+    "location": "Pasig",
+    "status": "Ready for Occupancy",
+    "price_min": 4177000,
+    "price_max": 6871000,
+    "beds": "2BR, 3BR"
+  },
+  {
+    "name": "Mirea Residences",
+    "slug": "mirea-residences",
+    "location": "Pasig",
+    "status": "Ready for Occupancy",
+    "price_min": 5950000,
+    "price_max": 9465000,
+    "beds": "2BR, 3BR"
+  },
+  {
+    "name": "Prisma Residences",
+    "slug": "prisma-residences",
+    "location": "Pasig",
+    "status": "Ready for Occupancy",
+    "price_min": 4701000,
+    "price_max": 12542000,
+    "beds": "1BR, 2BR, 3BR"
+  },
+  {
+    "name": "Riverfront Residences",
+    "slug": "riverfront-residences",
+    "location": "Pasig",
+    "status": "Ready for Occupancy",
+    "price_min": 5104000,
+    "price_max": 9974000,
+    "beds": "2BR, 3BR"
+  },
+  {
+    "name": "Satori Residences",
+    "slug": "satori-residences",
+    "location": "Pasig",
+    "status": "Ready for Occupancy",
+    "price_min": 4661000,
+    "price_max": 8800000,
+    "beds": "1BR, 2BR, 3BR"
+  },
+  {
+    "name": "Sheridan Towers",
+    "slug": "sheridan-towers",
+    "location": "Pasig",
+    "status": "Ready for Occupancy",
+    "price_min": 6083000,
+    "price_max": 12416000,
+    "beds": "1BR, 2BR, 3BR"
+  },
+  {
+    "name": "The Valeron Tower",
+    "slug": "the-valeron-tower",
+    "location": "Pasig",
+    "status": "Pre-selling",
+    "price_min": 6975000,
+    "price_max": 18014000,
+    "beds": "STUDIO, 1BR, 2BR, 3BR"
+  },
+  {
+    "name": "Accolade Place",
+    "slug": "accolade-place",
+    "location": "Quezon City",
+    "status": "Ready for Occupancy",
+    "price_min": 7293000,
+    "price_max": 14975000,
+    "beds": "2BR, 3BR"
+  },
+  {
+    "name": "Cameron Residences",
+    "slug": "cameron-residences",
+    "location": "Quezon City",
+    "status": "Ready for Occupancy",
+    "price_min": 5171000,
+    "price_max": 12603000,
+    "beds": "1BR, 2BR, 3BR"
+  },
+  {
+    "name": "Infina Towers",
+    "slug": "infina-towers",
+    "location": "Quezon City",
+    "status": "Ready for Occupancy",
+    "price_min": 4746000,
+    "price_max": 11042000,
+    "beds": "1BR, 2BR, 3BR"
+  },
+  {
+    "name": "Magnolia Place",
+    "slug": "magnolia-place",
+    "location": "Quezon City",
+    "status": "Ready for Occupancy",
+    "price_min": 4126000,
+    "price_max": 8538000,
+    "beds": "STUDIO, 2BR, 3BR"
+  },
+  {
+    "name": "One Castilla Place",
+    "slug": "one-castilla-place",
+    "location": "Quezon City",
+    "status": "Ready for Occupancy",
+    "price_min": 5140000,
+    "price_max": 12197000,
+    "beds": "1BR, 2BR, 3BR"
+  },
+  {
+    "name": "Stellar Place",
+    "slug": "stellar-place",
+    "location": "Quezon City",
+    "status": "Ready for Occupancy",
+    "price_min": 4446000,
+    "price_max": 10823000,
+    "beds": "STUDIO, 1BR, 2BR, 3BR"
+  },
+  {
+    "name": "The Amaryllis",
+    "slug": "the-amaryllis",
+    "location": "Quezon City",
+    "status": "Ready for Occupancy",
+    "price_min": 5106000,
+    "price_max": 15547000,
+    "beds": "2BR, 3BR, 4BR"
+  },
+  {
+    "name": "The Celandine",
+    "slug": "the-celandine",
+    "location": "Quezon City",
+    "status": "Ready for Occupancy",
+    "price_min": 4171000,
+    "price_max": 7353000,
+    "beds": "1BR, 2BR"
+  },
+  {
+    "name": "The Crestmont",
+    "slug": "the-crestmont",
+    "location": "Quezon City",
+    "status": "Ready for Occupancy",
+    "price_min": 6525000,
+    "price_max": 15718000,
+    "beds": "1BR, 2BR, 3BR"
+  },
+  {
+    "name": "The Erin Heights",
+    "slug": "the-erin-heights",
+    "location": "Quezon City",
+    "status": "Pre-selling",
+    "price_min": 4930000,
+    "price_max": 30140000,
+    "beds": "STUDIO, 2BR, 3BR"
+  },
+  {
+    "name": "The Manors at Celebrity Place",
+    "slug": "manors-celebrity-place",
+    "location": "Quezon City",
+    "status": "Ready for Occupancy",
+    "price_min": 3584000,
+    "price_max": 16445000,
+    "beds": "STUDIO, 2BR, 3BR, 4BR, H&L"
+  },
+  {
+    "name": "The Orabella",
+    "slug": "the-orabella",
+    "location": "Quezon City",
+    "status": "Ready for Occupancy",
+    "price_min": 4926000,
+    "price_max": 10564000,
+    "beds": "1BR, 2BR, 3BR"
+  },
+  {
+    "name": "The Oriana",
+    "slug": "the-oriana",
+    "location": "Quezon City",
+    "status": "Ready for Occupancy",
+    "price_min": 4678000,
+    "price_max": 10369000,
+    "beds": "STUDIO, 1BR, 2BR"
+  },
+  {
+    "name": "The Redwoods",
+    "slug": "the-redwoods",
+    "location": "Quezon City",
+    "status": "Ready for Occupancy",
+    "price_min": 4663000,
+    "price_max": 9494000,
+    "beds": "STUDIO, 2BR, 3BR"
+  },
+  {
+    "name": "Viera Residences",
+    "slug": "viera-residences",
+    "location": "Quezon City",
+    "status": "Ready for Occupancy",
+    "price_min": 4451000,
+    "price_max": 9982000,
+    "beds": "1BR, 2BR"
+  },
+  {
+    "name": "Zinnia Towers",
+    "slug": "zinnia-towers",
+    "location": "Quezon City",
+    "status": "Ready for Occupancy",
+    "price_min": 4031000,
+    "price_max": 10687000,
+    "beds": "STUDIO, 1BR, 2BR, 3BR"
+  },
+  {
+    "name": "Solmera Coast",
+    "slug": "solmera-coast",
+    "location": "San Juan, Batangas",
+    "status": "Pre-selling",
+    "price_min": 6621000,
+    "price_max": 20004000,
+    "beds": "STUDIO, 1BR, 2BR"
+  },
+  {
+    "name": "Alder Residences",
+    "slug": "alder-residences",
+    "location": "Taguig",
+    "status": "Ready for Occupancy",
+    "price_min": 8994000,
+    "price_max": 21178000,
+    "beds": "2BR, 3BR, 4BR"
+  },
+  {
+    "name": "Bonifacio Heights Condominiums",
+    "slug": "bonifacio-heights-condominiums",
+    "location": "Taguig",
+    "status": "Ready for Occupancy",
+    "price_min": 1382000,
+    "price_max": 4257000,
+    "beds": "STUDIO, 2BR, 3BR"
+  },
+  {
+    "name": "Cedar Crest",
+    "slug": "cedar-crest",
+    "location": "Taguig",
+    "status": "Ready for Occupancy",
+    "price_min": 7021000,
+    "price_max": 12044000,
+    "beds": "2BR, 3BR"
+  },
+  {
+    "name": "Cypress Towers",
+    "slug": "cypress-towers",
+    "location": "Taguig",
+    "status": "Ready for Occupancy",
+    "price_min": 3842000,
+    "price_max": 8797000,
+    "beds": "STUDIO, 2BR, 3BR"
+  },
+  {
+    "name": "Ivory Wood",
+    "slug": "ivory-wood",
+    "location": "Taguig",
+    "status": "Ready for Occupancy",
+    "price_min": 6895000,
+    "price_max": 10330000,
+    "beds": "2BR, 3BR"
+  },
+  {
+    "name": "Lakeview Manors",
+    "slug": "lakeview-manors",
+    "location": "Taguig",
+    "status": "Ready for Occupancy",
+    "price_min": 3179000,
+    "price_max": 10130000,
+    "beds": "2BR, 4BR, H&L"
+  },
+  {
+    "name": "Mahogany Place III",
+    "slug": "mahogany-place-iii",
+    "location": "Taguig",
+    "status": "Ready for Occupancy",
+    "price_min": 5625000,
+    "price_max": 61256000,
+    "beds": "H&L, LOT"
+  },
+  {
+    "name": "Maple Place",
+    "slug": "maple-place",
+    "location": "Taguig",
+    "status": "Ready for Occupancy",
+    "price_min": 7998000,
+    "price_max": 11770000,
+    "beds": "2BR, 3BR"
+  },
+  {
+    "name": "Mulberry Place",
+    "slug": "mulberry-place",
+    "location": "Taguig",
+    "status": "Ready for Occupancy",
+    "price_min": 7594000,
+    "price_max": 26361000,
+    "beds": "2BR, 3BR, 4BR"
+  },
+  {
+    "name": "Rainbow Ridge Condominiums",
+    "slug": "rainbow-ridge",
+    "location": "Taguig",
+    "status": "Ready for Occupancy",
+    "price_min": 1980000,
+    "price_max": 4607000,
+    "beds": "STUDIO, 1BR, 2BR"
+  },
+  {
+    "name": "Rosewood Pointe",
+    "slug": "rosewood-pointe",
+    "location": "Taguig",
+    "status": "Ready for Occupancy",
+    "price_min": 4955000,
+    "price_max": 11045000,
+    "beds": "STUDIO, 2BR, 3BR"
+  },
+  {
+    "name": "Royal Palm Residences",
+    "slug": "royal-palm-residences",
+    "location": "Taguig",
+    "status": "Ready for Occupancy",
+    "price_min": 5193000,
+    "price_max": 13431000,
+    "beds": "STUDIO, 1BR, 2BR, 3BR"
+  },
+  {
+    "name": "Spring Lane Homes",
+    "slug": "spring-lane-homes",
+    "location": "Taguig",
+    "status": "Ready for Occupancy",
+    "price_min": 812500,
+    "price_max": 3676000,
+    "beds": "H&L, LOT"
+  },
+  {
+    "name": "The Birchwood",
+    "slug": "the-birchwood",
+    "location": "Taguig",
+    "status": "Ready for Occupancy",
+    "price_min": 8118000,
+    "price_max": 11687000,
+    "beds": "2BR, 3BR"
+  },
+  {
+    "name": "Verawood Residences",
+    "slug": "verawood-residences",
+    "location": "Taguig",
+    "status": "Ready for Occupancy",
+    "price_min": 7992000,
+    "price_max": 10689000,
+    "beds": "2BR, 3BR"
+  },
+  {
+    "name": "Vista De Lago",
+    "slug": "vista-de-lago",
+    "location": "Taguig",
+    "status": "Ready for Occupancy",
+    "price_min": 4195000,
+    "price_max": 9695000,
+    "beds": "2BR, 3BR, 4BR"
+  }
+]

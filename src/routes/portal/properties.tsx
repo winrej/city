@@ -31,8 +31,11 @@ import {
   deleteProperty,
   togglePropertyActive,
   togglePropertyFeatured,
+  purgeDeletedProperties,
 } from "../../lib/api/admin.functions";
 import { toast } from "sonner";
+import { ProjectEditor } from "./projects";
+import { MediaPicker } from "../../components/MediaPicker";
 
 export const Route = createFileRoute("/portal/properties")({
   component: PropertiesPage,
@@ -119,217 +122,6 @@ const EMPTY_FORM: FormState = {
   featured_rank: 0,
   autoCreateProject: true,
 };
-
-function CloudinaryImageInput({
-  label,
-  value,
-  onChange,
-  aspectRatioLabel,
-  description,
-  optional = false,
-}: {
-  label: string;
-  value: string;
-  onChange: (val: string) => void;
-  aspectRatioLabel: string;
-  description?: string;
-  optional?: boolean;
-}) {
-  const [imageError, setImageError] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  // Check if it's a Cloudinary link
-  const isCloudinary = value ? value.includes("res.cloudinary.com") : false;
-
-  return (
-    <div className="portal-field">
-      <label
-        className="portal-field-label"
-        style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
-      >
-        <span>
-          {label}{" "}
-          {optional && (
-            <span style={{ color: "var(--zinc-500)", fontWeight: 400, fontSize: "11px" }}>
-              (Optional)
-            </span>
-          )}
-        </span>
-        <span
-          style={{
-            fontSize: "11px",
-            padding: "2px 6px",
-            borderRadius: "4px",
-            background: "rgba(255,255,255,0.05)",
-            border: "1px solid rgba(255,255,255,0.1)",
-            color: "var(--zinc-400)",
-            fontFamily: "monospace",
-          }}
-        >
-          {aspectRatioLabel}
-        </span>
-      </label>
-
-      <div style={{ position: "relative" }}>
-        <input
-          type="url"
-          className="portal-input"
-          style={{ paddingRight: "7.5rem" }}
-          placeholder="https://res.cloudinary.com/..."
-          value={value}
-          onChange={(e) => {
-            setImageError(false);
-            onChange(e.target.value);
-          }}
-        />
-        {value && (
-          <div
-            style={{
-              position: "absolute",
-              right: "12px",
-              top: "50%",
-              transform: "translateY(-50%)",
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            {isCloudinary ? (
-              <span
-                style={{
-                  fontSize: "10px",
-                  color: "oklch(0.65 0.18 145)",
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.05em",
-                }}
-              >
-                Cloudinary ✓
-              </span>
-            ) : (
-              <span
-                style={{
-                  fontSize: "10px",
-                  color: "oklch(0.74 0.137 79)",
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.05em",
-                }}
-              >
-                External Link
-              </span>
-            )}
-          </div>
-        )}
-      </div>
-
-      <p
-        style={{
-          fontSize: "11.5px",
-          color: "var(--zinc-400)",
-          marginTop: "0.25rem",
-          marginBottom: 0,
-          display: "flex",
-          alignItems: "center",
-          gap: "0.25rem",
-        }}
-      >
-        <span>💡</span> {description || "Please paste a direct Cloudinary image URL link."}
-      </p>
-
-      {value && (
-        <div
-          style={{
-            marginTop: "0.75rem",
-            padding: "0.5rem",
-            background: "rgba(255,255,255,0.01)",
-            border: "1px solid rgba(255,255,255,0.05)",
-            borderRadius: "10px",
-            display: "flex",
-            alignItems: "center",
-            gap: "0.75rem",
-          }}
-        >
-          <div
-            style={{
-              width: "64px",
-              height: "48px",
-              background: "rgba(0,0,0,0.2)",
-              border: "1px solid rgba(255,255,255,0.1)",
-              borderRadius: "6px",
-              overflow: "hidden",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              position: "relative",
-              flexShrink: 0,
-            }}
-          >
-            {loading && (
-              <div
-                style={{
-                  position: "absolute",
-                  inset: 0,
-                  background: "rgba(0,0,0,0.6)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "10px",
-                }}
-              >
-                ...
-              </div>
-            )}
-            <img
-              src={value}
-              alt="Preview"
-              style={{ width: "100%", height: "100%", objectFit: "cover" }}
-              onLoadStart={() => setLoading(true)}
-              onLoad={() => {
-                setImageError(false);
-                setLoading(false);
-              }}
-              onError={() => {
-                setImageError(true);
-                setLoading(false);
-              }}
-            />
-          </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            {imageError ? (
-              <p
-                style={{
-                  fontSize: "12px",
-                  color: "#f87171",
-                  fontWeight: 600,
-                  margin: 0,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.35rem",
-                }}
-              >
-                ⚠️ Could not load image. Make sure the URL is valid.
-              </p>
-            ) : (
-              <p
-                style={{
-                  fontSize: "11.5px",
-                  color: "oklch(0.65 0.18 145)",
-                  fontWeight: 600,
-                  margin: 0,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.35rem",
-                }}
-              >
-                ✓ Image loaded successfully
-              </p>
-            )}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
 
 function PropertyFormModal({
   mode,
@@ -656,12 +448,12 @@ function PropertyFormModal({
             {/* GALLERY & COVER TAB */}
             {activeTab === "gallery" && (
               <>
-                <CloudinaryImageInput
+                <MediaPicker
                   label="Listing Cover Image"
                   aspectRatioLabel="Ratio 4:3"
                   value={form.image_url || ""}
                   onChange={(val) => set("image_url", val)}
-                  description="Paste the direct Cloudinary URL link for the main cover photo (shown on the listings card)."
+                  description="Choose or paste the cover photo for the listing card."
                 />
               </>
             )}
@@ -1293,7 +1085,9 @@ function PropertiesPage() {
   const [viewMode, setViewMode] = useState<"table" | "cards">("cards");
 
   const [showCreate, setShowCreate] = useState(false);
-  const [editingProp, setEditingProp] = useState<Property | null>(null);
+  const [editingPropId, setEditingPropId] = useState<string | null>(null);
+  const [editingPropSlug, setEditingPropSlug] = useState<string | null>(null);
+  const [editingPropName, setEditingPropName] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Property | null>(null);
 
   const { data: properties, isLoading } = useQuery({
@@ -1358,30 +1152,18 @@ function PropertiesPage() {
           image_url: data.image_url || null,
         },
       }),
-    onSuccess: () => {
+    onSuccess: (inserted) => {
       qc.invalidateQueries({ queryKey: ["admin-properties"] });
       qc.invalidateQueries({ queryKey: ["public-properties"] });
       setShowCreate(false);
       toast.success("Property created successfully");
+      if (inserted) {
+        setEditingPropId(inserted.id);
+        setEditingPropSlug(inserted.slug);
+        setEditingPropName(inserted.name);
+      }
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Creation failed"),
-  });
-
-  const updateMut = useMutation({
-    mutationFn: (data: { id: string } & FormState) =>
-      updateProperty({
-        data: {
-          ...data,
-          image_url: data.image_url || null,
-        },
-      }),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["admin-properties"] });
-      qc.invalidateQueries({ queryKey: ["public-properties"] });
-      setEditingProp(null);
-      toast.success("Property updated");
-    },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Update failed"),
   });
 
   const deleteMut = useMutation({
@@ -1393,6 +1175,16 @@ function PropertiesPage() {
       toast.success("Property removed (soft deleted)");
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Delete failed"),
+  });
+
+  const purgeMut = useMutation({
+    mutationFn: () => purgeDeletedProperties(),
+    onSuccess: (res) => {
+      qc.invalidateQueries({ queryKey: ["admin-properties"] });
+      qc.invalidateQueries({ queryKey: ["public-properties"] });
+      toast.success(`Permanently purged ${res?.purged || 0} soft-deleted properties.`);
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Purge failed"),
   });
 
   const toggleActiveMut = useMutation({
@@ -1426,6 +1218,23 @@ function PropertiesPage() {
       deleted: all.filter((p) => p.is_deleted).length,
     };
   }, [properties]);
+
+  if (editingPropId && editingPropSlug && editingPropName) {
+    return (
+      <ProjectEditor
+        projectId={editingPropId}
+        slug={editingPropSlug}
+        projectTitle={editingPropName}
+        onBack={() => {
+          setEditingPropId(null);
+          setEditingPropSlug(null);
+          setEditingPropName(null);
+          qc.invalidateQueries({ queryKey: ["admin-properties"] });
+          qc.invalidateQueries({ queryKey: ["public-properties"] });
+        }}
+      />
+    );
+  }
 
   return (
     <div className="portal-page">
@@ -1534,6 +1343,35 @@ function PropertiesPage() {
             />
             Deleted
           </label>
+
+          {counts.deleted > 0 && (
+            <button
+              className="portal-btn-secondary"
+              style={{
+                color: "oklch(0.6 0.18 25)",
+                borderColor: "oklch(0.6 0.18 25 / 0.2)",
+                background: "oklch(0.6 0.18 25 / 0.05)",
+                display: "flex",
+                alignItems: "center",
+                gap: "0.4rem",
+                padding: "0.25rem 0.6rem",
+                fontSize: "11px",
+              }}
+              onClick={() => {
+                if (
+                  confirm(
+                    `Are you sure you want to permanently delete all ${counts.deleted} soft-deleted properties? This action is permanent and cannot be undone.`,
+                  )
+                ) {
+                  purgeMut.mutate();
+                }
+              }}
+              disabled={purgeMut.isPending}
+            >
+              <Trash2 size={12} />
+              Purge Deleted ({counts.deleted})
+            </button>
+          )}
         </div>
 
         {/* View Toggle */}
@@ -1714,7 +1552,11 @@ function PropertiesPage() {
                         <button
                           className="portal-icon-btn"
                           title="Edit property"
-                          onClick={() => setEditingProp(prop)}
+                          onClick={() => {
+                            setEditingPropId(prop.id);
+                            setEditingPropSlug(prop.slug);
+                            setEditingPropName(prop.name);
+                          }}
                         >
                           <Edit3 size={14} />
                         </button>
@@ -1903,7 +1745,11 @@ function PropertiesPage() {
                             <button
                               className="portal-icon-btn"
                               title="Edit property"
-                              onClick={() => setEditingProp(prop)}
+                              onClick={() => {
+                                setEditingPropId(prop.id);
+                                setEditingPropSlug(prop.slug);
+                                setEditingPropName(prop.name);
+                              }}
                             >
                               <Edit3 size={14} />
                             </button>
@@ -1952,43 +1798,6 @@ function PropertiesPage() {
           onSubmit={(data) => createMut.mutate(data)}
           isSubmitting={createMut.isPending}
           existingProperties={properties as Property[]}
-        />
-      )}
-
-      {/* Edit Modal */}
-      {editingProp && (
-        <PropertyFormModal
-          mode="edit"
-          initial={{
-            name: editingProp.name,
-            developer: editingProp.developer,
-            city: editingProp.city,
-            location: editingProp.location,
-            price_display: editingProp.price_display,
-            price_min: editingProp.price_min,
-            price_max: editingProp.price_max ?? 0,
-            price_max_display: editingProp.price_max_display ?? "",
-            status: editingProp.status,
-            beds: editingProp.beds,
-            baths: editingProp.baths,
-            area: editingProp.area,
-            unit_types: Array.isArray(editingProp.unit_types) ? editingProp.unit_types : [],
-            description: editingProp.description,
-            highlights: Array.isArray(editingProp.highlights) ? editingProp.highlights : [],
-            image_url: editingProp.image_url ?? "",
-            is_featured: editingProp.is_featured,
-            is_active: editingProp.is_active,
-            display_order: editingProp.display_order,
-            promo_badge: editingProp.promo_badge ?? "",
-            is_spotlight: editingProp.is_spotlight ?? false,
-            featured_rank: editingProp.featured_rank ?? 0,
-            autoCreateProject: false,
-          }}
-          onClose={() => setEditingProp(null)}
-          onSubmit={(data) => updateMut.mutate({ id: editingProp.id, ...data })}
-          isSubmitting={updateMut.isPending}
-          existingProperties={properties as Property[]}
-          editingId={editingProp.id}
         />
       )}
 

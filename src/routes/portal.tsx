@@ -49,6 +49,7 @@ export const Route = createFileRoute("/portal")({
 
 type NavItem = {
   label: string;
+  subtitle?: string;
   path: string;
   icon: React.ElementType;
   active: boolean;
@@ -57,16 +58,37 @@ type NavItem = {
 const navItems: NavItem[] = [
   { label: "Dashboard", path: "/portal", icon: LayoutDashboard, active: true },
   { label: "Leads", path: "/portal/leads", icon: Users, active: true },
-  { label: "Homepage Editor", path: "/portal/content", icon: Sparkles, active: true },
-  { label: "Projects", path: "/portal/projects", icon: FolderOpen, active: true },
-  { label: "Properties", path: "/portal/properties", icon: Building2, active: true },
+  {
+    label: "Site Content",
+    subtitle: "Hero, sections & site configurations",
+    path: "/portal/content",
+    icon: Sparkles,
+    active: true,
+  },
+  {
+    label: "Property Catalog",
+    subtitle: "Listing data · search & filters",
+    path: "/portal/properties",
+    icon: Building2,
+    active: true,
+  },
+  {
+    label: "Project Pages",
+    subtitle: "Full landing pages · layout builder",
+    path: "/portal/projects",
+    icon: FolderOpen,
+    active: true,
+  },
   { label: "Guides & Blog", path: "/portal/blogs", icon: BookOpen, active: true },
   { label: "FAQs", path: "/portal/faqs", icon: HelpCircle, active: true },
+  {
+    label: "Site Settings",
+    subtitle: "SEO, Contact & Social setup",
+    path: "/portal/settings",
+    icon: Settings,
+    active: true,
+  },
   { label: "Applications", path: "/portal/applications", icon: Briefcase, active: true },
-  { label: "Media", path: "/portal/media", icon: Image, active: false },
-  { label: "Marketing", path: "/portal/marketing", icon: Megaphone, active: false },
-  { label: "Users", path: "/portal/users", icon: Users, active: false },
-  { label: "Activity", path: "/portal/activity", icon: Activity, active: false },
 ];
 
 function PortalLayout() {
@@ -163,24 +185,22 @@ function PortalLayout() {
                   title={collapsed ? item.label : undefined}
                 >
                   <Icon size={18} className="portal-nav-icon" />
-                  {!collapsed && <span className="portal-nav-text">{item.label}</span>}
+                  {!collapsed && (
+                    <span className="portal-nav-text-wrap">
+                      <span className="portal-nav-text">{item.label}</span>
+                      {item.subtitle && (
+                        <span className="portal-nav-subtitle">{item.subtitle}</span>
+                      )}
+                    </span>
+                  )}
                   {active && !collapsed && <span className="portal-nav-active-dot" />}
                 </Link>
               );
             })}
           </div>
 
-          {/* Bottom: Settings + Logout */}
+          {/* Bottom: Logout */}
           <div className="portal-nav-bottom">
-            <Link
-              to="/portal/settings"
-              className={`portal-nav-item ${isActive("/portal/settings") ? "active" : ""} ${collapsed ? "collapsed" : ""}`}
-              title={collapsed ? "Settings" : undefined}
-            >
-              <Settings size={18} className="portal-nav-icon" />
-              {!collapsed && <span className="portal-nav-text">Settings</span>}
-            </Link>
-
             <button
               onClick={handleLogout}
               className={`portal-nav-item logout ${collapsed ? "collapsed" : ""}`}
