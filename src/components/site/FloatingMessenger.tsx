@@ -134,14 +134,18 @@ export function FloatingMessenger() {
     <div
       ref={cardRef}
       className={cn(
-        "fixed right-4 z-40 flex flex-col items-end gap-3 md:right-6",
+        // The container itself never catches taps — only its interactive children do.
+        // The collapsed card is opacity-0 but still occupies ~300px of layout, so an
+        // interactive container would swallow taps meant for page content beneath it
+        // (e.g. full-width featured cards on mobile, which sit under this corner box).
+        "pointer-events-none fixed right-4 z-40 flex flex-col items-end gap-3 md:right-6",
         // Sit above the mobile BottomNav on phones; comfortable corner on desktop.
         "bottom-[calc(5.5rem+env(safe-area-inset-bottom))] md:bottom-6",
         // Smoothly reveal once the home hero is scrolled past (always visible elsewhere).
         "transition-all duration-500 will-change-transform",
         revealed
           ? "translate-y-0 scale-100 opacity-100"
-          : "pointer-events-none translate-y-6 scale-95 opacity-0",
+          : "translate-y-6 scale-95 opacity-0",
       )}
       style={{ transitionTimingFunction: "var(--ease-luxe)" }}
       aria-hidden={!revealed}
@@ -204,7 +208,7 @@ export function FloatingMessenger() {
 
       {/* Teaser nudge — appears once, points to the button */}
       {nudge && !open && (
-        <div className="flex items-center gap-2">
+        <div className="pointer-events-auto flex items-center gap-2">
           <button
             type="button"
             onClick={toggle}
@@ -227,8 +231,9 @@ export function FloatingMessenger() {
         </div>
       )}
 
-      {/* Toggle FAB — real Messenger logo */}
-      <div className="relative self-end">
+      {/* Toggle FAB — real Messenger logo.
+          Interactive only once revealed, so the (opacity-0) hidden state can't catch taps. */}
+      <div className={cn("relative self-end", revealed ? "pointer-events-auto" : "pointer-events-none")}>
         {/* Pulsing attention ring (until first interaction) */}
         {!interacted && !open && (
           <span className="pointer-events-none absolute inset-0 animate-ping rounded-full bg-[#0084FF]/40" />

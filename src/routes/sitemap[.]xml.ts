@@ -6,8 +6,26 @@ const BASE_URL = "https://cityqlo.com";
 
 interface SitemapEntry {
   path: string;
-  changefreq?: "weekly" | "monthly" | "daily";
+  changefreq?: "daily" | "weekly" | "monthly" | "yearly";
   priority?: string;
+  lastmod?: string;
+}
+
+// Escape characters that are illegal in XML text / URLs inside <loc>.
+function escapeXml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
+}
+
+// Normalize any timestamp to a W3C date (YYYY-MM-DD) as Google expects for <lastmod>.
+function toLastmod(value?: string | null): string | undefined {
+  if (!value) return undefined;
+  const iso = new Date(value).toISOString();
+  return iso.slice(0, 10);
 }
 
 export const Route = createFileRoute("/sitemap.xml")({
@@ -24,42 +42,48 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/about", changefreq: "monthly", priority: "0.6" },
           { path: "/contact", changefreq: "monthly", priority: "0.6" },
           { path: "/faq", changefreq: "monthly", priority: "0.6" },
+          { path: "/careers", changefreq: "monthly", priority: "0.5" },
+          { path: "/privacy", changefreq: "yearly", priority: "0.3" },
+          { path: "/terms", changefreq: "yearly", priority: "0.3" },
         ];
 
-        let projectSlugs: string[] = [];
-        let guideSlugs: string[] = [];
+        let projects: Array<{ slug: string; updated_at?: string | null }> = [];
+        let guides: Array<{ slug: string; published_at?: string | null }> = [];
 
         try {
-          // Fetch projects
-          projectSlugs = await getPublishedProjectSlugs();
+          projects = await getPublishedProjectSlugs();
 
-          // Fetch guides (blogs)
           const blogs = await getPublicBlogs();
-          guideSlugs = (blogs || [])
-            .filter((b: any) => b.status === "published")
-            .map((b: any) => b.slug);
+          guides = (blogs || [])
+            .filter((b: any) => b.status === "published" || b.published_at)
+            .map((b: any) => ({ slug: b.slug, published_at: b.published_at }));
         } catch (error) {
           console.error("Failed to fetch slugs for sitemap:", error);
         }
 
-        const projectEntries: SitemapEntry[] = projectSlugs.map((slug) => ({
-          path: `/projects/${slug}`,
+        const projectEntries: SitemapEntry[] = projects.map((p) => ({
+          path: `/projects/${p.slug}`,
           changefreq: "weekly",
           priority: "0.8",
+          lastmod: toLastmod(p.updated_at),
         }));
 
-        const guideEntries: SitemapEntry[] = guideSlugs.map((slug) => ({
-          path: `/guides/${slug}`,
+        const guideEntries: SitemapEntry[] = guides.map((g) => ({
+          path: `/guides/${g.slug}`,
           changefreq: "weekly",
           priority: "0.7",
+          lastmod: toLastmod(g.published_at),
         }));
 
         const entries = [...staticEntries, ...projectEntries, ...guideEntries];
 
-        const urls = entries.map(
-          (e) =>
-            `  <url>\n    <loc>${BASE_URL}${e.path}</loc>\n    <changefreq>${e.changefreq}</changefreq>\n    <priority>${e.priority}</priority>\n  </url>`,
-        );
+        const urls = entries.map((e) => {
+          const parts = [`    <loc>${escapeXml(`${BASE_URL}${e.path}`)}</loc>`];
+          if (e.lastmod) parts.push(`    <lastmod>${e.lastmod}</lastmod>`);
+          if (e.changefreq) parts.push(`    <changefreq>${e.changefreq}</changefreq>`);
+          if (e.priority) parts.push(`    <priority>${e.priority}</priority>`);
+          return `  <url>\n${parts.join("\n")}\n  </url>`;
+        });
         const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join("\n")}\n</urlset>`;
         return new Response(xml, {
           headers: {

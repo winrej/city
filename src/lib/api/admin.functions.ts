@@ -891,12 +891,12 @@ export const getPublishedProjectSlugs = createServerFn({ method: "GET" }).handle
     const sb = await getServerClient();
     const { data, error } = await sb
       .from("projects")
-      .select("slug")
+      .select("slug, updated_at")
       .eq("status", "published")
       .order("updated_at", { ascending: false });
 
     if (error) throw new Error(error.message);
-    return (data || []).map((p) => p.slug);
+    return (data || []).map((p) => ({ slug: p.slug, updated_at: p.updated_at }));
   } catch (err: any) {
     console.error("getPublishedProjectSlugs error:", err);
     throw err;

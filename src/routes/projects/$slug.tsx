@@ -1337,7 +1337,7 @@ function ProjectDetailPage() {
           {/* Primary CTA */}
           <button
             id="widget-get-price-list"
-            onClick={() => openMessenger("pricelist")}
+            onClick={() => setPriceListOpen(true)}
             className={`w-full flex items-center justify-center gap-2 px-4 py-3.5 text-[12.5px] font-bold tracking-wide transition-all duration-300 cursor-pointer ${
               idlePulse
                 ? "bg-primary text-white animate-pulse"
@@ -1353,7 +1353,7 @@ function ProjectDetailPage() {
           <div className="p-3 flex flex-col gap-2">
             <button
               id="widget-free-computation"
-              onClick={() => openMessenger("computation")}
+              onClick={() => scrollToForm()}
               className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl bg-surface text-ink text-[12px] font-semibold hover:bg-border/40 transition-colors cursor-pointer"
             >
               <Zap size={13} className="text-primary" />
@@ -1361,7 +1361,7 @@ function ProjectDetailPage() {
             </button>
             <button
               id="widget-schedule-viewing"
-              onClick={() => openMessenger("viewing")}
+              onClick={() => scrollToForm()}
               className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl bg-surface text-ink text-[12px] font-semibold hover:bg-border/40 transition-colors cursor-pointer"
             >
               <Eye size={13} className="text-primary" />
