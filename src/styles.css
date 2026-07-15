@@ -2451,3 +2451,139 @@ header.fixed.inset-x-0.top-0 nav a[href="/contact"] {
   padding-bottom: 0.5rem !important;
   font-size: 13px !important;
 }
+
+/* ── Blog Editor Upgrade Styles ─────────────────────────────────────────── */
+
+.table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 1.5rem 0;
+}
+
+/* Editor Toolbar */
+.blog-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 6px 12px;
+  background: var(--portal-surface-2);
+  border-bottom: 1px solid var(--portal-border);
+}
+.blog-toolbar-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: var(--portal-text-muted);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+.blog-toolbar-btn:hover {
+  background: var(--portal-border);
+  color: var(--portal-text);
+}
+.blog-toolbar-btn-wide {
+  width: auto;
+  height: auto;
+  padding: 4px 8px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--portal-accent);
+  background: var(--portal-accent-dim);
+  border: 1px solid transparent;
+}
+.blog-toolbar-btn-wide:hover {
+  background: var(--portal-accent-dim);
+  border-color: var(--portal-accent);
+  color: var(--portal-text);
+}
+.blog-toolbar-divider {
+  width: 1px;
+  height: 16px;
+  background: var(--portal-border);
+  margin: 0 4px;
+}
+
+/* Property Shortcodes & Inline Placeholders */
+.property-shortcode-placeholder {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--portal-accent-dim);
+  border: 1px solid var(--portal-accent);
+  color: var(--portal-accent);
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.property-shortcode-card {
+  display: flex;
+  max-width: 440px;
+  margin: 1.5rem 0;
+  border: 1px solid var(--border, oklch(0.9 0.01 252));
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--surface, #fff);
+  text-decoration: none !important;
+  color: inherit !important;
+  transition:
+    transform 300ms var(--ease-luxe, cubic-bezier(0.22, 1, 0.36, 1)),
+    box-shadow 300ms var(--ease-luxe, cubic-bezier(0.22, 1, 0.36, 1)),
+    border-color 300ms ease;
+}
+.property-shortcode-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px -10px oklch(0 0 0 / 0.08);
+  border-color: var(--ink, oklch(0.21 0.012 252));
+}
+
+.property-card-img {
+  width: 140px;
+  height: 105px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border-right: 1px solid var(--border, oklch(0.9 0.01 252));
+}
+
+.property-card-body {
+  display: flex;
+  flex-direction: column;
+  padding: 0.875rem 1rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.property-card-name {
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--ink, oklch(0.21 0.012 252));
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.property-card-location {
+  font-size: 0.7rem;
+  color: var(--muted-foreground, oklch(0.62 0.012 252));
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.property-card-price {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--primary, oklch(0.43 0.2 258));
+  margin-top: auto;
+}

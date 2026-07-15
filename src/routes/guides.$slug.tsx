@@ -1,10 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { getPublicBlogBySlug } from "@/lib/api/admin.functions";
+import { useEffect, useState, useMemo } from "react";
+import { getPublicBlogBySlug, getPublicProperties } from "@/lib/api/admin.functions";
 import { Share2, Link2, Check, Facebook, Linkedin, Send } from "lucide-react";
 import { BreadcrumbJsonLd } from "../components/site/BreadcrumbJsonLd";
 import { FaqJsonLd, extractFaqs } from "../components/site/FaqJsonLd";
+import { BlogPostingJsonLd } from "../components/site/BlogPostingJsonLd";
+import { markdownToHtml } from "../lib/markdown";
 
 // Normalize any cover image into a crisp 1200×630 (1.91:1) social-share preview.
 // Handles the two sources used across the site — Unsplash and Cloudinary — and
@@ -116,117 +118,6 @@ function formatDate(iso?: string | null) {
     month: "long",
     day: "numeric",
   }).format(new Date(iso));
-}
-
-// Lightweight Markdown → HTML renderer (no dependencies)
-function markdownToHtml(md: string): string {
-  if (!md) return "";
-
-  // Helper to slugify heading text for ID
-  const slugify = (text: string) =>
-    text
-      .toLowerCase()
-      .trim()
-      .replace(/[^\w\s-]/g, "")
-      .replace(/\s+/g, "-");
-
-  let html = md
-    .replace(/\r\n/g, "\n")
-    .replace(/\r/g, "\n")
-    // Escape HTML tags in content
-    .replace(/&/g, "&amp;")
-    .replace(/<(?!\/?(br|b|i|em|strong|code|a)\b)/g, "&lt;")
-    // Headings with IDs
-    .replace(/^###### (.+)$/gm, (_, t) => `<h6 id="${slugify(t)}">${t}</h6>`)
-    .replace(/^##### (.+)$/gm, (_, t) => `<h5 id="${slugify(t)}">${t}</h5>`)
-    .replace(/^#### (.+)$/gm, (_, t) => `<h4 id="${slugify(t)}">${t}</h4>`)
-    .replace(/^### (.+)$/gm, (_, t) => `<h3 id="${slugify(t)}">${t}</h3>`)
-    .replace(/^## (.+)$/gm, (_, t) => `<h2 id="${slugify(t)}">${t}</h2>`)
-    .replace(/^# (.+)$/gm, (_, t) => `<h1 id="${slugify(t)}">${t}</h1>`)
-    // Blockquote (accept literal ">" — it is not escaped above)
-    .replace(/^(?:&gt;|>) (.+)$/gm, "<blockquote>$1</blockquote>")
-    // Code blocks
-    .replace(/```[\w]*\n?([\s\S]*?)```/gm, "<pre><code>$1</code></pre>")
-    // Inline code
-    .replace(/`([^`]+)`/g, "<code>$1</code>")
-    // Bold + Italic
-    .replace(/\*\*\*(.+?)\*\*\*/g, "<strong><em>$1</em></strong>")
-    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-    .replace(/\*(.+?)\*/g, "<em>$1</em>")
-    .replace(/__(.+?)__/g, "<strong>$1</strong>")
-    .replace(/_(.+?)_/g, "<em>$1</em>")
-    // Horizontal rule
-    .replace(/^---$/gm, "<hr />")
-    // Unordered list items
-    .replace(/^[-*] (.+)$/gm, "<li>$1</li>")
-    // Ordered list items
-    .replace(/^\d+\. (.+)$/gm, "<li>$1</li>")
-    // Links — internal (/ or #) open in the same tab; external open in a new tab
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_m: string, text: string, href: string) =>
-      /^(\/|#)/.test(href)
-        ? `<a href="${href}">${text}</a>`
-        : `<a href="${href}" target="_blank" rel="noopener noreferrer">${text}</a>`,
-    );
-
-  // GFM tables → <table> (must run before paragraph/line-break processing,
-  // while table rows still occupy their own newline-separated lines)
-  html = html.replace(/^\|.+\|[ \t]*\n\|[ \t:|-]+\|[ \t]*\n(?:\|.+\|[ \t]*\n?)+/gm, (block) => {
-    const lines = block.trim().split("\n");
-    const splitRow = (row: string) =>
-      row
-        .replace(/^\s*\|/, "")
-        .replace(/\|\s*$/, "")
-        .split("|")
-        .map((c) => c.trim());
-    const head = splitRow(lines[0])
-      .map((c) => `<th>${c}</th>`)
-      .join("");
-    const body = lines
-      .slice(2)
-      .map(
-        (r) =>
-          "<tr>" +
-          splitRow(r)
-            .map((c) => `<td>${c}</td>`)
-            .join("") +
-          "</tr>",
-      )
-      .join("");
-    return `<table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
-  });
-
-  html = html
-    // Line breaks / paragraphs
-    .replace(/\n\n/g, "</p><p>")
-    .replace(/\n/g, "<br />");
-
-  // Wrap loose text in paragraphs
-  html = `<p>${html}</p>`;
-
-  // Wrap consecutive <li> items
-  html = html
-    .replace(/(<li>[\s\S]*?<\/li>)(?=\s*<li>)/g, "$1")
-    .replace(/(<li>[\s\S]*?<\/li>)/g, (match) => `<ul>${match}</ul>`);
-
-  // Clean up empty paragraphs
-  html = html
-    .replace(/<p>\s*<\/p>/g, "")
-    .replace(/<p>(<h[1-6]>)/g, "$1")
-    .replace(/(<\/h[1-6]>)<\/p>/g, "$1")
-    .replace(/<p>(<blockquote>)/g, "$1")
-    .replace(/(<\/blockquote>)<\/p>/g, "$1")
-    .replace(/<p>(<pre>)/g, "$1")
-    .replace(/(<\/pre>)<\/p>/g, "$1")
-    .replace(/<p>(<ul>)/g, "$1")
-    .replace(/(<\/ul>)<\/p>/g, "$1")
-    .replace(/<p>(<hr\s*\/>)<\/p>/g, "$1")
-    // Tables: strip wrapping paragraphs and any stray line-breaks around them
-    .replace(/<p>(<table>)/g, "$1")
-    .replace(/(<\/table>)<\/p>/g, "$1")
-    .replace(/<br \/>(<table>)/g, "$1")
-    .replace(/(<\/table>)<br \/>/g, "$1");
-
-  return html;
 }
 
 function ScrollProgress() {
@@ -381,6 +272,23 @@ function BlogPost() {
     retry: false,
   });
 
+  // Query active properties for expanding shortcodes
+  const { data: properties } = useQuery({
+    queryKey: ["public-properties"],
+    queryFn: () => getPublicProperties(),
+    staleTime: 5 * 60_000,
+  });
+
+  const propertyMap = useMemo(() => {
+    const map = new Map<string, any>();
+    if (properties) {
+      properties.forEach((p: any) => {
+        map.set(p.slug, p);
+      });
+    }
+    return map;
+  }, [properties]);
+
   if (isLoading) {
     return (
       <div className="min-h-screen px-4 pt-32">
@@ -420,7 +328,7 @@ function BlogPost() {
     );
   }
 
-  const htmlContent = markdownToHtml(post.content ?? "");
+  const htmlContent = markdownToHtml(post.content ?? "", { properties: propertyMap });
   const faqs = extractFaqs(post.content ?? "");
 
   return (
@@ -431,6 +339,14 @@ function BlogPost() {
           { name: "Guides", href: "/guides" },
           { name: post.title, href: `/guides/${post.slug}` },
         ]}
+      />
+      <BlogPostingJsonLd
+        headline={post.title}
+        excerpt={post.excerpt}
+        coverImageUrl={post.cover_image_url}
+        datePublished={post.published_at}
+        url={`https://cityqlo.com/guides/${post.slug}`}
+        wordCount={post.content ? post.content.split(/\s+/).length : undefined}
       />
       <FaqJsonLd items={faqs} />
       <ScrollProgress />

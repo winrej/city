@@ -143,9 +143,7 @@ export function FloatingMessenger() {
         "bottom-[calc(5.5rem+env(safe-area-inset-bottom))] md:bottom-6",
         // Smoothly reveal once the home hero is scrolled past (always visible elsewhere).
         "transition-all duration-500 will-change-transform",
-        revealed
-          ? "translate-y-0 scale-100 opacity-100"
-          : "translate-y-6 scale-95 opacity-0",
+        revealed ? "translate-y-0 scale-100 opacity-100" : "translate-y-6 scale-95 opacity-0",
       )}
       style={{ transitionTimingFunction: "var(--ease-luxe)" }}
       aria-hidden={!revealed}
@@ -233,7 +231,12 @@ export function FloatingMessenger() {
 
       {/* Toggle FAB — real Messenger logo.
           Interactive only once revealed, so the (opacity-0) hidden state can't catch taps. */}
-      <div className={cn("relative self-end", revealed ? "pointer-events-auto" : "pointer-events-none")}>
+      <div
+        className={cn(
+          "relative self-end",
+          revealed ? "pointer-events-auto" : "pointer-events-none",
+        )}
+      >
         {/* Pulsing attention ring (until first interaction) */}
         {!interacted && !open && (
           <span className="pointer-events-none absolute inset-0 animate-ping rounded-full bg-[#0084FF]/40" />

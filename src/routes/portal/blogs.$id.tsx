@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import {
   Save,
   ArrowLeft,
@@ -15,89 +15,23 @@ import {
   AlertCircle,
   CheckCircle,
 } from "lucide-react";
-import { getAdminBlogById, createBlog, updateBlog } from "../../lib/api/admin.functions";
+import {
+  getAdminBlogById,
+  createBlog,
+  updateBlog,
+  getPublicProperties,
+} from "../../lib/api/admin.functions";
 import { toast } from "sonner";
 import { MediaPicker } from "../../components/MediaPicker";
+import { markdownToHtml } from "../../lib/markdown";
+import { EditorToolbar } from "../../components/blog/EditorToolbar";
+import { SeoScore } from "../../components/blog/SeoScore";
+import { Readability } from "../../components/blog/Readability";
+import { LinkSuggestions } from "../../components/blog/LinkSuggestions";
 
 export const Route = createFileRoute("/portal/blogs/$id")({
   component: BlogEditor,
 });
-
-// Lightweight Markdown → HTML renderer (mirrors the public reader)
-function mdToHtml(md: string): string {
-  if (!md) return "";
-  let html = md
-    .replace(/\r\n/g, "\n")
-    .replace(/\r/g, "\n")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/^###### (.+)$/gm, "<h6>$1</h6>")
-    .replace(/^##### (.+)$/gm, "<h5>$1</h5>")
-    .replace(/^#### (.+)$/gm, "<h4>$1</h4>")
-    .replace(/^### (.+)$/gm, "<h3>$1</h3>")
-    .replace(/^## (.+)$/gm, "<h2>$1</h2>")
-    .replace(/^# (.+)$/gm, "<h1>$1</h1>")
-    .replace(/^&gt; (.+)$/gm, "<blockquote>$1</blockquote>")
-    .replace(/```[\w]*\n?([\s\S]*?)```/gm, "<pre><code>$1</code></pre>")
-    .replace(/`([^`]+)`/g, "<code>$1</code>")
-    .replace(/\*\*\*(.+?)\*\*\*/g, "<strong><em>$1</em></strong>")
-    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-    .replace(/\*(.+?)\*/g, "<em>$1</em>")
-    .replace(/__(.+?)__/g, "<strong>$1</strong>")
-    .replace(/_(.+?)_/g, "<em>$1</em>")
-    .replace(/^---$/gm, "<hr />")
-    .replace(/^[-*] (.+)$/gm, "<li>$1</li>")
-    .replace(/^\d+\. (.+)$/gm, "<li>$1</li>")
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
-
-  // GFM tables → <table> (must run before paragraph/line-break processing)
-  html = html.replace(/^\|.+\|[ \t]*\n\|[ \t:|-]+\|[ \t]*\n(?:\|.+\|[ \t]*\n?)+/gm, (block) => {
-    const lines = block.trim().split("\n");
-    const splitRow = (row: string) =>
-      row
-        .replace(/^\s*\|/, "")
-        .replace(/\|\s*$/, "")
-        .split("|")
-        .map((c) => c.trim());
-    const head = splitRow(lines[0])
-      .map((c) => `<th>${c}</th>`)
-      .join("");
-    const body = lines
-      .slice(2)
-      .map(
-        (r) =>
-          "<tr>" +
-          splitRow(r)
-            .map((c) => `<td>${c}</td>`)
-            .join("") +
-          "</tr>",
-      )
-      .join("");
-    return `<table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
-  });
-
-  html = html.replace(/\n\n/g, "</p><p>").replace(/\n/g, "<br />");
-
-  html = `<p>${html}</p>`;
-  html = html
-    .replace(/(<li>[\s\S]*?<\/li>)/g, (m) => `<ul>${m}</ul>`)
-    .replace(/<p>\s*<\/p>/g, "")
-    .replace(/<p>(<h[1-6]>)/g, "$1")
-    .replace(/(<\/h[1-6]>)<\/p>/g, "$1")
-    .replace(/<p>(<blockquote>)/g, "$1")
-    .replace(/(<\/blockquote>)<\/p>/g, "$1")
-    .replace(/<p>(<pre>)/g, "$1")
-    .replace(/(<\/pre>)<\/p>/g, "$1")
-    .replace(/<p>(<ul>)/g, "$1")
-    .replace(/(<\/ul>)<\/p>/g, "$1")
-    .replace(/<p>(<hr\s*\/>)<\/p>/g, "$1")
-    .replace(/<p>(<table>)/g, "$1")
-    .replace(/(<\/table>)<\/p>/g, "$1")
-    .replace(/<br \/>(<table>)/g, "$1")
-    .replace(/(<\/table>)<br \/>/g, "$1");
-  return html;
-}
 
 function slugify(str: string) {
   return str
@@ -140,6 +74,9 @@ function BlogEditor() {
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [tagInput, setTagInput] = useState("");
   const [showPreview, setShowPreview] = useState(false);
+  const [previewDevice, setPreviewDevice] = useState<"desktop" | "tablet" | "mobile">("desktop");
+  const [showPropertyPicker, setShowPropertyPicker] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const [slugLocked, setSlugLocked] = useState(!isNew);
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
 
@@ -147,6 +84,96 @@ function BlogEditor() {
   const [autoSaveStatus, setAutoSaveStatus] = useState<"idle" | "saving" | "saved" | "error">(
     "idle",
   );
+
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  // Fetch active properties list for shortcode expansion
+  const { data: properties } = useQuery({
+    queryKey: ["public-properties"],
+    queryFn: () => getPublicProperties(),
+    staleTime: 5 * 60_000,
+  });
+
+  const propertyMap = useMemo(() => {
+    const map = new Map<string, any>();
+    if (properties) {
+      properties.forEach((p: any) => {
+        map.set(p.slug, p);
+      });
+    }
+    return map;
+  }, [properties]);
+
+  const uploadImageToCloudinary = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "cityqlo_blog_unsigned");
+
+    const response = await fetch("https://api.cloudinary.com/v1_1/dcnohpztl/image/upload", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error(errText || "Upload failed");
+    }
+
+    const data = await response.json();
+    let url = data.secure_url || data.url;
+    if (url && url.includes("res.cloudinary.com") && url.includes("/upload/")) {
+      url = url.replace("/upload/", "/upload/f_auto,q_auto/");
+    }
+    return url;
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+
+    const files = Array.from(e.dataTransfer.files);
+    const imgFile = files.find((f) => f.type.startsWith("image/"));
+    if (!imgFile) return;
+
+    const toastId = toast.loading("Uploading image to Cloudinary...");
+    try {
+      const url = await uploadImageToCloudinary(imgFile);
+      const el = textareaRef.current;
+      if (el) {
+        const start = el.selectionStart;
+        const end = el.selectionEnd;
+        const value = el.value;
+        const before = value.slice(0, start);
+        const after = value.slice(end);
+        const imgMarkdown = `![${imgFile.name.split(".")[0]}](${url})`;
+        const newValue = before + imgMarkdown + after;
+        set("content", newValue);
+        toast.success("Image uploaded and inserted!", { id: toastId });
+        setTimeout(() => {
+          el.focus();
+          el.setSelectionRange(
+            before.length + imgMarkdown.length,
+            before.length + imgMarkdown.length,
+          );
+        }, 50);
+      }
+    } catch (err: any) {
+      console.error(err);
+      toast.error(
+        "Failed to upload image. Make sure the unsigned preset 'cityqlo_blog_unsigned' exists.",
+        { id: toastId },
+      );
+    }
+  };
 
   // Page close unsaved warning
   useEffect(() => {
@@ -299,7 +326,7 @@ function BlogEditor() {
   };
 
   const isSaving = saveMutation.isPending;
-  const previewHtml = mdToHtml(form.content);
+  const previewHtml = markdownToHtml(form.content, { properties: propertyMap });
 
   if (isLoading) {
     return (
@@ -485,49 +512,86 @@ function BlogEditor() {
           </div>
 
           {/* Editor / Preview toggle */}
-          <div className="portal-card" style={{ overflow: "hidden" }}>
+          <div className="portal-card" style={{ overflow: "hidden", position: "relative" }}>
             {/* Tab bar */}
             <div
               style={{
                 display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
                 borderBottom: "1px solid var(--portal-border)",
                 padding: "0 1rem",
               }}
             >
-              {["Markdown", "Preview"].map((tab) => {
-                const isActive = tab === "Preview" ? showPreview : !showPreview;
-                return (
-                  <button
-                    key={tab}
-                    onClick={() => setShowPreview(tab === "Preview")}
-                    style={{
-                      padding: "0.75rem 1rem",
-                      fontSize: "0.75rem",
-                      fontWeight: 600,
-                      background: "none",
-                      border: "none",
-                      borderBottom: isActive
-                        ? "2px solid var(--portal-accent)"
-                        : "2px solid transparent",
-                      color: isActive ? "var(--portal-accent)" : "var(--portal-text-muted)",
-                      cursor: "pointer",
-                      transition: "all 200ms ease",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "6px",
-                    }}
-                  >
-                    {tab === "Markdown" ? <FileText size={13} /> : <Eye size={13} />}
-                    {tab}
-                  </button>
-                );
-              })}
+              <div style={{ display: "flex" }}>
+                {["Markdown", "Preview"].map((tab) => {
+                  const isActive = tab === "Preview" ? showPreview : !showPreview;
+                  return (
+                    <button
+                      key={tab}
+                      onClick={() => setShowPreview(tab === "Preview")}
+                      style={{
+                        padding: "0.75rem 1rem",
+                        fontSize: "0.75rem",
+                        fontWeight: 600,
+                        background: "none",
+                        border: "none",
+                        borderBottom: isActive
+                          ? "2px solid var(--portal-accent)"
+                          : "2px solid transparent",
+                        color: isActive ? "var(--portal-accent)" : "var(--portal-text-muted)",
+                        cursor: "pointer",
+                        transition: "all 200ms ease",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "6px",
+                      }}
+                    >
+                      {tab === "Markdown" ? <FileText size={13} /> : <Eye size={13} />}
+                      {tab}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {showPreview && (
+                <div style={{ display: "flex", gap: "4px", padding: "4px 0" }}>
+                  {(["desktop", "tablet", "mobile"] as const).map((device) => (
+                    <button
+                      key={device}
+                      onClick={() => setPreviewDevice(device)}
+                      style={{
+                        padding: "2px 8px",
+                        fontSize: "0.65rem",
+                        fontWeight: 600,
+                        borderRadius: "4px",
+                        border: "none",
+                        background:
+                          previewDevice === device ? "var(--portal-accent-dim)" : "transparent",
+                        color:
+                          previewDevice === device
+                            ? "var(--portal-accent)"
+                            : "var(--portal-text-muted)",
+                        cursor: "pointer",
+                        textTransform: "capitalize",
+                      }}
+                    >
+                      {device}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             {showPreview ? (
               /* Preview pane */
               <div
-                style={{ padding: "1.5rem", minHeight: "520px", background: "oklch(1 0 0 / 0.03)" }}
+                style={{
+                  padding: "1.5rem",
+                  minHeight: "520px",
+                  background: "oklch(1 0 0 / 0.03)",
+                  overflowX: "auto",
+                }}
               >
                 {form.content ? (
                   <div
@@ -538,6 +602,19 @@ function BlogEditor() {
                         "--muted-foreground": "var(--portal-text-muted)",
                         "--ink": "var(--portal-text)",
                         "--surface": "var(--portal-surface-2)",
+                        maxWidth:
+                          previewDevice === "desktop"
+                            ? "100%"
+                            : previewDevice === "tablet"
+                              ? "768px"
+                              : "375px",
+                        margin: "0 auto",
+                        transition: "max-width 300ms cubic-bezier(0.22, 1, 0.36, 1)",
+                        borderLeft:
+                          previewDevice !== "desktop" ? "1px solid var(--portal-border)" : "none",
+                        borderRight:
+                          previewDevice !== "desktop" ? "1px solid var(--portal-border)" : "none",
+                        padding: previewDevice !== "desktop" ? "0 1rem" : "0",
                       } as any
                     }
                     dangerouslySetInnerHTML={{ __html: previewHtml }}
@@ -551,20 +628,54 @@ function BlogEditor() {
             ) : (
               /* Editor pane */
               <div style={{ position: "relative" }}>
+                <EditorToolbar
+                  textareaRef={textareaRef}
+                  onChange={(v) => set("content", v)}
+                  onInsertProperty={() => setShowPropertyPicker(true)}
+                />
+
                 <textarea
+                  ref={textareaRef}
                   id="blog-content-textarea"
                   className="blog-editor-textarea"
                   value={form.content}
                   onChange={(e) => set("content", e.target.value)}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
                   placeholder="Write your guide in Markdown…"
                   style={{
                     minHeight: "520px",
                     borderRadius: 0,
                     border: "none",
                     borderTop: errors.content ? "2px solid oklch(0.6 0.18 25)" : "none",
+                    background: isDragging ? "oklch(0.6 0.18 258 / 0.05)" : undefined,
+                    transition: "background-color 200ms ease",
                   }}
                   spellCheck
                 />
+
+                {isDragging && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      border: "2px dashed var(--portal-accent)",
+                      pointerEvents: "none",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      background: "oklch(0.12 0.01 252 / 0.8)",
+                      color: "var(--portal-accent)",
+                      fontSize: "1.1rem",
+                      fontWeight: 700,
+                      zIndex: 5,
+                    }}
+                  >
+                    Drop image to upload to Cloudinary
+                  </div>
+                )}
+
                 {/* Markdown hint */}
                 <div
                   style={{
@@ -905,6 +1016,24 @@ function BlogEditor() {
             />
           </div>
 
+          {/* SEO Score Panel */}
+          <SeoScore
+            title={form.title}
+            excerpt={form.excerpt}
+            slug={form.slug}
+            content={form.content}
+          />
+
+          {/* Readability Panel */}
+          <Readability content={form.content} />
+
+          {/* Link Suggestions Panel */}
+          <LinkSuggestions
+            content={form.content}
+            textareaRef={textareaRef}
+            onChange={(v) => set("content", v)}
+          />
+
           {/* Save summary */}
           {saveMutation.isSuccess && (
             <div
@@ -926,6 +1055,126 @@ function BlogEditor() {
           )}
         </div>
       </div>
+
+      {/* Property Picker Overlay */}
+      {showPropertyPicker && (
+        <div
+          className="portal-overlay"
+          style={{ zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center" }}
+        >
+          <div
+            className="portal-card"
+            style={{
+              width: "420px",
+              padding: "1.5rem",
+              background: "var(--portal-surface)",
+              color: "var(--portal-text)",
+            }}
+          >
+            <div className="portal-card-header" style={{ marginBottom: "1rem" }}>
+              <div className="portal-card-title">Insert Property Shortcode</div>
+              <button
+                onClick={() => setShowPropertyPicker(false)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  color: "var(--portal-text-muted)",
+                  cursor: "pointer",
+                }}
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <p
+              style={{
+                fontSize: "0.75rem",
+                color: "var(--portal-text-muted)",
+                marginBottom: "1rem",
+              }}
+            >
+              Select a property to insert into the blog post. This will generate a{" "}
+              <code>::property[slug]::</code> card in the reader.
+            </p>
+
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.5rem",
+                maxHeight: "300px",
+                overflowY: "auto",
+              }}
+            >
+              {!properties || properties.length === 0 ? (
+                <p
+                  style={{
+                    fontSize: "0.75rem",
+                    color: "var(--portal-text-muted)",
+                    fontStyle: "italic",
+                  }}
+                >
+                  No active properties found.
+                </p>
+              ) : (
+                properties.map((p: any) => (
+                  <button
+                    key={p.id}
+                    onClick={() => {
+                      const el = textareaRef.current;
+                      if (el) {
+                        const start = el.selectionStart;
+                        const end = el.selectionEnd;
+                        const value = el.value;
+                        const before = value.slice(0, start);
+                        const after = value.slice(end);
+                        const shortcode = `::property[${p.slug}]::`;
+                        set("content", before + shortcode + after);
+                        setShowPropertyPicker(false);
+                        setTimeout(() => {
+                          el.focus();
+                          el.setSelectionRange(
+                            before.length + shortcode.length,
+                            before.length + shortcode.length,
+                          );
+                        }, 50);
+                      }
+                    }}
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "flex-start",
+                      width: "100%",
+                      padding: "8px 12px",
+                      borderRadius: "6px",
+                      background: "var(--portal-surface-2)",
+                      border: "1px solid var(--portal-border)",
+                      textAlign: "left",
+                      cursor: "pointer",
+                      gap: "2px",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.borderColor = "var(--portal-accent)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.borderColor = "var(--portal-border)";
+                    }}
+                  >
+                    <span
+                      style={{ fontSize: "0.8rem", fontWeight: 700, color: "var(--portal-text)" }}
+                    >
+                      {p.name}
+                    </span>
+                    <span style={{ fontSize: "0.65rem", color: "var(--portal-text-muted)" }}>
+                      slug: {p.slug} {p.location ? `· ${p.location}` : ""}
+                    </span>
+                  </button>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
